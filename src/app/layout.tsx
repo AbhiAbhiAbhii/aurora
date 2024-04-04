@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import localFont from "next/font/local"
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const GeistVariable = localFont({
+  src:'../../public/fonts/GeistVariableVF.woff2',
+  weight: '400',
+  variable: '--font-geist'
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body 
+        className={`${GeistVariable.variable} ${inter.variable}`}
+      >
+        {children}
+      </body>    
     </html>
   );
 }
