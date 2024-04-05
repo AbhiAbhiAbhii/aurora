@@ -7,12 +7,11 @@ type Props = {
 
 const AuroraText = ({ text, className, data }: Props) => {
 
-    console.log(data, "Hello")
 
   return (
     <div className={className}>
         <p>
-            { text }
+          { text }
         </p>
     </div>
   )
