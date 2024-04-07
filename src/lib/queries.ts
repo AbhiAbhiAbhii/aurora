@@ -8,5 +8,5 @@ export const getCompanyDetails = async () => {
 }
 
 export const getUserDetails = async () => {
-    return
+    
 }

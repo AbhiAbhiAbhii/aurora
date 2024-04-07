@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { createClient } from '@/utils/supabase/client'
+import { SignUp } from '@/app/login/sign-up'
 
 type Props = {}
 // Define our Form Schema/data type
@@ -21,10 +21,8 @@ const FormSchema = z.object({
     })
 })
 
-const InputCredentialsForm = (props: Props) => {   
+const LoginForm = (props: Props) => {   
     
-    const supabase = createClient()
-
     // 1. Define our form
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -34,15 +32,19 @@ const InputCredentialsForm = (props: Props) => {
         }
     })
 
-    const handleSubmit = async (value: z.infer<typeof FormSchema>) => {
-        try {
-            const supabase = createClient()
-            await supabase.from("user_details").insert({useremail: value.email, userpassword: value.password})
-            throw new Error("Something went WONG!")
-        } catch(error) {
-            console.log(error)
-        }
-
+    const handleSignIn = async (values: z.infer<typeof FormSchema>) => {
+        // try {
+        //     const supabase = createClient()
+        //     await supabase.from("user_details").insert({useremail: value.email, userpassword: value.password})
+        //     throw new Error("Something went WONG!")
+        // } catch(error) {
+        //     console.log(error)
+        // }
+        const {email, password} = values
+        SignUp(
+            email,
+            password
+        )
     }
 
 
@@ -66,7 +68,7 @@ const InputCredentialsForm = (props: Props) => {
         <CardContent>
             <Form {...form}>
                 <form 
-                    onSubmit={form.handleSubmit(handleSubmit)} 
+                    onSubmit={form.handleSubmit(handleSignIn)} 
                     className='flex flex-col gap-4'
                 >
                     <FormField 
@@ -95,18 +97,17 @@ const InputCredentialsForm = (props: Props) => {
                                     <Input 
                                         {...field}
                                         type='password'
-                                        placeholder='password' 
                                     />
                                 </FormControl>
                                 <FormMessage className='font-geist' />
                             </FormItem>
                         )}
                     />
-                    <Button 
+                    <Button
                         type='submit'
-                        className='w-full mt-4'
+                        className='w-full'
                     >
-                        Submit
+                        Sign-up
                     </Button>
                 </form>
             </Form>
@@ -115,4 +116,4 @@ const InputCredentialsForm = (props: Props) => {
   )
 }
 
-export default InputCredentialsForm
+export default LoginForm

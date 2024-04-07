@@ -1,20 +1,23 @@
-import InputCredentialsForm from "@/components/forms/input-credentials-form";
-import AuroraText from "@/components/global/aurora-text";
-import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from "next/navigation"
 
 export default async function Home() {
 
-  // redirect("/login")
+  const supabase = createClient()
+
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if(!session) {
+    redirect('/login')
+  }
+
+  console.log(session, "my session")
 
   return (
     <main className="flex flex-col items-center justify-start min-h-screen w-screen py-16 overflow-hidden">
-      <AuroraText 
-        text="Aurora"
-        className="font-geist text-6xl"
-      />
-      <div className="mt mt-32">
-        <InputCredentialsForm />
-      </div>
+      <p>
+        Hello user
+      </p>
     </main>
   )
 }
