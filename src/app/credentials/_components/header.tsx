@@ -45,13 +45,10 @@ const Header = () => {
                         <AlertDialogCancel>
                             Cancel
                         </AlertDialogCancel>
-                        <AlertDialogAction>
-                            <Button 
-                                className='!w-full'
-                                onClick={() => handleSignOut()}
-                            >
-                                SignOut
-                            </Button>
+                        <AlertDialogAction 
+                            onClick={() => handleSignOut()}
+                        >
+                            SignOut
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
