@@ -6,8 +6,8 @@ type Props = {}
 const LoginPage = (props: Props) => {
 
   return (
-    <main className="flex flex-col items-center justify-start min-h-screen w-screen py-16 overflow-hidden">
-      <div className="mt mt-32">
+    <main className="flex flex-col items-center justify-center h-screen w-full overflow-hidden">
+      <div className="w-full">
         <LoginForm />
       </div>
     </main>

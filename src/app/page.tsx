@@ -11,13 +11,5 @@ export default async function Home() {
     redirect('/login')
   }
 
-  console.log(session, "my session")
-
-  return (
-    <main className="flex flex-col items-center justify-start min-h-screen w-screen py-16 overflow-hidden">
-      <p>
-        Hello user
-      </p>
-    </main>
-  )
+  redirect('/credentials')
 }

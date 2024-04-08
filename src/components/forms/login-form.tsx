@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { SignUp } from '@/app/login/sign-up'
+import { Login, SignUp } from '@/app/login/actions'
 
 type Props = {}
 // Define our Form Schema/data type
@@ -32,7 +32,7 @@ const LoginForm = (props: Props) => {
         }
     })
 
-    const handleSignIn = async (values: z.infer<typeof FormSchema>) => {
+    const handleLogin = async (values: z.infer<typeof FormSchema>) => {
         // try {
         //     const supabase = createClient()
         //     await supabase.from("user_details").insert({useremail: value.email, userpassword: value.password})
@@ -41,34 +41,32 @@ const LoginForm = (props: Props) => {
         //     console.log(error)
         // }
         const {email, password} = values
-        SignUp(
+        Login(
             email,
             password
         )
     }
 
-
-
   return (
-    <Card className='w-[407px]'>
+    <Card className='w-[90%] mx-auto md:w-[412px]'>
         <CardHeader 
             className='py-4'
         >
             <CardTitle
                 className='font-geist py-2'
             >
-                Add Credentials
+                Login to Aurora
             </CardTitle>
             <CardDescription
                 className='font-geist py-2'
             >
-                Enter new credentials
+                Enter your email below to continue.
             </CardDescription>
         </CardHeader>
         <CardContent>
             <Form {...form}>
                 <form 
-                    onSubmit={form.handleSubmit(handleSignIn)} 
+                    onSubmit={form.handleSubmit(handleLogin)} 
                     className='flex flex-col gap-4'
                 >
                     <FormField 
@@ -107,7 +105,7 @@ const LoginForm = (props: Props) => {
                         type='submit'
                         className='w-full'
                     >
-                        Sign-up
+                        Continue
                     </Button>
                 </form>
             </Form>
