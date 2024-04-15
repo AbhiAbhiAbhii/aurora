@@ -1,3 +1,5 @@
+
+import { useGlobalContext } from "@/components/global/my-global-context"
 import { createClient } from "@/utils/supabase/client"
 
 export const getCompanyDetails = async () => {
@@ -9,4 +11,17 @@ export const getCompanyDetails = async () => {
 
 export const getUserDetails = async () => {
     
+}
+
+export const getCompanyName = async () => {
+    const supabase = createClient()
+    const data= (await supabase.from("Companies").select("*")).data
+    return data
+}
+
+export const getServiceDetails = async (value?:any) => {
+    const supabase = createClient()
+    // const data = (await supabase.from("Service").select("*").eq('company_name', `${value}`))
+    const data = (await supabase.from("Service").select("*")).data
+    return data
 }
