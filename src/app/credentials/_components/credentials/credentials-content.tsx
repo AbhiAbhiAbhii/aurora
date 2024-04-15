@@ -1,11 +1,9 @@
 'use client'
 import { useGlobalContext } from '@/components/global/my-global-context'
-import { DataValue } from '@/components/global/value'
-import { ServiceData } from '@/lib/type'
 import React from 'react'
 
 type Props = {
-  data: ServiceData[]
+  data: any
 }
 
 const CredentialsContent = ({ data }: Props) => {
