@@ -10,10 +10,10 @@ export type CompanyData =
 export type ServiceData = 
 | ({
     id: number
+    company_name: any
     service_name: string
     password: any
     type: string
     user_name: string
-    company_name: string
 })[]
 | undefined

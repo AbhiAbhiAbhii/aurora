@@ -15,7 +15,7 @@ const CredentialsContent = ({ data }: Props) => {
   return (
     <div>
       {
-        data?.filter((item) => item.company_name === value)?.map((filterValue, index) => {
+        data?.filter((item:any) => item.company_name === value)?.map((filterValue:any, index:number) => {
           return(
             <div className='flex text-left justify-between w-[700px] border border-rose-600' key={index}>
               <p>
