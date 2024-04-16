@@ -1,5 +1,3 @@
-
-import { useGlobalContext } from "@/components/global/my-global-context"
 import { createClient } from "@/utils/supabase/client"
 
 export const getCompanyDetails = async () => {
@@ -12,7 +10,6 @@ export const getCompanyDetails = async () => {
 export const getUserDetails = async () => {
     
 }
-
 export const getCompanyName = async () => {
     const supabase = createClient()
     const data= (await supabase.from("Companies").select("*")).data
@@ -28,9 +25,10 @@ export const getServiceDetails = async (value?:any) => {
 
 export const getCompanyImage = async(folderName?:string) => {
     const supabase= createClient()
+    const supabaseStorage = supabase.storage.from("images")
     try {
-        let file = (await supabase.storage.from("images").list(folderName)).data?.[0]
-        const data = (await supabase.storage.from("images").createSignedUrl(`${folderName}/${file?.name}`, 60)).data?.signedUrl
+        const file = (await supabaseStorage.list(folderName)).data?.[0]
+        const data = (await supabaseStorage.createSignedUrl(`${folderName}/${file?.name}`, 60)).data?.signedUrl
         return data
     } catch(error) {
         console.log(error)

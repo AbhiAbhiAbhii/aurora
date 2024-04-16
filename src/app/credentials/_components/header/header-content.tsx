@@ -48,8 +48,9 @@ const Header = ({ data }: Props) => {
     useEffect(() => {
         const setInitialImage = async () => {
             const supabase = createClient()
-            let file = (await supabase.storage.from("images").list(value)).data?.[0]
-            const data = (await supabase.storage.from("images").createSignedUrl(`${value}/${file?.name}`, 60)).data?.signedUrl
+            const supabaseStorage = supabase.storage.from("images")
+            const file = (await supabaseStorage.list(value)).data?.[0]
+            const data = (await supabaseStorage.createSignedUrl(`${value}/${file?.name}`, 60)).data?.signedUrl
             setSource(data)
             setSourceImage(file)
         }
@@ -57,7 +58,7 @@ const Header = ({ data }: Props) => {
     }, [value])
 
     const checkImage = () => {
-        if(!sourceImage) {
+        if(sourceImage) {
             return(
                 <div className='mx-2 h-[40px] w-[40px] flex items-center justify-center rounded-full relative'>
                     <Image 
@@ -72,7 +73,7 @@ const Header = ({ data }: Props) => {
         } else {
             return(
                 <div className='mx-2 h-[40px] w-[40px] flex items-center justify-center rounded-full bg-muted relative'>
-                    <p className='text-black text-lg font-inter'>{value.slice(0,2).toUpperCase()}   </p> 
+                    <p className='text-black text-lg font-inter'>{value.slice(0,2).toUpperCase()}</p> 
                 </div>
             )
         }
@@ -146,7 +147,7 @@ const Header = ({ data }: Props) => {
             </Popover>
         </div>
         <div>
-                                
+
         </div>
         <SignoutComponent 
             handleClick={handleSignOut}
