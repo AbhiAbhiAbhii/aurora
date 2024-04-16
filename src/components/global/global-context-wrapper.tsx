@@ -7,7 +7,7 @@ type Props = {
 
 const ContextWrapper = ({ children }: Props) => {
 
-  const [ value, setValue ] = useState<string>("Select company...")
+  const [ value, setValue ] = useState<string>("Gradical")
   const [ storedValue, setStoredValue ] = useState<string>("")
 
   return (

@@ -25,3 +25,14 @@ export const getServiceDetails = async (value?:any) => {
     const data = (await supabase.from("Service").select("*")).data
     return data
 }
+
+export const getCompanyImage = async(folderName?:string) => {
+    const supabase= createClient()
+    try {
+        let file = (await supabase.storage.from("images").list(folderName)).data?.[0]
+        const data = (await supabase.storage.from("images").createSignedUrl(`${folderName}/${file?.name}`, 60)).data?.signedUrl
+        return data
+    } catch(error) {
+        console.log(error)
+    }
+}

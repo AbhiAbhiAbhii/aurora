@@ -32,7 +32,6 @@ const CredentialsContent = ({ data }: Props) => {
           )
         })
       }
-
     </div>
   )
 }

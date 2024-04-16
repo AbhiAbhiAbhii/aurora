@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import React, { useState } from 'react'
 import { v4 as uuidv4 } from "uuid";
+import { useGlobalContext } from './my-global-context';
 
 type Props = {}
 
@@ -13,36 +14,23 @@ const ImageUpload = (props: Props) => {
 
 
     const [file, setFile] = useState<any>([])
-
+    const { value } = useGlobalContext()
+    
     const handleSubmit = async (e: any) => {
         e.preventDefault()
 
-        // const filename = `${uuidv4()}-${file.name}`;
-        // console.log(file," OUR FIKLE")
-
-        // const { data, error } = await supabase.storage
-        // .from("images")
-        // .upload(filename, file, {
-        //     cacheControl: "3600",
-        //     upsert: false,
-        // });
-
-
-        // const filepath = data?.path;
-        // save filepath in database
         const fileName = file.name
 
-        const { data, error } = await supabase.storage.from("images").upload(fileName, file, { cacheControl: "3600", upsert: false })
-
-        // const {data} = supabase.storage.from("images").getPublicUrl("torii.jpg")
+        // const { error } = await supabase.storage.from("images").upload(`${value}/${fileName}`, file, { cacheControl: "3600", upsert: false })
+        // const { data } =  supabase.storage.from("images").getPublicUrl("XBOX_controller.png")
+        // const { data } = await supabase.storage.from("images").createSignedUrl()
         // setSource(data.publicUrl)
-
-        if(error) {
-            console.log(error)
-            console.log("Something went WONG")
-        } else {
-            console.log("YES")
-        }
+        // if(error) {
+        //     console.log(error)
+        //     console.log("Something went WONG")
+        // } else {
+        //     console.log("YES")
+        // }
 
     }
 

@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import React from 'react'
 import CredentialsContent from './_components/credentials/credentials-content'
-import { getServiceDetails } from '@/lib/queries'
+import { getCompanyImage, getServiceDetails } from '@/lib/queries'
 import { DataValue } from '@/components/global/value'
 {/* <ImageUpload /> */}
 
@@ -17,8 +17,8 @@ const Credentials = async (props: Props) => {
 
     if(!user) redirect("/login")
     
-    let ourValue:string;
     const serviceDetails = await getServiceDetails()
+    const companyImage = await getCompanyImage()
 
 
   return (
