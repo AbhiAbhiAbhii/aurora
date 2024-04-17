@@ -2,17 +2,15 @@
 type Props = {
     text?: string
     className?: string
-    data?: any
 }
 
-const AuroraText = ({ text, className, data }: Props) => {
-
+const AuroraText = ({ text, className }: Props) => {
 
   return (
     <div className={className}>
-        <p>
-          { text }
-        </p>
+      <p>
+        { text }
+      </p>
     </div>
   )
 }

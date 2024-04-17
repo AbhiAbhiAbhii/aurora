@@ -3,13 +3,13 @@ import { createContext, useContext } from "react"
 export type GlobalContent = {
   value: string
   setValue:(v: string) => void
-  storedValue: string,
-  setStoredValue:(v: string) => void
+  linkValue: string,
+  setLinkValue:(v: string) => void
 }
 export const MyGlobalContext = createContext<GlobalContent>({
 value: '', // set a default value
 setValue: () => {},
-storedValue: '',
-setStoredValue: () => {}
+linkValue: '',
+setLinkValue: () => {}
 })
 export const useGlobalContext = () => useContext(MyGlobalContext)

@@ -5,9 +5,7 @@ import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/lib/utils'
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
@@ -24,9 +22,14 @@ import Image from 'next/image'
 import { getCompanyImage } from '@/lib/queries'
 import { Skeleton } from '@/components/ui/skeleton'
 import SignoutComponent from './sign-out'
+import AuroraText from '@/components/global/aurora-text'
 
 type Props = {
     data?: CompanyData[]
+}
+
+interface Links {
+    linkName: string
 }
 
 const Header = ({ data }: Props) => {
@@ -35,7 +38,8 @@ const Header = ({ data }: Props) => {
     const [ open, setOpen ] = useState(false)
     const [ source, setSource ] = useState<any>("")
     const [ sourceImage, setSourceImage ] = useState<any>(false)
-    const { value, setValue } = useGlobalContext()
+    const { value, setValue, setLinkValue } = useGlobalContext()
+    const [ linkState, setLinkState ] = useState<number>(0)
 
     const handleSignOut = async () => {
         const supabase = createClient()
@@ -58,7 +62,7 @@ const Header = ({ data }: Props) => {
     }, [value])
 
     const checkImage = () => {
-        if(sourceImage) {
+        if(!sourceImage) {
             return(
                 <div className='mx-2 h-[40px] w-[40px] flex items-center justify-center rounded-full relative'>
                     <Image 
@@ -79,75 +83,112 @@ const Header = ({ data }: Props) => {
         }
     }
 
+    const links: Links[] = [
+        {
+            linkName: 'Credentials'
+        },
+        {
+            linkName: 'Subscriptions'
+        },
+        {
+            linkName: 'Settings'
+        }
+    ]
+
   return (
     <div className='w-full flex items-center justify-between py-4 px-10 border'>
-        <div>
-            <Popover
-                open={open}
-                onOpenChange={setOpen}
-            >
-                <PopoverTrigger className='!py-[1.8rem]' asChild>
-                    <Button
-                        className='flex items-center justify-between w-auto'
-                        variant={"outline"}
-                        role='combobox'
-                        aria-expanded={open}
-                    >
-                        <div className='flex items-center justify-center mr-4'>
-                            {
-                                source ?
-                                checkImage()
-                                :
-                                <div className='mx-2 h-[45px] w-[45px] flex items-center justify-center rounded-full'>
-                                    <Skeleton 
-                                        className='h-full w-full rounded-full'
-                                    />
-                                </div>
-                            }
-                            <p className='uppercase'>{value}</p>
-                        </div>
-                        <ChevronsUpDown 
-                            size={12}
-                        />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className='w-[200px] p-0'>
-                    <Command>
-                        <CommandList>
-                            <CommandGroup>
+        <div className='flex items-center gap-24 border border-red-500'>
+            <div>
+                <Popover
+                    open={open}
+                    onOpenChange={setOpen}
+                >
+                    <PopoverTrigger className='!py-[1.8rem]' asChild>
+                        <Button
+                            className='flex items-center justify-between w-auto'
+                            variant={"outline"}
+                            role='combobox'
+                            aria-expanded={open}
+                        >
+                            <div className='flex items-center justify-center mr-4'>
                                 {
-                                    data?.map((item:any, index: number) => {
-                                        return(
-                                            <CommandItem
-                                                key={index}
-                                                onSelect={ async (currentValue: any) => {
-                                                    setValue(currentValue)
-                                                    setOpen(false)
-                                                    try{
-                                                        setSource(await getCompanyImage(currentValue))
-                                                    } catch(error) {
-                                                        console.log(error)
-                                                    }
-                                                }}
-                                            >
-                                                <Check 
-                                                    className={cn
-                                                        ("mr-2 h-4 w-4", value === item.company_name ? "opacity-100" : "opacity-0")
-                                                    }
-                                                />
-                                                    {item.company_name}
-                                            </CommandItem>
-                                        )
-                                    })
+                                    source ?
+                                    <AuroraText 
+                                        className='mx-2 h-[40px] w-[40px] flex items-center justify-center 
+                                        rounded-full bg-muted relative text-black text-lg font-inter'
+                                        text={value.slice(0, 2).toUpperCase()}
+                                    />
+                                    :
+                                    <div className='mx-2 h-[45px] w-[45px] flex items-center justify-center rounded-full'>
+                                        <Skeleton 
+                                            className='h-full w-full rounded-full'
+                                        />
+                                    </div>
                                 }
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
-        </div>
-        <div>
-
+                                <p className='uppercase'>{value}</p>
+                            </div>
+                            <ChevronsUpDown 
+                                size={12}
+                            />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-[200px] p-0'>
+                        <Command>
+                            <CommandList>
+                                <CommandGroup>
+                                    {
+                                        data?.map((item:any, index: number) => {
+                                            return(
+                                                <CommandItem
+                                                    key={index}
+                                                    className='font-inter font-medium'
+                                                    onSelect={ async (currentValue: any) => {
+                                                        setValue(currentValue)
+                                                        setOpen(false)
+                                                        try{
+                                                            setSource(await getCompanyImage(currentValue))
+                                                        } catch(error) {
+                                                            console.log(error)
+                                                        }
+                                                    }}
+                                                >
+                                                    <Check 
+                                                        className={cn
+                                                            ("mr-2 h-4 w-4", value === item.company_name ? "opacity-100" : "opacity-0")
+                                                        }
+                                                    />
+                                                        {item.company_name}
+                                                </CommandItem>
+                                            )
+                                        })
+                                    }
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+            </div>
+            <div className=''>
+                <ul className='flex items-center'>
+                    {
+                        links.map((item, index: number) => (
+                            <li
+                                onClick={(e) => {
+                                    setLinkState(index)
+                                    setLinkValue(e.currentTarget.innerText)
+                                }}
+                                className={
+                                    `mx-4 cursor-pointer transition-all border
+                                    ${index === linkState ? 'text-black' : 'text-muted-foreground'} hover:text-black font-inter font-medium`
+                                }
+                                key={item.linkName}
+                            >
+                                {item.linkName}
+                            </li>       
+                        ))
+                    }
+                </ul>
+            </div>
         </div>
         <SignoutComponent 
             handleClick={handleSignOut}
