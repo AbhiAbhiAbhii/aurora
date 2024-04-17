@@ -11,8 +11,10 @@ const layout = async ({ children } : { children: React.ReactNode }) => {
 
   return (
     <ContextWrapper>
-      <Header />
-      { children }
+      <div className='max-w-[2000px] mx-auto'>
+        <Header />
+        { children }
+      </div>
     </ContextWrapper>
   )
 }

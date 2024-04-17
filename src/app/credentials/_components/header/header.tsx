@@ -10,7 +10,7 @@ const Header = async (props: Props) => {
     if(!companyName) redirect('/error')
 
     return (
-        <header>
+        <header className='border border-t-0 border-[#E4E4E7]'>
             <HeaderContent 
                 data={companyName}
             />

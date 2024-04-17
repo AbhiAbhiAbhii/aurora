@@ -19,7 +19,7 @@ import { useGlobalContext } from '../../../../components/global/my-global-contex
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { CompanyData } from '@/lib/type'
 import Image from 'next/image'
-import { getCompanyImage } from '@/lib/queries'
+import { getCompanyImage, getServiceDetails } from '@/lib/queries'
 import { Skeleton } from '@/components/ui/skeleton'
 import SignoutComponent from './sign-out'
 import AuroraText from '@/components/global/aurora-text'
@@ -96,16 +96,16 @@ const Header = ({ data }: Props) => {
     ]
 
   return (
-    <div className='w-full flex items-center justify-between py-4 px-10 border'>
-        <div className='flex items-center gap-24 border border-red-500'>
+    <div className='w-full flex items-center justify-between py-4 px-10'>
+        <div className='flex items-center gap-6'>
             <div>
                 <Popover
                     open={open}
                     onOpenChange={setOpen}
                 >
-                    <PopoverTrigger className='!py-[1.8rem]' asChild>
+                    <PopoverTrigger asChild>
                         <Button
-                            className='flex items-center justify-between w-auto'
+                            className='flex items-center justify-between w-auto py-[1.8rem] w-[12.3rem]'
                             variant={"outline"}
                             role='combobox'
                             aria-expanded={open}
@@ -115,7 +115,7 @@ const Header = ({ data }: Props) => {
                                     source ?
                                     <AuroraText 
                                         className='mx-2 h-[40px] w-[40px] flex items-center justify-center 
-                                        rounded-full bg-muted relative text-black text-lg font-inter'
+                                        rounded-full bg-muted relative text-black text-base font-normal font-inter'
                                         text={value.slice(0, 2).toUpperCase()}
                                     />
                                     :
@@ -125,7 +125,7 @@ const Header = ({ data }: Props) => {
                                         />
                                     </div>
                                 }
-                                <p className='uppercase'>{value}</p>
+                                <p className='uppercase text-foreground font-inter font-medium text-sm'>{value}</p>
                             </div>
                             <ChevronsUpDown 
                                 size={12}
@@ -148,7 +148,7 @@ const Header = ({ data }: Props) => {
                                                         try{
                                                             setSource(await getCompanyImage(currentValue))
                                                         } catch(error) {
-                                                            console.log(error)
+                                                            console.log(error, "Something went WONG")
                                                         }
                                                     }}
                                                 >
@@ -168,7 +168,7 @@ const Header = ({ data }: Props) => {
                     </PopoverContent>
                 </Popover>
             </div>
-            <div className=''>
+            <div>
                 <ul className='flex items-center'>
                     {
                         links.map((item, index: number) => (
@@ -178,8 +178,9 @@ const Header = ({ data }: Props) => {
                                     setLinkValue(e.currentTarget.innerText)
                                 }}
                                 className={
-                                    `mx-4 cursor-pointer transition-all border
-                                    ${index === linkState ? 'text-black' : 'text-muted-foreground'} hover:text-black font-inter font-medium`
+                                    `mx-4 cursor-pointer transition-all
+                                    ${index === linkState ? 'text-black' : 'text-muted-foreground'} 
+                                    hover:text-black font-inter font-medium text-sm`
                                 }
                                 key={item.linkName}
                             >

@@ -18,8 +18,8 @@ export const getCompanyName = async () => {
 
 export const getServiceDetails = async (value?:any) => {
     const supabase = createClient()
-    // const data = (await supabase.from("Service").select("*").eq('company_name', `${value}`))
-    const data = (await supabase.from("Service").select("*")).data
+    const data = (await supabase.from("Service").select("*").eq('company_name', `${value}`)).data
+    // const data = (await supabase.from("Service").select("*")).data
     return data
 }
 

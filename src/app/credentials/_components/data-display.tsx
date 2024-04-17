@@ -5,22 +5,17 @@ import SettingView from '@/components/global/setting-view'
 import SubscriptionView from '@/components/global/subscription-view'
 import React from 'react'
 
-type Props = {
-  data: any
-}
+type Props = {}
 
-const DataDisplay = ({ data }: Props) => {
+const DataDisplay = (props: Props) => {
 
   const { linkValue } = useGlobalContext()
 
   return (
-    <div className='border border-red-500'>
+    <div className='max-w-[90%] w-[900px]'>
       {linkValue === "Credentials"
         ?
-        <CredentialView 
-          className='border'
-          data={data}
-        />
+        <CredentialView />
         :
         linkValue === "Subscriptions"
         ?

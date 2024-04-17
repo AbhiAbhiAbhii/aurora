@@ -9,9 +9,12 @@ const ContextWrapper = ({ children }: Props) => {
 
   const [ value, setValue ] = useState<string>("Gradical")
   const [ linkValue, setLinkValue ] = useState<string>("Credentials")
+  const [ tabValue, setTabValue ] = useState<string>("All")
 
   return (
-    <MyGlobalContext.Provider value={{ value, setValue, linkValue, setLinkValue }}>
+    <MyGlobalContext.Provider 
+      value={{ value, setValue, linkValue, setLinkValue, tabValue, setTabValue }}
+    >
       { children }
     </MyGlobalContext.Provider>
   )

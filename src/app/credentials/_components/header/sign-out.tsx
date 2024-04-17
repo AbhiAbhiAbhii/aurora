@@ -38,9 +38,7 @@ const SignoutComponent = ({ handleClick, className }: Props) => {
                     <AlertDialogAction 
                         onClick={() => handleClick()}
                     >
-                        <Button className=''>
-                            SignOut
-                        </Button>
+                        SignOut
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
