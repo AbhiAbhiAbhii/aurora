@@ -19,10 +19,9 @@ const CredentialView = (props: Props) => {
         if(serviceDetails) return setServiceData(serviceDetails)
       } catch (error) {
         console.log(error, "Something went WONG")
-      } finally {
-        console.log(serviceData, "asdjasdjas")
-      }
+      } 
     }
+
     FetchServiceData()
   }, [value])
 

@@ -111,20 +111,20 @@ const Header = ({ data }: Props) => {
                             aria-expanded={open}
                         >
                             <div className='flex items-center justify-center mr-4'>
-                                {
-                                    source ?
+                                {/* {
+                                    source ? */}
                                     <AuroraText 
                                         className='mx-2 h-[40px] w-[40px] flex items-center justify-center 
                                         rounded-full bg-muted relative text-black text-base font-normal font-inter'
                                         text={value.slice(0, 2).toUpperCase()}
                                     />
-                                    :
+                                    {/* :
                                     <div className='mx-2 h-[45px] w-[45px] flex items-center justify-center rounded-full'>
                                         <Skeleton 
                                             className='h-full w-full rounded-full'
                                         />
                                     </div>
-                                }
+                                } */}
                                 <p className='uppercase text-foreground font-inter font-medium text-sm'>{value}</p>
                             </div>
                             <ChevronsUpDown 
@@ -145,11 +145,11 @@ const Header = ({ data }: Props) => {
                                                     onSelect={ async (currentValue: any) => {
                                                         setValue(currentValue)
                                                         setOpen(false)
-                                                        try{
-                                                            setSource(await getCompanyImage(currentValue))
-                                                        } catch(error) {
-                                                            console.log(error, "Something went WONG")
-                                                        }
+                                                        // try{
+                                                        //     setSource(await getCompanyImage(currentValue))
+                                                        // } catch(error) {
+                                                        //     console.log(error, "Something went WONG")
+                                                        // }
                                                     }}
                                                 >
                                                     <Check 

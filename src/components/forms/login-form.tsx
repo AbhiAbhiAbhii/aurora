@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -9,10 +9,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Login, SignUp } from '@/app/login/actions'
+import { SignUpTest } from '@/app/login/signup-test'
 
 type Props = {}
 // Define our Form Schema/data type
 const FormSchema = z.object({
+    // username: z.string().min(1, {
+    //     message: "Must be 5 characters or more"
+    // }),
     email: z.string().email({
         message: 'Invalid email address'
     }).min(1),
@@ -23,28 +27,35 @@ const FormSchema = z.object({
 
 const LoginForm = (props: Props) => {   
     
+    const [ boolean, setBoolean ] = useState(true)
+
     // 1. Define our form
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
+            // username: "" ,
             email: "",
-            password: ""
+            password: "",
         }
     })
 
     const handleLogin = async (values: z.infer<typeof FormSchema>) => {
-        // try {
-        //     const supabase = createClient()
-        //     await supabase.from("user_details").insert({useremail: value.email, userpassword: value.password})
-        //     throw new Error("Something went WONG!")
-        // } catch(error) {
-        //     console.log(error)
-        // }
         const {email, password} = values
         Login(
             email,
             password
         )
+        // try {
+        //     SignUpTest(
+        //         password,
+        //         email,
+        //         username,
+        //         // boolean
+        //     )
+        //     alert("Success")
+        // } catch(error) {
+        //     alert("something went wong")
+        // }
     }
 
   return (
@@ -85,6 +96,22 @@ const LoginForm = (props: Props) => {
                             </FormItem>
                         )}
                     />
+                    {/* <FormField 
+                        control={form.control}
+                        name='username'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>User name</FormLabel>
+                                <FormControl>
+                                    <Input 
+                                        {...field}
+                                        placeholder='enter your username' 
+                                    />
+                                </FormControl>
+                                <FormMessage className='font-geist' />
+                            </FormItem>
+                        )}
+                    /> */}
                     <FormField 
                         control={form.control}
                         name='password'

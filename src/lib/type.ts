@@ -17,3 +17,13 @@ export type ServiceData =
     user_name: string
 })[]
 | undefined
+
+// export type UserDetails =
+// | ({
+//     id?: number
+//     email: string
+//     is_god?: boolean
+//     user_name: string 
+//     password: string
+// })[]
+// | undefined

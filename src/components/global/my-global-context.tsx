@@ -6,7 +6,9 @@ export type GlobalContent = {
   linkValue: string,
   setLinkValue:(v: string) => void
   tabValue: string
-  setTabValue:(v: string) => void
+  setTabValue:(v: string) => void,
+  credentialInsert: boolean,
+  setCredentialInsert: (v: boolean) => void
 }
 export const MyGlobalContext = createContext<GlobalContent>({
 value: '', // set a default value
@@ -14,6 +16,8 @@ setValue: () => {},
 linkValue: '',
 setLinkValue: () => {},
 tabValue: '',
-setTabValue: () => {}
+setTabValue: () => {},
+credentialInsert: false,
+setCredentialInsert: () => {}
 })
 export const useGlobalContext = () => useContext(MyGlobalContext)
