@@ -1,11 +1,15 @@
 "use client"
 
 import AuroraText from "@/components/global/aurora-text"
+import { useGlobalContext } from "@/components/global/my-global-context"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, Trash2Icon } from "lucide-react"
+import { CopyIcon, MoreHorizontal, Trash2Icon } from "lucide-react"
+import PasswordFormat from "./_components/password-format"
+import UsernameBox from "./_components/username-box"
+import DataTableDropDown from "./_components/data-table-dropdown"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -21,6 +25,7 @@ export type Service = {
   managed_by: string
 }
 
+
 export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "service_name",
@@ -29,10 +34,18 @@ export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "user_name",
     header: "Username",
+    cell: ({ row }) => {
+      const data: string = row.getValue('user_name')
+      return <UsernameBox data={data} />
+    }
   },
   {
     accessorKey: "password",
     header: "Password",
+    cell: ({ row }) => {
+      const data: string = row.getValue('password')
+      return <PasswordFormat data={data} />
+    }
   },
   {
     accessorKey: "type",
@@ -55,34 +68,13 @@ export const columns: ColumnDef<Service>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const rowData = row.original
+      const rowUsernameData:string = row.getValue('user_name')
+      const rowPasswordData: string = row.getValue('password')
       return(
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant={'ghost'}
-              className="h-6 w-6 p-0"
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal size={10} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Copy Username</DropdownMenuItem>
-            <DropdownMenuItem>Visit Login</DropdownMenuItem>
-            <DropdownMenuItem>Copy Password</DropdownMenuItem>
-            <DropdownMenuItem>Share Credential</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="flex items-center justify-between"
-            >
-              <AuroraText 
-                text="Delete"
-              />
-              <Trash2Icon size={15} />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DataTableDropDown 
+          rowUsernameData={rowUsernameData} 
+          rowPasswordData={rowPasswordData}
+        />
       )
     }
   }

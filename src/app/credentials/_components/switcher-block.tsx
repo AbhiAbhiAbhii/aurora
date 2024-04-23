@@ -23,11 +23,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { addNewCredentials, getAuthUsers, getUserDetails } from "@/lib/queries"
+import { getAuthUsers, getUserDetails } from "@/lib/queries"
 import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { redirect } from "next/navigation"
 
 type Props = {}
 
@@ -63,7 +62,7 @@ const SwitcherBlock = (props: Props) => {
         },
     ]
 
-    const { setTabValue, value } = useGlobalContext()
+    const { setTabValue, value, setAlertTitle, setAlertDescription } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
@@ -80,6 +79,29 @@ const SwitcherBlock = (props: Props) => {
         }
     })
 
+    const successNotification = () => {
+        let alertContainer = document.querySelector('.alert')
+        alertContainer?.classList.add('alert-active')
+        setAlertTitle('Success')
+        setAlertDescription('Your credential is added successfully')
+        setTimeout(() => {
+            alertContainer?.classList.remove('alert-active')
+        }, 2000)
+        setTimeout(() => {
+            location.reload()
+        }, 3000)
+    }
+
+    const notSuccessNotification = () => {
+        let alertContainer = document.querySelector('.alert')
+        alertContainer?.classList.add('alert-active')
+        setTimeout(() => {
+            alertContainer?.classList.remove('alert-active')
+        }, 2000)
+        setAlertTitle('Not Success')
+        setAlertDescription('Something went WONG')  
+    }
+
     const addCredentialSubmit = async (values: z.infer<typeof AddCredentialsFormSchema>) => {
        const {  social, service_name, user_name, password, url, additional_notes, managedby } = values
         try {
@@ -94,7 +116,11 @@ const SwitcherBlock = (props: Props) => {
                 additional_notes: additional_notes,
                 managed_by: managedby
             }) 
-            if(!res.error) redirect('/error')
+            if(res.error) {
+                notSuccessNotification()
+            } else {
+                successNotification()
+            }
             
         } catch(error) {
             console.log(error, "Something went WONG")

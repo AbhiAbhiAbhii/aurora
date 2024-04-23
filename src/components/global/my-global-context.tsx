@@ -9,6 +9,10 @@ export type GlobalContent = {
   setTabValue:(v: string) => void,
   credentialInsert: boolean,
   setCredentialInsert: (v: boolean) => void
+  alertTitle: string
+  setAlertTitle: (v: string) => void
+  alertDescription: string
+  setAlertDescription: (v: string) => void
 }
 export const MyGlobalContext = createContext<GlobalContent>({
 value: '', // set a default value
@@ -18,6 +22,10 @@ setLinkValue: () => {},
 tabValue: '',
 setTabValue: () => {},
 credentialInsert: false,
-setCredentialInsert: () => {}
+setCredentialInsert: () => {},
+alertTitle: '',
+setAlertTitle: () => {},
+alertDescription: '',
+setAlertDescription: () => {}
 })
 export const useGlobalContext = () => useContext(MyGlobalContext)
