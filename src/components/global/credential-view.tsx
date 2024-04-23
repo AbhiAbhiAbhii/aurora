@@ -4,7 +4,8 @@ import SwitcherBlock from "@/app/credentials/_components/switcher-block"
 import { useGlobalContext } from "./my-global-context"
 import { useEffect, useState } from "react"
 import { getServiceDetails } from "@/lib/queries"
-import { TabsContent } from "../ui/tabs"
+import { DataTable } from "@/app/credentials/_components/data-table"
+import { columns } from "@/app/credentials/columns"
 
 type Props = {}
 const CredentialView = (props: Props) => {
@@ -25,47 +26,29 @@ const CredentialView = (props: Props) => {
     FetchServiceData()
   }, [value])
 
+  const filteredData = () => {
+    return serviceData.filter((item: any) => item.company_name === value && item.type === tabValue)
+  }
+
   return (
     <div>
       <SwitcherBlock />
        <div className="mt-12">
         {
           tabValue !== "All" ?
-            serviceData.filter((item:any) => item.company_name === value && item.type === tabValue).map((filterValue:any, index: number) => {
-              return(
-                <div className='flex text-left justify-between' key={index}>
-                  <p>
-                    {filterValue.service_name}
-                  </p>
-                  <p>
-                    {filterValue.password}
-                  </p>
-                  <p>
-                    {filterValue.type}
-                  </p>
-                  <p>
-                    {filterValue.user_name}
-                  </p>
-                </div>
-              )
-            })
+          <>
+            <DataTable 
+              columns={columns}
+              data={filteredData()}
+            />
+          </>
             :
-            serviceData.map((item:any, index: number) => (
-              <div className='flex text-left justify-between' key={index}>
-                <p>
-                  {item.service_name}
-                </p>
-                <p>
-                  {item.password}
-                </p>
-                <p>
-                  {item.type}
-                </p>
-                <p>
-                  {item.user_name}
-                </p>
-              </div>
-            ))
+          <>
+            <DataTable 
+              columns={columns}
+              data={serviceData}
+            />
+          </>
         }
        </div>
     </div>
