@@ -78,3 +78,9 @@ export const getAuthUsers = async () => {
         console.log(error, "Something went WONG")
     }
 }
+
+export const deleteItem = async (service_name:string) => {
+    const supabase = createClient()
+    const data = await supabase.from("Service").delete().eq('service_name', service_name)
+    return data
+}

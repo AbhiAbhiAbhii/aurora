@@ -1,12 +1,6 @@
 "use client"
-
-import AuroraText from "@/components/global/aurora-text"
-import { useGlobalContext } from "@/components/global/my-global-context"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ColumnDef } from "@tanstack/react-table"
-import { CopyIcon, MoreHorizontal, Trash2Icon } from "lucide-react"
 import PasswordFormat from "./_components/password-format"
 import UsernameBox from "./_components/username-box"
 import DataTableDropDown from "./_components/data-table-dropdown"
@@ -70,10 +64,12 @@ export const columns: ColumnDef<Service>[] = [
       const rowData = row.original
       const rowUsernameData:string = row.getValue('user_name')
       const rowPasswordData: string = row.getValue('password')
+      const rowServicenameData: string = row.getValue('service_name')
       return(
         <DataTableDropDown 
           rowUsernameData={rowUsernameData} 
           rowPasswordData={rowPasswordData}
+          rowServicenameData={rowServicenameData}
         />
       )
     }

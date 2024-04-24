@@ -1,16 +1,19 @@
 import AuroraText from '@/components/global/aurora-text'
 import { useGlobalContext } from '@/components/global/my-global-context'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { deleteItem } from '@/lib/queries'
 import { MoreHorizontal, Trash2Icon } from 'lucide-react'
 import React from 'react'
 
 type Props = {
     rowUsernameData: string,
-    rowPasswordData: string
+    rowPasswordData: string,
+    rowServicenameData: string
 }
 
-const DataTableDropDown = ({ rowUsernameData, rowPasswordData }: Props) => {
+const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData }: Props) => {
 
     const { setAlertTitle, setAlertDescription } = useGlobalContext()
 
@@ -38,6 +41,27 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData }: Props) => {
         getAlertContainer()
         setAlertTitle('Password Copied!')
         setAlertDescription('Your credential password is ready to be pasted.')
+    }
+
+    const ItemDeletedSuccess = () => {
+      getAlertContainer()
+      setAlertTitle('Item Deleted')
+      setAlertDescription('Your selected credential were deleted')
+    }
+
+    const ItemDeletedError = () => {
+      getAlertContainer()
+      setAlertTitle('Item not deleted')
+      setAlertDescription('Something went wrong and credential was not deleted')
+    }
+
+    const DeleteItem = async () => {
+     let dataDeleted = await deleteItem(rowServicenameData)
+     if(!dataDeleted.error) {
+      ItemDeletedSuccess()
+     } else {
+      ItemDeletedError()
+     }
     }
 
   return (
@@ -68,14 +92,41 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData }: Props) => {
             </DropdownMenuItem>
             <DropdownMenuItem>Share Credential</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="flex items-center justify-between"
-            >
-              <AuroraText 
-                text="Delete"
-              />
-              <Trash2Icon size={15} />
-            </DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <div role="menuitem" 
+                  className="relative flex cursor-default select-none items-center
+                    justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
+                    focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
+                  data-orientation="vertical" data-radix-collection-item=""
+                >
+                  <AuroraText 
+                    text="Delete"
+                  />
+                  <Trash2Icon size={15} />
+                </div>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the credential.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <DropdownMenuItem className='px-0 py-0'>
+                    <AlertDialogAction>
+                      <Button
+                        onClick={DeleteItem}
+                      >
+                        Continue
+                      </Button>
+                    </AlertDialogAction>
+                  </DropdownMenuItem>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+          </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
   )
