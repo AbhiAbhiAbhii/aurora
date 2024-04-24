@@ -34,7 +34,6 @@ interface TabValue {
     tab: string
 }
 
-
 const AddCredentialsFormSchema = z.object({
     managedby: z.string(),
     social: z.string(),
@@ -149,8 +148,6 @@ const SwitcherBlock = (props: Props) => {
         }
         setDetectRoleFunction()
     }, [users])
-
-    // Super Admin -> only can change "Managed by" 
 
     return (
         <div>

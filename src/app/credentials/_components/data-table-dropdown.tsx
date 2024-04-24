@@ -1,68 +1,122 @@
+'use client'
+import EditForm from '@/components/forms/edit-form'
 import AuroraText from '@/components/global/aurora-text'
 import { useGlobalContext } from '@/components/global/my-global-context'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { 
+  AlertDialog,
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { deleteItem } from '@/lib/queries'
-import { MoreHorizontal, Trash2Icon } from 'lucide-react'
-import React from 'react'
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu'
+import { 
+  FormField, 
+  FormItem, 
+  FormLabel 
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { 
+  Select, 
+  SelectContent, 
+  SelectGroup, 
+  SelectItem, 
+  SelectLabel, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select'
+import { 
+  Sheet, 
+  SheetClose, 
+  SheetContent, 
+  SheetFooter, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger 
+} from '@/components/ui/sheet'
+import { Textarea } from '@/components/ui/textarea'
+import { deleteItem, getAuthUsers, getUserDetails } from '@/lib/queries'
+import { 
+  MoreHorizontal, 
+  Trash2Icon 
+} from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Form, useForm } from 'react-hook-form'
 
 type Props = {
-    rowUsernameData: string,
-    rowPasswordData: string,
-    rowServicenameData: string
+  rowUsernameData: string,
+  rowPasswordData: string,
+  rowServicenameData: string
 }
+
+
+
 
 const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData }: Props) => {
 
-    const { setAlertTitle, setAlertDescription } = useGlobalContext()
 
-    const getAlertContainer = () => {
-        let alertContainer = document.querySelector('.alert')
-        alertContainer?.classList.add('alert-active')
-        setTimeout(() => {
-            alertContainer?.classList.remove('alert-active')
-        }, 2000)
-    }
+  const { setAlertTitle, setAlertDescription } = useGlobalContext()
 
-    const copyToClipBoard = (data:string) => {
-        navigator.clipboard.writeText(data)
-    }
 
-    const UserNameCopy = () => {
-        copyToClipBoard(rowUsernameData)
-        getAlertContainer()
-        setAlertTitle('Username Copied!')
-        setAlertDescription('Your credential username is ready to be pasted.')
-    }
 
-    const PasswordCopy = () => {
-        copyToClipBoard(rowPasswordData)
-        getAlertContainer()
-        setAlertTitle('Password Copied!')
-        setAlertDescription('Your credential password is ready to be pasted.')
-    }
+  const getAlertContainer = () => {
+      let alertContainer = document.querySelector('.alert')
+      alertContainer?.classList.add('alert-active')
+      setTimeout(() => {
+          alertContainer?.classList.remove('alert-active')
+      }, 2000)
+  }
 
-    const ItemDeletedSuccess = () => {
+  const copyToClipBoard = (data:string) => {
+      navigator.clipboard.writeText(data)
+  }
+
+  const UserNameCopy = () => {
+      copyToClipBoard(rowUsernameData)
       getAlertContainer()
-      setAlertTitle('Item Deleted')
-      setAlertDescription('Your selected credential were deleted')
-    }
+      setAlertTitle('Username Copied!')
+      setAlertDescription('Your credential username is ready to be pasted.')
+  }
 
-    const ItemDeletedError = () => {
+  const PasswordCopy = () => {
+      copyToClipBoard(rowPasswordData)
       getAlertContainer()
-      setAlertTitle('Item not deleted')
-      setAlertDescription('Something went wrong and credential was not deleted')
-    }
+      setAlertTitle('Password Copied!')
+      setAlertDescription('Your credential password is ready to be pasted.')
+  }
 
-    const DeleteItem = async () => {
-     let dataDeleted = await deleteItem(rowServicenameData)
-     if(!dataDeleted.error) {
-      ItemDeletedSuccess()
-     } else {
-      ItemDeletedError()
-     }
+  const ItemDeletedSuccess = () => {
+    getAlertContainer()
+    setAlertTitle('Item Deleted')
+    setAlertDescription('Your selected credential were deleted')
+  }
+
+  const ItemDeletedError = () => {
+    getAlertContainer()
+    setAlertTitle('Item not deleted')
+    setAlertDescription('Something went wrong and credential was not deleted')
+  }
+
+  const DeleteItem = async () => {
+    let dataDeleted = await deleteItem(rowServicenameData)
+    if(!dataDeleted.error) {
+    ItemDeletedSuccess()
+    } else {
+    ItemDeletedError()
     }
+  }
+
 
   return (
     <DropdownMenu>
@@ -76,9 +130,7 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
-              Edit
-            </DropdownMenuItem>
+            <EditForm />
             <DropdownMenuItem
               onClick={UserNameCopy}
             >
