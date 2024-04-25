@@ -12,7 +12,6 @@ import {
 import { getAuthUsers, getServiceRowDetails, getUserDetails } from '@/lib/queries'
 import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
-import SelectArrowIcon from '../select-arrow-icon'
 
 
 type Props = {
