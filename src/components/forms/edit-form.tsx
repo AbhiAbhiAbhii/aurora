@@ -158,7 +158,6 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                 className={selectCustomClassName}
                             >
                                 <span style={{pointerEvents: 'none'}}>{typeData}</span>
-                                <SelectArrowIcon />
                                 { buttonSelectClick && <div
                                     className={`select-custom-box-activate border bg-white rounded-md`}
                                 >
@@ -248,7 +247,6 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                 className={selectCustomClassName}
                             >
                                 <span style={{pointerEvents: 'none'}}>{managedbyData}</span>
-                                <SelectArrowIcon />
                                 { buttonManagedSelectClick && <div
                                     className={`select-custom-box-activate border bg-white rounded-md`}
                                 >
