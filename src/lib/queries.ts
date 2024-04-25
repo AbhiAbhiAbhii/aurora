@@ -91,3 +91,43 @@ export const deleteItem = async (service_name:string) => {
     const data = await supabase.from("Service").delete().eq('service_name', service_name)
     return data
 }
+
+export const deleteRowItem = async (dataId: string) => {
+    const supabase = createClient()
+    const { error } = await supabase.from("Service").delete().eq('id', dataId)
+    if(error) {
+        console.log("Something went WONG")
+    }
+}
+
+export const updateItem = async(
+    rowId: any,
+    companyname: string,
+    servicename: string,
+    pass: string,
+    type: string,
+    username: string,
+    url: string,
+    additionalnotes: string,
+    managedby: string
+) => {
+    const supabase = createClient()
+    try {
+      const { error } = await supabase.from("Service").update({
+            id: rowId,
+            company_name: companyname,
+            service_name: servicename,
+            password: pass,
+            type: type,
+            user_name: username,
+            URL: url,
+            additional_notes: additionalnotes,
+            managed_by: managedby
+        }).eq('id', rowId)
+        if(error) {
+            alert("Something went WONG")
+        }
+    } catch(err) {
+        console.log(err, "Something went WONG")
+    }
+}

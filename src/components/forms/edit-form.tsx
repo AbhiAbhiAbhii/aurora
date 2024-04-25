@@ -9,10 +9,11 @@ import {
     SheetTitle, 
     SheetTrigger 
 } from '@/components/ui/sheet'
-import { getAuthUsers, getServiceRowDetails, getUserDetails } from '@/lib/queries'
+import { deleteRowItem, getAuthUsers, getServiceRowDetails, getUserDetails, updateItem } from '@/lib/queries'
 import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
 import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
+import { useGlobalContext } from '../global/my-global-context'
 
 
 type Props = {
@@ -47,6 +48,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
     let selectCustomClassName: string = "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 relative"
     let textAreaClassName: string = "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
     
+    const { setAlertDescription, setAlertTitle } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
@@ -61,9 +63,53 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
     const [ managedbyData, setManagedbyData ] = useState<string>("")
     const [ additionalNotesData, setAdditionalNotesData ] = useState<string>("")
 
+
+    const updateSuccess = () => {
+        let alertContainer = document.querySelector('.alert')
+        alertContainer?.classList.add('alert-active')
+        setAlertTitle('Item Updated')
+        setAlertDescription('Your credential has been updated successfully')
+        setTimeout(() => {
+            alertContainer?.classList.remove('alert-active')
+        }, 2000)
+        setTimeout(() => {
+            location.reload()
+        }, 3000)
+    }
+
+    const deleteSuccess = () => {
+        let alertContainer = document.querySelector('.alert')
+        alertContainer?.classList.add('alert-active')
+        setAlertTitle('Item Deleted')
+        setAlertDescription('Your selected credential were deleted')
+        setTimeout(() => {
+            alertContainer?.classList.remove('alert-active')
+        }, 2000)
+        setTimeout(() => {
+            location.reload()
+        }, 3000)
+    }
+
     const editCredentialItemSubmit = async (e:any) => {
         e.preventDefault()
-        console.log("HANDLER")
+        await updateItem(
+            serviceRowData.id,
+            serviceRowData.company_name,
+            serviceNameData,
+            passwordData,
+            typeData,
+            userNameData,
+            urlData,
+            additionalNotesData,
+            managedbyData
+        )
+        updateSuccess()
+    }
+
+    const deleteRow = async (e: any) => {
+        e.preventDefault()
+        await deleteRowItem(serviceRowData.id)
+        deleteSuccess()
     }
 
     const handleButtonSelectClick = (e:any) => {
@@ -144,7 +190,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                 <div 
                     className="mt-4"
                 >
-                    <form>
+                    <form onSubmit={editCredentialItemSubmit}>
                         {/* Type */}
                         <div
                             className='flex flex-col space-y-2 mb-4'
@@ -289,18 +335,27 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                         </div>
                         <SheetFooter>
                             <div className='flex items-center justify-end space-x-2 w-full'>
-                                <Button
-                                    onClick={editCredentialItemSubmit}
+                                <SheetClose
+                                    asChild>
+                                    <DropdownMenuItem className='p-0'>
+                                        <Button type='submit'>
+                                            Save Credential
+                                        </Button>
+                                    </DropdownMenuItem>
+                                </SheetClose>
+                                <SheetClose 
+                                    asChild
                                 >
-                                    Save Credential
-                                </Button>
-                                <Button
-                                    variant={'destructive'}
-                                    className='bg-[#631F0A] text-zinc-50'
-                                    onClick={(e) => e.preventDefault()}
-                                >
-                                    Delete
-                                </Button>
+                                    <DropdownMenuItem className='p-0'>
+                                        <Button
+                                            variant={'destructive'}
+                                            className='bg-[#631F0A] text-zinc-50'
+                                            onClick={deleteRow}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </DropdownMenuItem>
+                                </SheetClose>
                             </div>
                         </SheetFooter>
                     </form>
