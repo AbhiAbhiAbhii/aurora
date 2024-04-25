@@ -12,6 +12,7 @@ import {
 import { getAuthUsers, getServiceRowDetails, getUserDetails } from '@/lib/queries'
 import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
+import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
 
 
 type Props = {
@@ -158,6 +159,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                 className={selectCustomClassName}
                             >
                                 <span style={{pointerEvents: 'none'}}>{typeData}</span>
+                                <SelectArrowIcon />
                                 { buttonSelectClick && <div
                                     className={`select-custom-box-activate border bg-white rounded-md`}
                                 >
@@ -247,6 +249,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                 className={selectCustomClassName}
                             >
                                 <span style={{pointerEvents: 'none'}}>{managedbyData}</span>
+                                <SelectArrowIcon />
                                 { buttonManagedSelectClick && <div
                                     className={`select-custom-box-activate border bg-white rounded-md`}
                                 >
