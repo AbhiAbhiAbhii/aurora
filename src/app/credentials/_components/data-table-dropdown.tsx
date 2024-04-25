@@ -21,38 +21,13 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
-import { 
-  FormField, 
-  FormItem, 
-  FormLabel 
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { 
-  Select, 
-  SelectContent, 
-  SelectGroup, 
-  SelectItem, 
-  SelectLabel, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { 
-  Sheet, 
-  SheetClose, 
-  SheetContent, 
-  SheetFooter, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger 
-} from '@/components/ui/sheet'
-import { Textarea } from '@/components/ui/textarea'
-import { deleteItem, getAuthUsers, getUserDetails } from '@/lib/queries'
+
+import { deleteItem, getServiceRowDetails } from '@/lib/queries'
 import { 
   MoreHorizontal, 
   Trash2Icon 
 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { Form, useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
 
 type Props = {
   rowUsernameData: string,
@@ -60,15 +35,10 @@ type Props = {
   rowServicenameData: string
 }
 
-
-
-
 const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData }: Props) => {
 
-
   const { setAlertTitle, setAlertDescription } = useGlobalContext()
-
-
+  const [ initValues, setInitValues ] = useState<any>()
 
   const getAlertContainer = () => {
       let alertContainer = document.querySelector('.alert')
@@ -117,70 +87,80 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     }
   }
 
+  useEffect(() => {
+    async function SetInitialValues() {
+      let data:any = await getServiceRowDetails(rowServicenameData)
+      setInitValues(data[0])
+    }
+    SetInitialValues()
+}, [])
 
   return (
     <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant={'ghost'}
-              className="h-6 w-6 p-0"
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant={'ghost'}
+          className="h-6 w-6 p-0"
+        >
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal size={10} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <EditForm 
+          serviceRowData={initValues}
+          rowServicenameData={rowServicenameData}
+        />
+        <DropdownMenuItem
+          onClick={UserNameCopy}
+        >
+          Copy Username
+        </DropdownMenuItem>
+        <DropdownMenuItem>Visit Login</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={PasswordCopy}
+        >
+          Copy Password
+        </DropdownMenuItem>
+        <DropdownMenuItem>Share Credential</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <div role="menuitem" 
+              className="relative flex cursor-default select-none items-center
+                justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
+                focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
+              data-orientation="vertical" data-radix-collection-item=""
             >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal size={10} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <EditForm />
-            <DropdownMenuItem
-              onClick={UserNameCopy}
-            >
-              Copy Username
-            </DropdownMenuItem>
-            <DropdownMenuItem>Visit Login</DropdownMenuItem>
-            <DropdownMenuItem
-                onClick={PasswordCopy}
-            >
-                Copy Password
-            </DropdownMenuItem>
-            <DropdownMenuItem>Share Credential</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <div role="menuitem" 
-                  className="relative flex cursor-default select-none items-center
-                    justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
-                    focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
-                  data-orientation="vertical" data-radix-collection-item=""
-                >
-                  <AuroraText 
-                    text="Delete"
-                  />
-                  <Trash2Icon size={15} />
-                </div>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the credential.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <DropdownMenuItem className='px-0 py-0'>
-                    <AlertDialogAction>
-                      <Button
-                        onClick={DeleteItem}
-                      >
-                        Continue
-                      </Button>
-                    </AlertDialogAction>
-                  </DropdownMenuItem>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-          </AlertDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <AuroraText 
+                text="Delete"
+              />
+              <Trash2Icon size={15} />
+            </div>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the credential.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <DropdownMenuItem className='px-0 py-0'>
+                <AlertDialogAction>
+                  <Button
+                    onClick={DeleteItem}
+                  >
+                    Continue
+                  </Button>
+                </AlertDialogAction>
+              </DropdownMenuItem>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

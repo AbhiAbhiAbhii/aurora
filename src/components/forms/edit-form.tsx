@@ -1,20 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { 
-    FormField, 
-    FormItem
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { 
-    Select, 
-    SelectContent, 
-    SelectGroup, 
-    SelectItem, 
-    SelectLabel, 
-    SelectTrigger, 
-    SelectValue 
-} from '@/components/ui/select'
-import { 
     Sheet, 
     SheetClose, 
     SheetContent, 
@@ -23,33 +9,24 @@ import {
     SheetTitle, 
     SheetTrigger 
 } from '@/components/ui/sheet'
-import { Textarea } from '@/components/ui/textarea'
-import { Form, useForm } from 'react-hook-form'
-import { z } from "zod"
-import { zodResolver } from '@hookform/resolvers/zod'
+import { getAuthUsers, getServiceRowDetails, getUserDetails } from '@/lib/queries'
 import { Button } from '../ui/button'
-import { getAuthUsers, getUserDetails } from '@/lib/queries'
-import { useGlobalContext } from '../global/my-global-context'
+import { DropdownMenuItem } from '../ui/dropdown-menu'
+import SelectArrowIcon from '../select-arrow-icon'
 
 
-type Props = {}
+type Props = {
+    rowServicenameData: string
+    serviceRowData: any
+}
 
 interface TabValue {
     tab: string
 }
 
-const AddCredentialsFormSchema = z.object({
-    managedby: z.string(),
-    social: z.string(),
-    service_name: z.string().min(1, { message: "Enter Service Name" }),
-    user_name: z.string().min(1, { message: 'Enter User Name' }),
-    password: z.string().min(5, { message: "Must be 5 characters or more" }),
-    url: z.string(),
-    additional_notes: z.string()
-})
+const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
 
-const EditForm = (props: Props) => {
-
+    
     const tabs: TabValue[] = [
         {
             tab: 'All'
@@ -64,26 +41,39 @@ const EditForm = (props: Props) => {
             tab: 'Subscriptions'
         },
     ]
-    const { setAlertTitle, setAlertDescription } = useGlobalContext()
+
+    let labelClassName: string = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2"
+    let inputClassName: string = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    let selectCustomClassName: string = "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 relative"
+    let textAreaClassName: string = "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+    
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
-  
-    const formB = useForm<z.infer<typeof AddCredentialsFormSchema>>({
-        resolver: zodResolver(AddCredentialsFormSchema),
-        defaultValues: {
-            managedby: "",
-            social: "",
-            service_name: "",
-            user_name: "",
-            password: "",
-            url: "",
-            additional_notes: ""
-        }
-    })
+    const [ buttonSelectClick, setButtonSelectClick ] = useState<boolean>(false)
+    const [ buttonManagedSelectClick, setButtonManagedSelectClick ] = useState<boolean>(false)
 
-    async function EditCredentialItem() {  
-        console.log("asdasdjhak")
+    const [ typeData, setTypeData ] = useState<string>("")
+    const [ serviceNameData, setServiceNameData ] = useState<string>("")
+    const [ userNameData, setUserNameData ] = useState<string>("")
+    const [ passwordData, setPasswordData ] = useState<string>("")
+    const [ urlData, setUrlData ] = useState<string>("")
+    const [ managedbyData, setManagedbyData ] = useState<string>("")
+    const [ additionalNotesData, setAdditionalNotesData ] = useState<string>("")
+
+    const editCredentialItemSubmit = async (e:any) => {
+        e.preventDefault()
+        console.log("HANDLER")
+    }
+
+    const handleButtonSelectClick = (e:any) => {
+        setButtonSelectClick(!buttonSelectClick)
+        e.preventDefault()
+    } 
+
+    const handleManagedButtonClick = (e:any) => {
+        setButtonManagedSelectClick(!buttonManagedSelectClick)
+        e.preventDefault()
     }
 
     useEffect(() => {
@@ -109,6 +99,25 @@ const EditForm = (props: Props) => {
         setDetectRoleFunction()
     }, [users])
 
+    useEffect(() => {
+        setServiceNameData(serviceRowData.service_name)
+        setTypeData(serviceRowData.type)
+        setUserNameData(serviceRowData.user_name)
+        setPasswordData(serviceRowData.password)
+        setUrlData(serviceRowData.URL)
+        setManagedbyData(serviceRowData.managed_by)
+        setAdditionalNotesData(serviceRowData.additional_notes)
+    }, [
+        serviceRowData.service_name, 
+        serviceRowData.type, 
+        serviceRowData.user_name, 
+        serviceRowData.password, 
+        serviceRowData.URL, 
+        serviceRowData.managed_by, 
+        serviceRowData.additional_notes
+    ])
+
+
   return (
     <Sheet>
         <SheetTrigger asChild>
@@ -122,7 +131,7 @@ const EditForm = (props: Props) => {
             </div>
         </SheetTrigger>
         <SheetContent 
-            className="w-[80%] min-w-[500px]"
+            className="w-[80%] min-w-[500px] overflow-y-scroll"
         >
             <div className="w-[380px] min-w-[80%] ml-4">
                 <SheetHeader className="mt-8">
@@ -135,173 +144,166 @@ const EditForm = (props: Props) => {
                 <div 
                     className="mt-4"
                 >
-                    <Form {...formB}>
-                        <form onSubmit={formB.handleSubmit(EditCredentialItem)}>
-                            <FormField 
-                                name='social'
-                                control={formB.control}
-                                render={({field}) => (
-                                    <FormItem 
-                                        className='mb-4'
-                                    >
-                                        <label>What type of credential is this?</label>
-                                        <Select onValueChange={field.onChange}>
-                                            <SelectTrigger>
-                                                <SelectValue 
-                                                    placeholder="Select type"
-                                                />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectLabel>Types of Credential</SelectLabel>
-                                                    {
-                                                        tabs.slice(1).map((item, index) => (
-                                                            <SelectItem value={item.tab} key={index}>{item.tab}</SelectItem>
-                                                        ))
-                                                    }
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField 
+                    <form>
+                        {/* Type */}
+                        <div
+                            className='flex flex-col space-y-2 mb-4'
+                        >
+                            <label
+                                className={labelClassName}
+                            >
+                                What type of credential is this?
+                            </label>
+                            <button
+                                onClick={handleButtonSelectClick}
+                                className={selectCustomClassName}
+                            >
+                                <span style={{pointerEvents: 'none'}}>{typeData}</span>
+                                <SelectArrowIcon />
+                                { buttonSelectClick && <div
+                                    className={`select-custom-box-activate border bg-white rounded-md`}
+                                >
+                                    <div className='font-semibold flex py-[0.45rem] items-start text-sm pointer-events-none cursor-default'>
+                                        <p className='ml-7'>
+                                            Type of Credentials
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {
+                                            tabs.slice(1).map((item) => (
+                                                <div
+                                                    onClick={(e:any) => setTypeData(e.target.outerText)}
+                                                    key={item.tab} className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md'>
+                                                    <p className='ml-7'>
+                                                        {item.tab}
+                                                    </p>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                </div>}
+                            </button>
+                        </div>
+                        {/* Servicename */}
+                        <div className='flex flex-col space-y-2 mb-4'>
+                            <label className={labelClassName}>
+                                Service Name
+                            </label>
+                            <input 
+                                value={serviceNameData}
+                                placeholder={serviceNameData}
+                                onChange={(e) => {
+                                    setServiceNameData(e.target.value)
+                                }}
                                 name='service_name'
-                                control={formB.control}
-                                render={({ field }) => (
-                                    <FormItem
-                                        className='mb-4'
-                                    >
-                                        <label>Service Name</label>
-                                        <Input placeholder='' {...field}/>
-                                    </FormItem>
-                                )}
+                                className={`${inputClassName}`}
+                                type="text" 
                             />
-                            <FormField 
-                                control={formB.control}
-                                name="user_name"
-                                render={({ field }) => (
-                                    <FormItem
-                                        className="mb-4"
-                                    >
-                                        <label>
-                                            Username
-                                        </label>
-                                        <Input 
-                                            placeholder=""
-                                            {...field}
-                                        />
-                                    </FormItem>
-                                )}
+                        </div>
+                        {/* Username */}
+                        <div className='flex flex-col space-y-2 mb-4'>
+                            <label className={labelClassName}>
+                                Username
+                            </label>
+                            <input
+                                value={userNameData}
+                                onChange={(e) => setUserNameData(e.target.value)}
+                                name='user_name' 
+                                className={inputClassName}
+                                type="text" 
                             />
-                            <FormField 
-                                control={formB.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem
-                                        className="mb-4"
-                                    >
-                                        <label>
-                                            Password
-                                        </label>
-                                        <Input 
-                                            type="password"
-                                            {...field}
-                                        />
-                                    </FormItem>
-                                )}
+                        </div>
+                        {/* Password*/}
+                        <div className='flex flex-col space-y-2 mb-4'>
+                            <label className={labelClassName}>
+                                Password
+                            </label>
+                            <input
+                                value={passwordData}
+                                onChange={(e) => setPasswordData(e.target.value)}
+                                name='password' 
+                                className={inputClassName}
+                                type="text" 
                             />
-                            <FormField 
-                                control={formB.control}
-                                name="url"
-                                render={({ field }) => (
-                                    <FormItem
-                                        className="mb-4"
-                                    >
-                                        <label>
-                                            URL
-                                        </label>
-                                        <Input 
-                                            {...field}
-                                        />
-                                    </FormItem>
-                                )}
+                        </div>
+                        {/* URL */}
+                        <div className='flex flex-col space-y-2 mb-4'>
+                            <label className={labelClassName}>
+                                URL
+                            </label>
+                            <input
+                                value={urlData}
+                                onChange={(e) => setUrlData(e.target.value)}
+                                name='URL' 
+                                className={inputClassName}
+                                type="text" 
                             />
-                            <FormField 
-                                control={formB.control}
-                                name="managedby"
-                                render={({ field }) => (
-                                    <FormItem
-                                        className="mb-4"
-                                    >
-                                        <label>
-                                            Managed by
-                                        </label>
-                                        <Select
-                                            // defaultValue={"testing"}
-                                            onValueChange={field.onChange}
-                                        >
-                                            <SelectTrigger>
-                                                    <SelectValue 
-                                                        className="text-black"
-                                                        placeholder={
-                                                            users.filter((item:any) => item.email === authUser.user.email).map((filterValue:any) => {
-                                                                setDetectRole(filterValue)
-                                                                return filterValue.user_name
-                                                            })
-                                                        }
-                                                    />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectLabel>Users</SelectLabel>
-                                                    {
-                                                        detectRole.is_god === true ?
-                                                            users.map((item:any, index:number) => (
-                                                                <SelectItem value={item.user_name} key={index}>{item.user_name}</SelectItem>
-                                                            )) 
-                                                            :
-                                                            <SelectItem value={detectRole.user_name}>{detectRole.user_name}</SelectItem>
-                                                    }                                                                
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField 
-                                control={formB.control}
-                                name="additional_notes"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label>Additional Notes</label>
-                                        <Textarea 
-                                            {...field}
-                                            className="resize-none"
-                                        />
-                                    </FormItem>
-                                )}
-                            />
-                            <SheetFooter className="mt-10">
-                                <SheetClose asChild>
-                                    <Button
-                                        type="submit"
-                                    >
-                                        Save Credential
-                                    </Button>
-                                </SheetClose>
-                                <SheetClose>
-                                    <Button
-                                        className='bg-[#631F0A] text-white'
-                                        variant={'destructive'}
-                                        onClick={() => console.log("Cancel")}
-                                    >
-                                        Delete
-                                    </Button>
-                                </SheetClose>
-                            </SheetFooter>
-                        </form>
-                    </Form>
+                        </div>
+                        {/* Managed by */}
+                        <div className='flex flex-col space-y-2 mb-4'>
+                            <label className={labelClassName}>
+                                Managed by
+                            </label>
+                            <button
+                                onClick={handleManagedButtonClick}
+                                className={selectCustomClassName}
+                            >
+                                <span style={{pointerEvents: 'none'}}>{managedbyData}</span>
+                                <SelectArrowIcon />
+                                { buttonManagedSelectClick && <div
+                                    className={`select-custom-box-activate border bg-white rounded-md`}
+                                >
+                                    <div className='font-semibold flex py-[0.45rem] items-start text-sm pointer-events-none cursor-default'>
+                                        <p className='ml-7'>
+                                            Users
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {
+                                            detectRole.is_god === true ?
+                                                users.map((item:any, index:number) => (
+                                                    <div onClick={(e:any) => setManagedbyData(e.target.outerText)} 
+                                                        className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md' key={index}>
+                                                        <p className='ml-7'>
+                                                            {item.user_name}
+                                                        </p>
+                                                    </div>
+                                                )) 
+                                                :
+                                                <div onClick={(e:any) => setManagedbyData(e.target.outerText)} className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md'>
+                                                    <p className='ml-7'>
+                                                        {detectRole.user_name}
+                                                    </p>
+                                                </div>
+                                        }   
+                                    </div>
+                                </div>}
+                            </button>
+                        </div>
+                        {/* Additional notes */}
+                        <div className='flex flex-col space-y-2 mb-12'>
+                            <label className={labelClassName}>
+                                Additional Notes
+                            </label>
+                            <textarea value={additionalNotesData} onChange={(e:any) => setAdditionalNotesData(e.target.value)} className={textAreaClassName} />
+                        </div>
+                        <SheetFooter>
+                            <div className='flex items-center justify-end space-x-2 w-full'>
+                                <Button
+                                    onClick={editCredentialItemSubmit}
+                                >
+                                    Save Credential
+                                </Button>
+                                <Button
+                                    variant={'destructive'}
+                                    className='bg-[#631F0A] text-zinc-50'
+                                    onClick={(e) => e.preventDefault()}
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                        </SheetFooter>
+                    </form>
                 </div>
             </div>
         </SheetContent>

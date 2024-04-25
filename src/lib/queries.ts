@@ -1,9 +1,8 @@
 import { createClient } from "@/utils/supabase/client"
 
-export const getCompanyDetails = async () => { // delete later
+export const getCompanyDetails = async () => { 
     const db =  createClient()
     const response = (await db.from("companies").select("*")).data
-
     return response
 }
 
@@ -13,7 +12,6 @@ export const getUserDetails = async () => {
     if(error) {
         console.log(error)
     } else {
-        console.log(data, "adhjasjdashjkdhjk")
         return data
     }
 }
@@ -27,6 +25,16 @@ export const getServiceDetails = async (value?:any) => {
     const supabase = createClient()
     const data = (await supabase.from("Service").select("*").eq('company_name', `${value}`)).data
     return data
+}
+
+export const getServiceRowDetails = async(value?:string) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from("Service").select("*").eq('service_name', value)
+    if(!error) {
+        return data
+    } else {
+        console.log(error, "Something went Wong")
+    }
 }
 
 export const getCompanyImage = async(folderName?:string) => {
@@ -72,7 +80,6 @@ export const getAuthUsers = async () => {
         if(error) {
             console.log(error, "adjhasd")
         }
-        console.log(data, "asdjahsjkdh")
         return data
     } catch(error) {
         console.log(error, "Something went WONG")

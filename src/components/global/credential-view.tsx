@@ -31,8 +31,7 @@ const CredentialView = (props: Props) => {
   const filteredData = () => {
     return serviceData.filter((item: any) => item.company_name === value && item.type === tabValue)
   }
-
-
+  
   return (
     <div>
       <div 

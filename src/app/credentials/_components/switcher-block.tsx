@@ -185,7 +185,7 @@ const SwitcherBlock = (props: Props) => {
                         </Button>
                     </SheetTrigger>
                     <SheetContent 
-                        className="w-[80%] min-w-[500px]"
+                        className="w-[80%] min-w-[500px] overflow-y-scroll"
                     >
                         <div className="w-[380px] min-w-[80%] ml-4">
                             <SheetHeader className="mt-8">
@@ -305,7 +305,6 @@ const SwitcherBlock = (props: Props) => {
                                                         Managed by
                                                     </FormLabel>
                                                     <Select
-                                                        // defaultValue={"testing"}
                                                         onValueChange={field.onChange}
                                                     >
                                                         <SelectTrigger>

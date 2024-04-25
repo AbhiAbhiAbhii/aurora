@@ -61,7 +61,7 @@ export const columns: ColumnDef<Service>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const rowData = row.original
+      // const rowData = row.original
       const rowUsernameData:string = row.getValue('user_name')
       const rowPasswordData: string = row.getValue('password')
       const rowServicenameData: string = row.getValue('service_name')
