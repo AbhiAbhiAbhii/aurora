@@ -7,11 +7,11 @@ type Props = {}
 
 const Credentials = async (props: Props) => {
 
-  const supabase = createClient()
+  // const supabase = createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // const { data: { user } } = await supabase.auth.getUser()
 
-  if(!user) redirect("/login")
+  // if(!user) redirect("/login")
 
   return (
     <div className='flex flex-col items-start px-10 justify-center mt-12'>
