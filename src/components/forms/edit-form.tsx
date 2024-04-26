@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { 
     Sheet, 
     SheetClose, 
@@ -14,6 +14,8 @@ import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
 import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
 import { useGlobalContext } from '../global/my-global-context'
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
+import { EyeNoneIcon } from '@radix-ui/react-icons'
 
 
 type Props = {
@@ -27,7 +29,6 @@ interface TabValue {
 
 const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
 
-    
     const tabs: TabValue[] = [
         {
             tab: 'All'
@@ -47,7 +48,10 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
     let inputClassName: string = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
     let selectCustomClassName: string = "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 relative"
     let textAreaClassName: string = "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+    let alertDialogTriggerClassName: string = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/90 h-10 px-4 py-2 bg-[#631F0A] text-zinc-50"
     
+    const ref: any = useRef()
+
     const { setAlertDescription, setAlertTitle } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
@@ -63,6 +67,8 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
     const [ managedbyData, setManagedbyData ] = useState<string>("")
     const [ additionalNotesData, setAdditionalNotesData ] = useState<string>("")
 
+    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
+
 
     const updateSuccess = () => {
         let alertContainer = document.querySelector('.alert')
@@ -74,7 +80,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
         }, 2000)
         setTimeout(() => {
             location.reload()
-        }, 3000)
+        }, 2500)
     }
 
     const deleteSuccess = () => {
@@ -87,7 +93,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
         }, 2000)
         setTimeout(() => {
             location.reload()
-        }, 3000)
+        }, 2500)
     }
 
     const editCredentialItemSubmit = async (e:any) => {
@@ -106,7 +112,7 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
         updateSuccess()
     }
 
-    const deleteRow = async (e: any) => {
+    const deleteRow = async (e?: any) => {
         e.preventDefault()
         await deleteRowItem(serviceRowData.id)
         deleteSuccess()
@@ -163,7 +169,6 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
         serviceRowData.additional_notes
     ])
 
-
   return (
     <Sheet>
         <SheetTrigger asChild>
@@ -190,7 +195,9 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                 <div 
                     className="mt-4"
                 >
-                    <form onSubmit={editCredentialItemSubmit}>
+                    <form 
+                        onSubmit={editCredentialItemSubmit}
+                    >
                         {/* Type */}
                         <div
                             className='flex flex-col space-y-2 mb-4'
@@ -219,7 +226,9 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                             tabs.slice(1).map((item) => (
                                                 <div
                                                     onClick={(e:any) => setTypeData(e.target.outerText)}
-                                                    key={item.tab} className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md'>
+                                                    key={item.tab} 
+                                                    className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md'
+                                                >
                                                     <p className='ml-7'>
                                                         {item.tab}
                                                     </p>
@@ -264,13 +273,28 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                             <label className={labelClassName}>
                                 Password
                             </label>
-                            <input
-                                value={passwordData}
-                                onChange={(e) => setPasswordData(e.target.value)}
-                                name='password' 
-                                className={inputClassName}
-                                type="text" 
-                            />
+                            <div
+                                className='w-full relative'
+                            >
+                                <input
+                                    value={passwordData}
+                                    onChange={(e) => setPasswordData(e.target.value)}
+                                    name='password' 
+                                    className={inputClassName}
+                                    type={
+                                        togglePassClick ?
+                                        "text"
+                                        :
+                                        "password"
+                                    }
+                                />
+                                <div
+                                    onClick={() => setTogglePassClick(!togglePassClick)}
+                                    className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                >
+                                    <EyeNoneIcon />
+                                </div>
+                            </div>
                         </div>
                         {/* URL */}
                         <div className='flex flex-col space-y-2 mb-4'>
@@ -285,46 +309,60 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                 type="text" 
                             />
                         </div>
+
                         {/* Managed by */}
                         <div className='flex flex-col space-y-2 mb-4'>
                             <label className={labelClassName}>
                                 Managed by
                             </label>
-                            <button
-                                onClick={handleManagedButtonClick}
-                                className={selectCustomClassName}
-                            >
-                                <span style={{pointerEvents: 'none'}}>{managedbyData}</span>
-                                <SelectArrowIcon />
-                                { buttonManagedSelectClick && <div
-                                    className={`select-custom-box-activate border bg-white rounded-md`}
-                                >
-                                    <div className='font-semibold flex py-[0.45rem] items-start text-sm pointer-events-none cursor-default'>
-                                        <p className='ml-7'>
-                                            Users
+                            {
+                                detectRole?.is_god ? (
+                                    <button
+                                        onClick={handleManagedButtonClick}
+                                        className={selectCustomClassName}
+                                    >
+                                        <span style={{pointerEvents: 'none'}}>{managedbyData}</span>
+                                        <SelectArrowIcon />
+                                        { buttonManagedSelectClick && <div
+                                            className={`select-custom-box-activate border bg-white rounded-md`}
+                                        >
+                                            <div 
+                                                className='font-semibold flex 
+                                                py-[0.45rem] items-start text-sm 
+                                                pointer-events-none cursor-default'
+                                            >
+                                                <p className='ml-7'>
+                                                    Users
+                                                </p>
+                                            </div>
+                                            <div>
+                                                {
+                                                    users.map((item:any, index:number) => (
+                                                        <div onClick={(e:any) => setManagedbyData(e.target.outerText)} 
+                                                            className='flex py-[0.45rem] items-start
+                                                            text-sm hover:bg-[#F5F5F4] transition rounded-md' 
+                                                            key={index}
+                                                        >
+                                                            <p className='ml-7'>
+                                                                {item.user_name}
+                                                            </p>
+                                                        </div>
+                                                    ))  
+                                                }   
+                                            </div>
+                                        </div>}
+                                    </button>
+                                )
+                                : (
+                                    <div 
+                                        className={selectCustomClassName}
+                                    >
+                                        <p>
+                                            {detectRole?.user_name}
                                         </p>
-                                    </div>
-                                    <div>
-                                        {
-                                            detectRole.is_god === true ?
-                                                users.map((item:any, index:number) => (
-                                                    <div onClick={(e:any) => setManagedbyData(e.target.outerText)} 
-                                                        className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md' key={index}>
-                                                        <p className='ml-7'>
-                                                            {item.user_name}
-                                                        </p>
-                                                    </div>
-                                                )) 
-                                                :
-                                                <div onClick={(e:any) => setManagedbyData(e.target.outerText)} className='flex py-[0.45rem] items-start text-sm hover:bg-[#F5F5F4] transition rounded-md'>
-                                                    <p className='ml-7'>
-                                                        {detectRole.user_name}
-                                                    </p>
-                                                </div>
-                                        }   
-                                    </div>
-                                </div>}
-                            </button>
+                                    </div> 
+                                )
+                            }
                         </div>
                         {/* Additional notes */}
                         <div className='flex flex-col space-y-2 mb-12'>
@@ -337,8 +375,11 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                             <div className='flex items-center justify-end space-x-2 w-full'>
                                 <SheetClose
                                     asChild>
-                                    <DropdownMenuItem className='p-0'>
-                                        <Button type='submit'>
+                                    <DropdownMenuItem
+                                        className='p-0'>
+                                        <Button
+                                            type='submit'
+                                        >
                                             Save Credential
                                         </Button>
                                     </DropdownMenuItem>
@@ -346,15 +387,46 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                                 <SheetClose 
                                     asChild
                                 >
-                                    <DropdownMenuItem className='p-0'>
-                                        <Button
-                                            variant={'destructive'}
-                                            className='bg-[#631F0A] text-zinc-50'
-                                            onClick={deleteRow}
+                                    <AlertDialog>
+                                        <AlertDialogTrigger
+                                            className={alertDialogTriggerClassName}
                                         >
                                             Delete
-                                        </Button>
-                                    </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Are you absolutely sure?
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the credential.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel
+                                                >
+                                                    Cancel
+                                                </AlertDialogCancel>
+                                                {/* <AlertDialogCancel
+                                                    className='p-0'
+                                                > */}
+                                                    <DropdownMenuItem
+                                                        ref={ref}
+                                                        className='p-0 hidden'
+                                                        >
+                                                    </DropdownMenuItem>
+                                                    <Button
+                                                        onClick={(e) => {
+                                                            deleteRow(e)
+                                                            ref.current.click()
+                                                        }}
+                                                    >
+                                                        Continue
+                                                    </Button>
+                                                {/* </AlertDialogCancel> */}
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </SheetClose>
                             </div>
                         </SheetFooter>

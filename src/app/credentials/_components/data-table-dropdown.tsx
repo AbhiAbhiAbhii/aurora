@@ -70,6 +70,9 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     getAlertContainer()
     setAlertTitle('Item Deleted')
     setAlertDescription('Your selected credential were deleted')
+    setTimeout(() => {
+      location.reload()
+    }, 2500)
   }
 
   const ItemDeletedError = () => {
@@ -148,7 +151,9 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <DropdownMenuItem className='px-0 py-0'>
-                <AlertDialogAction>
+                <AlertDialogAction
+                  className='p-0'
+                >
                   <Button
                     onClick={DeleteItem}
                   >

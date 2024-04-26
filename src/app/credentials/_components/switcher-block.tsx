@@ -27,6 +27,7 @@ import { getAuthUsers, getUserDetails } from "@/lib/queries"
 import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
+import { EyeNoneIcon } from "@radix-ui/react-icons"
 
 type Props = {}
 
@@ -35,12 +36,12 @@ interface TabValue {
 }
 
 const AddCredentialsFormSchema = z.object({
-    managedby: z.string(),
-    social: z.string(),
+    managedby: z.string().min(1, { message: 'Select a field'}),
+    social: z.string().min(1, { message: "Select the type field" }),
     service_name: z.string().min(1, { message: "Enter Service Name" }),
     user_name: z.string().min(1, { message: 'Enter User Name' }),
     password: z.string().min(5, { message: "Must be 5 characters or more" }),
-    url: z.string(),
+    url: z.string().min(1, { message: 'The url field is required'}),
     additional_notes: z.string()
 })
 
@@ -65,6 +66,7 @@ const SwitcherBlock = (props: Props) => {
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
+    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
     const form = useForm<z.infer<typeof AddCredentialsFormSchema>>({
         resolver: zodResolver(AddCredentialsFormSchema),
         defaultValues: {
@@ -271,10 +273,23 @@ const SwitcherBlock = (props: Props) => {
                                                     <FormLabel>
                                                         Password
                                                     </FormLabel>
-                                                    <Input 
-                                                        type="password"
-                                                        {...field}
-                                                    />
+                                                    <div className="w-full relative">
+                                                        <Input 
+                                                            type={
+                                                                togglePassClick ?
+                                                                "text"
+                                                                :
+                                                                "password"
+                                                            }
+                                                            {...field}
+                                                        />
+                                                        <div
+                                                            onClick={() => setTogglePassClick(!togglePassClick)}
+                                                            className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                                        >
+                                                            <EyeNoneIcon />
+                                                        </div>
+                                                    </div>
                                                 </FormItem>
                                             )}
                                         />
@@ -294,47 +309,43 @@ const SwitcherBlock = (props: Props) => {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField 
-                                            control={form.control}
-                                            name="managedby"
-                                            render={({ field }) => (
-                                                <FormItem
-                                                    className="mb-4"
-                                                >
-                                                    <FormLabel>
-                                                        Managed by
-                                                    </FormLabel>
-                                                    <Select
-                                                        onValueChange={field.onChange}
+                                        {
+                                            detectRole?.is_god && (
+                                                <FormField 
+                                                control={form.control}
+                                                name="managedby"
+                                                render={({ field }) => (
+                                                    <FormItem
+                                                        className="mb-4"
                                                     >
-                                                        <SelectTrigger>
-                                                                <SelectValue 
-                                                                    className="text-black"
-                                                                    placeholder={
-                                                                        users.filter((item:any) => item.email === authUser.user.email).map((filterValue:any) => {
-                                                                            setDetectRole(filterValue)
-                                                                            return filterValue.user_name
-                                                                        })
-                                                                    }
-                                                                />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectGroup>
-                                                                <SelectLabel>Users</SelectLabel>
-                                                                {
-                                                                    detectRole.is_god === true ?
+                                                        <FormLabel>
+                                                            Managed by
+                                                        </FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                        >
+                                                            <SelectTrigger>
+                                                                    <SelectValue 
+                                                                        className="text-black"
+                                                                        placeholder={""}
+                                                                    />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectGroup>
+                                                                    <SelectLabel>Users</SelectLabel>
+                                                                    {
                                                                         users.map((item:any, index:number) => (
                                                                             <SelectItem value={item.user_name} key={index}>{item.user_name}</SelectItem>
-                                                                        )) 
-                                                                        :
-                                                                        <SelectItem value={detectRole.user_name}>{detectRole.user_name}</SelectItem>
-                                                                }                                                                
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
+                                                                        ))    
+                                                                    }                                                           
+                                                                </SelectGroup>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            )
+                                        }
                                         <FormField 
                                             control={form.control}
                                             name="additional_notes"
