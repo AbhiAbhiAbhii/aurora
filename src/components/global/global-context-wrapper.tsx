@@ -14,6 +14,8 @@ const ContextWrapper = ({ children }: Props) => {
   const [ alertTitle, setAlertTitle ] = useState<string>("")
   const [ alertDescription, setAlertDescription ] = useState<string>("")
 
+  const [ checkBoxIdValue, setCheckBoxIdValue ] = useState<any>([])
+
   return (
     <MyGlobalContext.Provider 
       value={
@@ -22,7 +24,8 @@ const ContextWrapper = ({ children }: Props) => {
           setLinkValue, tabValue, setTabValue,
           credentialInsert, setCredentialInsert,
           alertTitle, setAlertTitle,
-          alertDescription, setAlertDescription
+          alertDescription, setAlertDescription,
+          checkBoxIdValue, setCheckBoxIdValue
         }
       }
     >

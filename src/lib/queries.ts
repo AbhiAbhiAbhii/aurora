@@ -100,6 +100,12 @@ export const deleteRowItem = async (dataId: string) => {
     }
 }
 
+export const deleteAllItems = async (data: any) => {
+    const supabase = createClient()
+    const allData = await supabase.from("Service").delete().in('id', [...data])
+    return allData
+}
+
 export const updateItem = async(
     rowId: any,
     companyname: string,

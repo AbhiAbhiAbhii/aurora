@@ -4,6 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import PasswordFormat from "./_components/password-format"
 import UsernameBox from "./_components/username-box"
 import DataTableDropDown from "./_components/data-table-dropdown"
+import AllAction from "./_components/all-action"
+import ServiceCheckBox from "./_components/service-checkbox"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -24,6 +26,11 @@ export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "service_name",
     header: "Service Name",
+    cell: ({ row }) => {
+      const data: string = row.getValue('service_name')
+      const rowServicenameData: string = row.getValue('service_name')
+      return <ServiceCheckBox rowServicenameData={rowServicenameData} data={data} />
+    }
   },
   {
     accessorKey: "user_name",
@@ -60,6 +67,7 @@ export const columns: ColumnDef<Service>[] = [
   },
   {
     id: 'actions',
+    header: () => <AllAction />,
     cell: ({ row }) => {
       // const rowData = row.original
       const rowUsernameData:string = row.getValue('user_name')

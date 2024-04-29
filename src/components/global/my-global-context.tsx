@@ -13,6 +13,8 @@ export type GlobalContent = {
   setAlertTitle: (v: string) => void
   alertDescription: string
   setAlertDescription: (v: string) => void
+  checkBoxIdValue: any
+  setCheckBoxIdValue: (v: any) => void
 }
 export const MyGlobalContext = createContext<GlobalContent>({
 value: '', // set a default value
@@ -26,6 +28,8 @@ setCredentialInsert: () => {},
 alertTitle: '',
 setAlertTitle: () => {},
 alertDescription: '',
-setAlertDescription: () => {}
+setAlertDescription: () => {},
+checkBoxIdValue: '',
+setCheckBoxIdValue: () => {}
 })
 export const useGlobalContext = () => useContext(MyGlobalContext)
