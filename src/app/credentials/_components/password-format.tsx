@@ -1,13 +1,16 @@
 import { useGlobalContext } from '@/components/global/my-global-context'
+import { createClient } from '@/utils/supabase/client'
 import { CopyIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 type Props = {
     data: string
+    checkValue: boolean
 }
 
-const PasswordFormat = ({ data }: Props) => {
-    const { setAlertTitle, setAlertDescription } = useGlobalContext()
+const PasswordFormat = ({ data, checkValue }: Props) => {
+    const { setAlertTitle, setAlertDescription, isGoogle } = useGlobalContext()
+    const [ checkState, setCheckState ] = useState<any>([])
     const CopyClick = () => {
         navigator.clipboard.writeText(data)
         setAlertTitle('Password Copied!')
@@ -18,16 +21,29 @@ const PasswordFormat = ({ data }: Props) => {
           alertContainer?.classList.remove('alert-active')
         }, 2000)
     }
+
+    console.log(checkValue, "hello")
+
+
   return (
     <div className="flex items-center space-x-2">
-        <p className="password-format">
-        12345678910
-        </p>
-        <CopyIcon 
-        className="cursor-pointer"
-        onClick={CopyClick}
-        size={16}
-        />
+        {
+          checkValue ?
+          <>
+            Signed in with a service
+          </>
+          :
+          <>
+            <p className="password-format">
+              Entha Mwone ?
+            </p>
+            <CopyIcon 
+              className="cursor-pointer"
+              onClick={CopyClick}
+              size={16}
+            />
+          </>
+        }
     </div>
   )
 }

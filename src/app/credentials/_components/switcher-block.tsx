@@ -35,16 +35,6 @@ interface TabValue {
     tab: string
 }
 
-const AddCredentialsFormSchema = z.object({
-    managedby: z.string().min(1, { message: 'Select a field'}),
-    social: z.string().min(1, { message: "Select the type field" }),
-    service_name: z.string().min(1, { message: "Enter Service Name" }),
-    user_name: z.string().min(1, { message: 'Enter User Name' }),
-    password: z.string().min(5, { message: "Must be 5 characters or more" }),
-    url: z.string().min(1, { message: 'The url field is required'}),
-    additional_notes: z.string()
-})
-
 const SwitcherBlock = (props: Props) => {
 
     const tabs: TabValue[] = [
@@ -62,11 +52,27 @@ const SwitcherBlock = (props: Props) => {
         },
     ]
 
-    const { setTabValue, value, setAlertTitle, setAlertDescription } = useGlobalContext()
+    const { setTabValue, value, setAlertTitle, setAlertDescription, isGoogle, setIsGoogle } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
+
+    const AddCredentialsFormSchema = z.object({
+        managedby: z.string().min(1, { message: 'Select a field'}),
+        social: z.string().min(1, { message: "Select the type field" }),
+        service_name: z.string().min(1, { message: "Enter Service Name" }),
+        user_name: z.string().min(1, { message: 'Enter User Name' }),
+        password: 
+            isGoogle ?
+            z.string()
+            :
+            z.string().min(5, { message: "Must be 5 characters or more" })
+        ,
+        url: z.string().min(1, { message: 'The url field is required'}),
+        additional_notes: z.string()
+    })
+
     const form = useForm<z.infer<typeof AddCredentialsFormSchema>>({
         resolver: zodResolver(AddCredentialsFormSchema),
         defaultValues: {
@@ -79,6 +85,10 @@ const SwitcherBlock = (props: Props) => {
             additional_notes: ""
         }
     })
+
+    useEffect(() => {
+        console.log(AddCredentialsFormSchema, "hello there")
+    }, [isGoogle])
 
     const successNotification = () => {
         let alertContainer = document.querySelector('.alert')
@@ -115,7 +125,8 @@ const SwitcherBlock = (props: Props) => {
                 password: password, 
                 URL: url, 
                 additional_notes: additional_notes,
-                managed_by: managedby
+                managed_by: managedby,
+                is_google: isGoogle
             }) 
             if(res.error) {
                 notSuccessNotification()
@@ -150,6 +161,13 @@ const SwitcherBlock = (props: Props) => {
         }
         setDetectRoleFunction()
     }, [users])
+
+   function detectCheckBox() {
+    setIsGoogle((prevValue: any) => !prevValue)
+   }
+
+   let inactiveCheckBox = <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"></button>
+   let activeCheckBox = <button type="button" role="checkbox" aria-checked="true" data-state="checked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"><span data-state="checked" className="flex items-center justify-center text-current" style={{pointerEvents: 'none'}}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-check h-4 w-4"><path d="M20 6 9 17l-5-5"></path></svg></span></button>;
 
     return (
         <div>
@@ -263,36 +281,60 @@ const SwitcherBlock = (props: Props) => {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField 
-                                            control={form.control}
-                                            name="password"
-                                            render={({ field }) => (
-                                                <FormItem
-                                                    className="mb-4"
+                                        <div
+                                            className="space-y-2 mb-6 mt-6 flex items-center"
+                                        >
+                                            <label
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                is Google?
+                                            </label>
+                                                <div
+                                                    className="flex items-center justify-center !m-0 !ml-2"
+                                                    onClick={detectCheckBox}
                                                 >
-                                                    <FormLabel>
-                                                        Password
-                                                    </FormLabel>
-                                                    <div className="w-full relative">
-                                                        <Input 
-                                                            type={
-                                                                togglePassClick ?
-                                                                "text"
-                                                                :
-                                                                "password"
-                                                            }
-                                                            {...field}
-                                                        />
-                                                        <div
-                                                            onClick={() => setTogglePassClick(!togglePassClick)}
-                                                            className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                                    {
+                                                        isGoogle ?
+                                                        activeCheckBox
+                                                        :
+                                                        inactiveCheckBox
+                                                    }
+                                                </div>
+                                        </div>
+                                        {
+                                            !isGoogle && (
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="password"
+                                                    render={({ field }) => (
+                                                        <FormItem
+                                                            className="mb-4"
                                                         >
-                                                            <EyeNoneIcon />
-                                                        </div>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
+                                                            <FormLabel>
+                                                                Password
+                                                            </FormLabel>
+                                                            <div className="w-full relative">
+                                                                <Input 
+                                                                    type={
+                                                                        togglePassClick ?
+                                                                        "text"
+                                                                        :
+                                                                        "password"
+                                                                    }
+                                                                    {...field}
+                                                                />
+                                                                <div
+                                                                    onClick={() => setTogglePassClick(!togglePassClick)}
+                                                                    className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                                                >
+                                                                    <EyeNoneIcon />
+                                                                </div>
+                                                            </div>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            )
+                                        }
                                         <FormField 
                                             control={form.control}
                                             name="url"

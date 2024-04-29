@@ -19,6 +19,7 @@ export type Service = {
   URL: string
   additional_notes: string
   managed_by: string
+  is_goolge: boolean
 }
 
 export const columns: ColumnDef<Service>[] = [
@@ -40,11 +41,17 @@ export const columns: ColumnDef<Service>[] = [
     }
   },
   {
+    accessorKey: 'is_google',
+    header: () => <div className="hidden"></div>,
+    cell:({row}) => <div className="hidden"></div>
+  },
+  {
     accessorKey: "password",
     header: "Password",
     cell: ({ row }) => {
       const data: string = row.getValue('password')
-      return <PasswordFormat data={data} />
+      const boolean: boolean = row.getValue('is_google')
+      return <PasswordFormat checkValue={boolean} data={data} />
     }
   },
   {

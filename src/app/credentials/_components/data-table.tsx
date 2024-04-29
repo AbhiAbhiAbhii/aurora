@@ -166,9 +166,9 @@ export function DataTable<TData, TValue>({
                     onClick={() => table.lastPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    <DoubleArrowRightIcon 
-                        fontSize={iconSize}
-                    />
+                  <DoubleArrowRightIcon 
+                      fontSize={iconSize}
+                  />
                 </Button>
             </div>
         </div>
