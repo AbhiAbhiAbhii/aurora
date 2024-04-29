@@ -47,7 +47,6 @@ const AllAction = (props: Props) => {
         } else {
             ItemDeletedError()
         }
-        console.log(checkBoxIdValue, "testing")
     }
 
   return (

@@ -309,8 +309,8 @@ const SwitcherBlock = (props: Props) => {
                                                 </FormItem>
                                             )}
                                         />
-                                        {
-                                            detectRole?.is_god && (
+                                        {/* {
+                                            detectRole?.is_god && ( */}
                                                 <FormField 
                                                 control={form.control}
                                                 name="managedby"
@@ -344,8 +344,6 @@ const SwitcherBlock = (props: Props) => {
                                                     </FormItem>
                                                 )}
                                             />
-                                            )
-                                        }
                                         <FormField 
                                             control={form.control}
                                             name="additional_notes"

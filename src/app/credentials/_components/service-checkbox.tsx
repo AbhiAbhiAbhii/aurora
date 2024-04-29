@@ -24,11 +24,9 @@ const ServiceCheckBox = ({ data, rowServicenameData }: Props) => {
 
   function handleCheckBoxChange(id:any) {
     setCheckBoxIdValue((prevValue: any) => {
-      
-      const isChecked = checkBoxIdValue.includes(id);
-
+      const isChecked = checkBoxIdValue.includes(id)
       if(isChecked) {
-        return prevValue.filter((value:any) => value !== id);
+        return prevValue.filter((value:any) => value !== id)
       } else {
         return [...prevValue, id]
       }
