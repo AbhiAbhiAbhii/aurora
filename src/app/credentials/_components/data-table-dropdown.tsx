@@ -37,7 +37,7 @@ type Props = {
 
 const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData }: Props) => {
 
-  const { setAlertTitle, setAlertDescription } = useGlobalContext()
+  const { setAlertTitle, setAlertDescription, value } = useGlobalContext()
   const [ initValues, setInitValues ] = useState<any>()
 
   const getAlertContainer = () => {
@@ -93,10 +93,13 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   useEffect(() => {
     async function SetInitialValues() {
       let data:any = await getServiceRowDetails(rowServicenameData)
-      setInitValues(data[0])
+      setInitValues((prevValue: any) => {
+        let currentValue = data[0]
+        return currentValue;
+      })
     }
     SetInitialValues()
-}, [])
+}, [value, rowServicenameData])
 
   return (
     <DropdownMenu>

@@ -21,7 +21,6 @@ export type Service = {
   managed_by: string
 }
 
-
 export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "service_name",
