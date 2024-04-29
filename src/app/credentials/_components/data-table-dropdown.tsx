@@ -32,10 +32,11 @@ import { useEffect, useState } from 'react'
 type Props = {
   rowUsernameData: string,
   rowPasswordData: string,
-  rowServicenameData: string
+  rowServicenameData: string,
+  checkState: boolean
 }
 
-const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData }: Props) => {
+const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData, checkState }: Props) => {
 
   const { setAlertTitle, setAlertDescription, value } = useGlobalContext()
   const [ initValues, setInitValues ] = useState<any>()
@@ -114,6 +115,7 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <EditForm 
+          checkState={checkState}
           serviceRowData={initValues}
           rowServicenameData={rowServicenameData}
         />

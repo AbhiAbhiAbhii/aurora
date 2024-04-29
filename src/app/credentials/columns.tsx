@@ -79,8 +79,11 @@ export const columns: ColumnDef<Service>[] = [
       const rowUsernameData:string = row.getValue('user_name')
       const rowPasswordData: string = row.getValue('password')
       const rowServicenameData: string = row.getValue('service_name')
+      const boolean: boolean = row.getValue('is_google')
+
       return(
         <DataTableDropDown 
+          checkState={boolean}
           rowUsernameData={rowUsernameData} 
           rowPasswordData={rowPasswordData}
           rowServicenameData={rowServicenameData}

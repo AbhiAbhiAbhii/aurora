@@ -21,13 +21,14 @@ import { EyeNoneIcon } from '@radix-ui/react-icons'
 type Props = {
     rowServicenameData: string
     serviceRowData: any
+    checkState: boolean
 }
 
 interface TabValue {
     tab: string
 }
 
-const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
+const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
 
     const tabs: TabValue[] = [
         {
@@ -269,33 +270,37 @@ const EditForm = ({rowServicenameData, serviceRowData}: Props) => {
                             />
                         </div>
                         {/* Password*/}
-                        <div className='flex flex-col space-y-2 mb-4'>
-                            <label className={labelClassName}>
-                                Password
-                            </label>
-                            <div
-                                className='w-full relative'
-                            >
-                                <input
-                                    value={passwordData}
-                                    onChange={(e) => setPasswordData(e.target.value)}
-                                    name='password' 
-                                    className={inputClassName}
-                                    type={
-                                        togglePassClick ?
-                                        "text"
-                                        :
-                                        "password"
-                                    }
-                                />
-                                <div
-                                    onClick={() => setTogglePassClick(!togglePassClick)}
-                                    className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
-                                >
-                                    <EyeNoneIcon />
+                        {
+                            !checkState && (
+                                <div className='flex flex-col space-y-2 mb-4'>
+                                    <label className={labelClassName}>
+                                        Password
+                                    </label>
+                                    <div
+                                        className='w-full relative'
+                                    >
+                                        <input
+                                            value={passwordData}
+                                            onChange={(e) => setPasswordData(e.target.value)}
+                                            name='password' 
+                                            className={inputClassName}
+                                            type={
+                                                togglePassClick ?
+                                                "text"
+                                                :
+                                                "password"
+                                            }
+                                        />
+                                        <div
+                                            onClick={() => setTogglePassClick(!togglePassClick)}
+                                            className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                        >
+                                            <EyeNoneIcon />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            )
+                        }
                         {/* URL */}
                         <div className='flex flex-col space-y-2 mb-4'>
                             <label className={labelClassName}>
