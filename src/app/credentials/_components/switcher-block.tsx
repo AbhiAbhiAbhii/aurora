@@ -52,11 +52,12 @@ const SwitcherBlock = (props: Props) => {
         },
     ]
 
-    const { setTabValue, value, setAlertTitle, setAlertDescription, isGoogle, setIsGoogle } = useGlobalContext()
+    const { setTabValue, value, setAlertTitle, setAlertDescription } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
+    const [ isGoogle, setIsGoogle ] = useState<any>(false)
 
     const AddCredentialsFormSchema = z.object({
         managedby: z.string().min(1, { message: 'Select a field'}),
@@ -163,7 +164,7 @@ const SwitcherBlock = (props: Props) => {
     }, [users])
 
    function detectCheckBox() {
-    setIsGoogle((prevValue: any) => !prevValue)
+    setIsGoogle((prevValue:any) => !prevValue)
    }
 
    let inactiveCheckBox = <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"></button>

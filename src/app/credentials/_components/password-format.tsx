@@ -9,8 +9,7 @@ type Props = {
 }
 
 const PasswordFormat = ({ data, checkValue }: Props) => {
-    const { setAlertTitle, setAlertDescription, isGoogle } = useGlobalContext()
-    const [ checkState, setCheckState ] = useState<any>([])
+    const { setAlertTitle, setAlertDescription } = useGlobalContext()
     const CopyClick = () => {
         navigator.clipboard.writeText(data)
         setAlertTitle('Password Copied!')
@@ -21,9 +20,6 @@ const PasswordFormat = ({ data, checkValue }: Props) => {
           alertContainer?.classList.remove('alert-active')
         }, 2000)
     }
-
-    console.log(checkValue, "hello")
-
 
   return (
     <div className="flex items-center space-x-2">

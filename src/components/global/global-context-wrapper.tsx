@@ -13,10 +13,7 @@ const ContextWrapper = ({ children }: Props) => {
   const [ credentialInsert, setCredentialInsert ] = useState<boolean>(false)
   const [ alertTitle, setAlertTitle ] = useState<string>("")
   const [ alertDescription, setAlertDescription ] = useState<string>("")
-
   const [ checkBoxIdValue, setCheckBoxIdValue ] = useState<any>([])
-  const [ isGoogle, setIsGoogle ] = useState<boolean>(false)
-
 
   return (
     <MyGlobalContext.Provider 
@@ -28,7 +25,6 @@ const ContextWrapper = ({ children }: Props) => {
           alertTitle, setAlertTitle,
           alertDescription, setAlertDescription,
           checkBoxIdValue, setCheckBoxIdValue,
-          isGoogle, setIsGoogle
         }
       }
     >
