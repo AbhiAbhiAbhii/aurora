@@ -67,7 +67,7 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
     const [ urlData, setUrlData ] = useState<string>("")
     const [ managedbyData, setManagedbyData ] = useState<string>("")
     const [ additionalNotesData, setAdditionalNotesData ] = useState<string>("")
-
+    const [ ssoNameData, setSsoNameData ] = useState<string>("")
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
 
 
@@ -108,7 +108,8 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
             userNameData,
             urlData,
             additionalNotesData,
-            managedbyData
+            managedbyData,
+            ssoNameData
         )
         updateSuccess()
     }
@@ -120,13 +121,13 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
     }
 
     const handleButtonSelectClick = (e:any) => {
-        setButtonSelectClick(!buttonSelectClick)
         e.preventDefault()
+        setButtonSelectClick(!buttonSelectClick)
     } 
 
     const handleManagedButtonClick = (e:any) => {
-        setButtonManagedSelectClick(!buttonManagedSelectClick)
         e.preventDefault()
+        setButtonManagedSelectClick(!buttonManagedSelectClick)
     }
 
     useEffect(() => {
@@ -160,6 +161,7 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
         setUrlData(serviceRowData.URL)
         setManagedbyData(serviceRowData.managed_by)
         setAdditionalNotesData(serviceRowData.additional_notes)
+        setSsoNameData(serviceRowData.sso_name)
     }, [
         serviceRowData.service_name, 
         serviceRowData.type, 
@@ -167,7 +169,8 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
         serviceRowData.password, 
         serviceRowData.URL, 
         serviceRowData.managed_by, 
-        serviceRowData.additional_notes
+        serviceRowData.additional_notes,
+        serviceRowData.sso_name
     ])
 
   return (
@@ -269,6 +272,25 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
                                 type="text" 
                             />
                         </div>
+                        {
+                            checkState && (
+                                <div className='flex flex-col space-y-2 mb-4'>
+                                    <label className={labelClassName}>
+                                        SSO Name
+                                    </label>
+                                    <input 
+                                        onChange={(e) => {
+                                            setSsoNameData(() => {
+                                                let inputValue = e.target.value
+                                                return inputValue
+                                            })
+                                        }}
+                                        value={ssoNameData}
+                                        className={inputClassName}
+                                    />
+                                </div>
+                            )
+                        }
                         {/* Password*/}
                         {
                             !checkState && (

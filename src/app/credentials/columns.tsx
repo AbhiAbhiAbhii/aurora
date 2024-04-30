@@ -19,7 +19,8 @@ export type Service = {
   URL: string
   additional_notes: string
   managed_by: string
-  is_goolge: boolean
+  is_sso: boolean
+  sso_name: string
 }
 
 export const columns: ColumnDef<Service>[] = [
@@ -41,17 +42,23 @@ export const columns: ColumnDef<Service>[] = [
     }
   },
   {
-    accessorKey: 'is_google',
+    accessorKey: 'is_sso',
     header: () => <div className="hidden"></div>,
-    cell:({row}) => <div className="hidden"></div>
+    cell:() => <div className="hidden"></div>
+  },
+  {
+    accessorKey: 'sso_name',
+    header: () => <div className="hidden"></div>,
+    cell:() => <div className="hidden"></div>
   },
   {
     accessorKey: "password",
     header: "Password",
     cell: ({ row }) => {
       const data: string = row.getValue('password')
-      const boolean: boolean = row.getValue('is_google')
-      return <PasswordFormat checkValue={boolean} data={data} />
+      const boolean: boolean = row.getValue('is_sso')
+      const ssoValue: string = row.getValue('sso_name')
+      return <PasswordFormat ssoName={ssoValue} checkValue={boolean} data={data} />
     }
   },
   {
@@ -75,12 +82,10 @@ export const columns: ColumnDef<Service>[] = [
     id: 'actions',
     header: () => <AllAction />,
     cell: ({ row }) => {
-      // const rowData = row.original
       const rowUsernameData:string = row.getValue('user_name')
       const rowPasswordData: string = row.getValue('password')
       const rowServicenameData: string = row.getValue('service_name')
-      const boolean: boolean = row.getValue('is_google')
-
+      const boolean: boolean = row.getValue('is_sso')
       return(
         <DataTableDropDown 
           checkState={boolean}

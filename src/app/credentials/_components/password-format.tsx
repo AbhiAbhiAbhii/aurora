@@ -6,19 +6,20 @@ import React, { useEffect, useState } from 'react'
 type Props = {
     data: string
     checkValue: boolean
+    ssoName: string
 }
 
-const PasswordFormat = ({ data, checkValue }: Props) => {
+const PasswordFormat = ({ data, checkValue, ssoName }: Props) => {
     const { setAlertTitle, setAlertDescription } = useGlobalContext()
     const CopyClick = () => {
-        navigator.clipboard.writeText(data)
-        setAlertTitle('Password Copied!')
-        setAlertDescription('Your credential password is ready to be pasted.')
-        const alertContainer = document.querySelector('.alert')
-        alertContainer?.classList.add('alert-active')
-        setTimeout(() => {
-          alertContainer?.classList.remove('alert-active')
-        }, 2000)
+      navigator.clipboard.writeText(data)
+      setAlertTitle('Password Copied!')
+      setAlertDescription('Your credential password is ready to be pasted.')
+      const alertContainer = document.querySelector('.alert')
+      alertContainer?.classList.add('alert-active')
+      setTimeout(() => {
+        alertContainer?.classList.remove('alert-active')
+      }, 2000)
     }
 
   return (
@@ -26,7 +27,7 @@ const PasswordFormat = ({ data, checkValue }: Props) => {
         {
           checkValue ?
           <>
-            Signed in with a service
+            {ssoName} SSO
           </>
           :
           <>

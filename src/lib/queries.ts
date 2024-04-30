@@ -115,7 +115,8 @@ export const updateItem = async(
     username: string,
     url: string,
     additionalnotes: string,
-    managedby: string
+    managedby: string,
+    sso_name?: string
 ) => {
     const supabase = createClient()
     try {
@@ -128,7 +129,8 @@ export const updateItem = async(
             user_name: username,
             URL: url,
             additional_notes: additionalnotes,
-            managed_by: managedby
+            managed_by: managedby,
+            sso_name: sso_name
         }).eq('id', rowId)
         if(error) {
             alert("Something went WONG")

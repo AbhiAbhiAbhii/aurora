@@ -57,7 +57,8 @@ const SwitcherBlock = (props: Props) => {
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
-    const [ isGoogle, setIsGoogle ] = useState<any>(false)
+    const [ isSSO, setIsSSO ] = useState<any>(false)
+    const [ ssoName, setSsoName ] = useState<string>("")
 
     const AddCredentialsFormSchema = z.object({
         managedby: z.string().min(1, { message: 'Select a field'}),
@@ -65,7 +66,7 @@ const SwitcherBlock = (props: Props) => {
         service_name: z.string().min(1, { message: "Enter Service Name" }),
         user_name: z.string().min(1, { message: 'Enter User Name' }),
         password: 
-            isGoogle ?
+            isSSO ?
             z.string()
             :
             z.string().min(5, { message: "Must be 5 characters or more" })
@@ -89,7 +90,7 @@ const SwitcherBlock = (props: Props) => {
 
     useEffect(() => {
         console.log(AddCredentialsFormSchema, "hello there")
-    }, [isGoogle])
+    }, [isSSO])
 
     const successNotification = () => {
         let alertContainer = document.querySelector('.alert')
@@ -127,7 +128,8 @@ const SwitcherBlock = (props: Props) => {
                 URL: url, 
                 additional_notes: additional_notes,
                 managed_by: managedby,
-                is_google: isGoogle
+                is_sso: isSSO,
+                sso_name: ssoName
             }) 
             if(res.error) {
                 notSuccessNotification()
@@ -164,7 +166,7 @@ const SwitcherBlock = (props: Props) => {
     }, [users])
 
    function detectCheckBox() {
-    setIsGoogle((prevValue:any) => !prevValue)
+    setIsSSO((prevValue:any) => !prevValue)
    }
 
    let inactiveCheckBox = <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"></button>
@@ -288,14 +290,14 @@ const SwitcherBlock = (props: Props) => {
                                             <label
                                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                             >
-                                                is Google?
+                                                Is it a SSO(Single sign-on)?
                                             </label>
                                                 <div
                                                     className="flex items-center justify-center !m-0 !ml-2"
                                                     onClick={detectCheckBox}
                                                 >
                                                     {
-                                                        isGoogle ?
+                                                        isSSO ?
                                                         activeCheckBox
                                                         :
                                                         inactiveCheckBox
@@ -303,7 +305,31 @@ const SwitcherBlock = (props: Props) => {
                                                 </div>
                                         </div>
                                         {
-                                            !isGoogle && (
+                                            isSSO && (
+                                                <div
+                                                    className="space-y-2 mb-4 flex flex-col"
+                                                >
+                                                    <label
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2"
+                                                    >
+                                                        Which Service?
+                                                    </label>
+                                                    <input 
+                                                        onChange={(e) => {
+                                                            setSsoName((prevValue) => {
+                                                                let inputValue = e.target.value
+                                                                return inputValue
+                                                            })
+                                                        }}
+                                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                        type="text"
+                                                        placeholder="Enter Service Name"
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                        {
+                                            !isSSO && (
                                                 <FormField 
                                                     control={form.control}
                                                     name="password"

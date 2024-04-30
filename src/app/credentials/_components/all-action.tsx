@@ -62,9 +62,9 @@ const AllAction = (props: Props) => {
                     <div
                         onClick={deleteItems}
                     role="menuitem" 
-                    className="relative flex cursor-default select-none items-center
-                        justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
-                        focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
+                    className="relative flex select-none items-center cursor-pointer hover:bg-[#F5F5F4] transition
+                        justify-between rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent 
+                        focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
                     data-orientation="vertical" data-radix-collection-item=""
                     >
                     <AuroraText 
