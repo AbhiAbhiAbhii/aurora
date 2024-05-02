@@ -88,10 +88,6 @@ const SwitcherBlock = (props: Props) => {
         }
     })
 
-    useEffect(() => {
-        console.log(AddCredentialsFormSchema, "hello there")
-    }, [isSSO])
-
     const successNotification = () => {
         let alertContainer = document.querySelector('.alert')
         alertContainer?.classList.add('alert-active')
@@ -170,7 +166,7 @@ const SwitcherBlock = (props: Props) => {
    }
 
    let inactiveCheckBox = <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"></button>
-   let activeCheckBox = <button type="button" role="checkbox" aria-checked="true" data-state="checked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"><span data-state="checked" className="flex items-center justify-center text-current" style={{pointerEvents: 'none'}}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-check h-4 w-4"><path d="M20 6 9 17l-5-5"></path></svg></span></button>;
+   let activeCheckBox = <button type="button" role="checkbox" aria-checked="true" data-state="checked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"><span data-state="checked" className="flex items-center justify-center text-current" style={{pointerEvents: 'none'}}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-check h-4 w-4"><path d="M20 6 9 17l-5-5"></path></svg></span></button>
 
     return (
         <div>
@@ -316,7 +312,7 @@ const SwitcherBlock = (props: Props) => {
                                                     </label>
                                                     <input 
                                                         onChange={(e) => {
-                                                            setSsoName((prevValue) => {
+                                                            setSsoName(() => {
                                                                 let inputValue = e.target.value
                                                                 return inputValue
                                                             })

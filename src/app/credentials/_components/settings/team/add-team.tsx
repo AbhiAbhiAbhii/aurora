@@ -1,13 +1,11 @@
-'use client'
 import AuroraText from '@/components/global/aurora-text'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Plus } from 'lucide-react'
 import React from 'react'
 import CurrentUser from './current-user'
 import TeamUsers from './team-users'
+import AddTeamForm from '@/components/forms/add-team-form'
 
 type Props = {
     currentUser: any
@@ -15,7 +13,6 @@ type Props = {
 }
 
 const AddTeam = ({ currentUser, filteredUsers }: Props) => {
-
 
   return (
     <div>
@@ -59,7 +56,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
                     <div 
                         className="mt-4"
                     >
-                        
+                        <AddTeamForm />
                     </div>
                 </div>
             </SheetContent>

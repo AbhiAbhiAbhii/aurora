@@ -9,7 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Login, SignUp } from '@/app/login/actions'
-import { SignUpTest } from '@/app/login/signup-test'
 
 type Props = {}
 // Define our Form Schema/data type
