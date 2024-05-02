@@ -66,7 +66,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
         >
             <CurrentUser 
                 email={currentUser[0].email}
-                username={currentUser[0].user_name}
+                username={currentUser[0].name}
             />
             <div className='space-y-4'>
                 {
@@ -74,7 +74,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
                         <TeamUsers
                             key={user.email}
                             email={user.email}
-                            username={user.user_name}
+                            username={user.name}
                         />
                     ))
                 }
