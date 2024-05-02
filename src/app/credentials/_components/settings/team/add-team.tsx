@@ -1,0 +1,90 @@
+'use client'
+import AuroraText from '@/components/global/aurora-text'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Plus } from 'lucide-react'
+import React from 'react'
+import CurrentUser from './current-user'
+import TeamUsers from './team-users'
+
+type Props = {
+    currentUser: any
+    filteredUsers: any
+}
+
+const AddTeam = ({ currentUser, filteredUsers }: Props) => {
+
+
+  return (
+    <div>
+        <Sheet>
+            <div className='flex items-center justify-between'>
+                <div className='flex flex-col gap-2'>
+                    <AuroraText 
+                        text='Add your team'
+                        className="font-inter font-semibold text-base tracking-[-0.02em]"
+                    />
+                    <AuroraText 
+                        text='Manage adminstrators for the database'
+                        className='font-inter font-normal text-sm text-muted-foreground'
+                    />
+                </div>
+                <SheetTrigger
+                    asChild
+                >
+                    <Button 
+                        className="flex items-center font-inter font-medium text-sm"
+                    >
+                        <Plus 
+                            className='mr-4'
+                            size={16}
+                        />
+                        Add Member
+                    </Button>
+                </SheetTrigger>
+            </div>
+            <SheetContent 
+                className="w-[80%] min-w-[500px] overflow-y-scroll"
+            >
+                <div className="w-[380px] min-w-[80%] ml-4">
+                    <SheetHeader className="mt-8">
+                        <SheetTitle 
+                            className="font-geist font-medium text-2xl text-foreground"
+                        >
+                            Add New Team
+                        </SheetTitle>
+                    </SheetHeader>
+                    <div 
+                        className="mt-4"
+                    >
+                        
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+        <div 
+            className='mt-12'
+        >
+            <CurrentUser 
+                email={currentUser[0].email}
+                username={currentUser[0].user_name}
+            />
+            <div className='space-y-4'>
+                {
+                    filteredUsers.map((user:any) => (
+                        <TeamUsers
+                            key={user.email}
+                            email={user.email}
+                            username={user.user_name}
+                        />
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+  )
+}
+
+export default AddTeam

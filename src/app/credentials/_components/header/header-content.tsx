@@ -180,6 +180,7 @@ const Header = ({ data }: Props) => {
                                 className={
                                     `mx-4 cursor-pointer transition-all
                                     ${index === linkState ? 'text-black' : 'text-muted-foreground'} 
+                                    ${item.linkName === "Subscriptions" ? 'hidden' : undefined}
                                     hover:text-black font-inter font-medium text-sm`
                                 }
                                 key={item.linkName}
