@@ -1,14 +1,17 @@
+'use client'
 import AuroraText from '@/components/global/aurora-text'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import React from 'react'
 
 type Props = {
+    god: any
     username: any
     email: any
 }
 
-const TeamUsers = ({ email, username }: Props) => {
+const TeamUsers = ({ god, email, username }: Props) => {
+
   return (
     <div className='flex items-center gap-3 mb-6'>
         <Avatar>
@@ -30,7 +33,12 @@ const TeamUsers = ({ email, username }: Props) => {
                 variant={'outline'}
                 className='rounded-md px-2 py-1 font-inter font-medium text-xs'
             >
-                Admin
+             {
+                god ? 
+                'God'
+                :
+                'Admin'
+             }   
             </Badge>
         </div>
     </div>

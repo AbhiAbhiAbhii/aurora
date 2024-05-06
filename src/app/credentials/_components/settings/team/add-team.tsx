@@ -67,11 +67,13 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
             <CurrentUser 
                 email={currentUser[0].email}
                 username={currentUser[0].name}
+                god={currentUser[0].is_god}
             />
             <div className='space-y-4'>
                 {
                     filteredUsers.map((user:any) => (
                         <TeamUsers
+                            god={user.is_god}
                             key={user.email}
                             email={user.email}
                             username={user.name}

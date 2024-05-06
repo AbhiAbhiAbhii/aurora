@@ -6,9 +6,10 @@ import React from 'react'
 type Props = {
     username: any
     email: any
+    god: any
 }
 
-const CurrentUser = ({ email, username }: Props) => {
+const CurrentUser = ({ email, username, god }: Props) => {
   return (
     <div className='flex items-center gap-3 mb-6'>
         <Avatar>
@@ -30,7 +31,12 @@ const CurrentUser = ({ email, username }: Props) => {
                 variant={'outline'}
                 className='rounded-md px-2 py-1 font-inter font-medium text-xs'
             >
-                Admin
+                {
+                    god ?
+                    'God'
+                    :
+                    'Admin'
+                }
             </Badge>
         </div>
     </div>

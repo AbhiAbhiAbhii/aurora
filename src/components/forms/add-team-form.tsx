@@ -10,6 +10,7 @@ import { Textarea } from '../ui/textarea'
 import { SheetClose, SheetFooter } from '../ui/sheet'
 import { Button } from '../ui/button'
 import { SignUpTeam } from '@/app/login/signup-test'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
 
 type Props = {}
 
@@ -18,7 +19,8 @@ const AddNewMemberFormSchema = z.object({
     email: z.string().email({ message: 'Invalid email address' }),
     username: z.string().min(1, { message: 'This field is required ' }),
     password: z.string().min(5, { message: 'Must be 5 characters or more' }),
-    additionalNotes: z.string()
+    additionalNotes: z.string(),
+    role: z.string()
 })
 
 const AddTeamForm = (props: Props) => {
@@ -30,7 +32,8 @@ const AddTeamForm = (props: Props) => {
             email: '',
             username: '',
             password: '',
-            additionalNotes: ''
+            additionalNotes: '',
+            role: ''
         }
     });
 
@@ -38,9 +41,9 @@ const AddTeamForm = (props: Props) => {
     const ref:MutableRefObject<any> = useRef();
     
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
-        const { name, email, username, password, additionalNotes } = values
+        const { name, email, username, password, additionalNotes, role } = values
         try {
-            SignUpTeam(name, password, email, username, additionalNotes);
+            SignUpTeam(name, password, email, username, additionalNotes, role);
             ref.current.click()
         } catch(err) {
             console.log(err)
@@ -125,6 +128,37 @@ const AddTeamForm = (props: Props) => {
                                 <EyeNoneIcon />
                             </div>
                         </div>
+                    </FormItem>
+                )}
+            />
+            {/* Role */}
+            <FormField 
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                    <FormItem 
+                        className="mb-4"
+                    >
+                        <FormLabel>
+                            Role of this user
+                        </FormLabel>
+                        <Select onValueChange={field.onChange}>
+                            <SelectTrigger>
+                                <SelectValue 
+                                    placeholder="Select Role"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Types of Roles</SelectLabel>
+                                    {
+                                        ['God', 'Admin'].map((item: any) => (
+                                            <SelectItem value={item} key={item}>{item}</SelectItem>
+                                        ))
+                                    }
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                     </FormItem>
                 )}
             />
