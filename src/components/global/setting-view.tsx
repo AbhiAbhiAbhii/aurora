@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import SettingSwitcher from '@/app/credentials/_components/settings/settings-switcher'
 import AddTeam from '@/app/credentials/_components/settings/team/add-team'
 import { createClient } from '@/utils/supabase/client'
+import AccountView from '@/app/credentials/_components/settings/account/account-view'
 
 type Props = {
   currentUser: any
@@ -22,9 +23,9 @@ const SettingView = ({ currentUser, filteredUsers }: Props) => {
       <div className='w-[60%]'>
         {
           tabState === "Account" && (
-            <p>
-              Hello
-            </p>
+            <AccountView 
+              currentUser={currentUser}
+            />
           )
         }
         {

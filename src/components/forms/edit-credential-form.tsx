@@ -28,7 +28,7 @@ interface TabValue {
     tab: string
 }
 
-const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
+const EditCredentialForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
 
     const tabs: TabValue[] = [
         {
@@ -314,7 +314,7 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
                                             }
                                         />
                                         <div
-                                            onClick={() => setTogglePassClick(!togglePassClick)}
+                                            onClick={() => setTogglePassClick((prevValue) => !prevValue)}
                                             className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
                                         >
                                             <EyeNoneIcon />
@@ -465,4 +465,4 @@ const EditForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
   )
 }
 
-export default EditForm
+export default EditCredentialForm

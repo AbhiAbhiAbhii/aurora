@@ -139,3 +139,17 @@ export const updateItem = async(
         console.log(err, "Something went WONG")
     }
 }
+
+export const editAccountDetails = async (
+    password?: string,
+    name?: string,
+    columnId?: any
+) => {
+    const supabase = createClient();
+
+    await supabase.from("User_Details").update({
+        name: name, 
+        password: password
+    }).eq('id', columnId);
+    await supabase.auth.updateUser({ password: password });
+}

@@ -1,5 +1,5 @@
 'use client'
-import EditForm from '@/components/forms/edit-form'
+import EditCredentialForm from '@/components/forms/edit-credential-form'
 import AuroraText from '@/components/global/aurora-text'
 import { useGlobalContext } from '@/components/global/my-global-context'
 import { 
@@ -42,11 +42,11 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   const [ initValues, setInitValues ] = useState<any>()
 
   const getAlertContainer = () => {
-      let alertContainer = document.querySelector('.alert')
-      alertContainer?.classList.add('alert-active')
-      setTimeout(() => {
-          alertContainer?.classList.remove('alert-active')
-      }, 2000)
+    let alertContainer = document.querySelector('.alert')
+    alertContainer?.classList.add('alert-active')
+    setTimeout(() => {
+      alertContainer?.classList.remove('alert-active')
+    }, 2000)
   }
 
   const copyToClipBoard = (data:string) => {
@@ -85,9 +85,9 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   const DeleteItem = async () => {
     let dataDeleted = await deleteItem(rowServicenameData)
     if(!dataDeleted.error) {
-    ItemDeletedSuccess()
+      ItemDeletedSuccess()
     } else {
-    ItemDeletedError()
+      ItemDeletedError()
     }
   }
 
@@ -114,7 +114,7 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <EditForm 
+        <EditCredentialForm 
           checkState={checkState}
           serviceRowData={initValues}
           rowServicenameData={rowServicenameData}
