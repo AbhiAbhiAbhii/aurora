@@ -119,3 +119,7 @@ body {
     opacity: 1;
   }
 }
+
+td:has(.remove-header), th:has(.remove-header) {
+  display: none;
+}

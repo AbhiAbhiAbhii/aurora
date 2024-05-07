@@ -153,3 +153,13 @@ export const editAccountDetails = async (
     }).eq('id', columnId);
     await supabase.auth.updateUser({ password: password });
 }
+
+export const getServiceURL = async (id: number) => {
+    const supabase = createClient();
+    const { data, error } = await supabase.from("Service").select('URL').eq('id', id);
+    if(error) {
+        return alert('Something went wrong');
+    } else {
+        return data[0].URL;
+    }
+}

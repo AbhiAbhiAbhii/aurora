@@ -12,8 +12,8 @@ type Props = {}
 
 const CredentialView = (props: Props) => {
 
-  const { value, tabValue, alertTitle, alertDescription } = useGlobalContext()
-  const [ serviceData, setServiceData ] = useState<any>([])
+  const { value, tabValue, alertTitle, alertDescription } = useGlobalContext();
+  const [ serviceData, setServiceData ] = useState<any>([]);
 
   useEffect(() => {
     const FetchServiceData = async() => {
@@ -24,7 +24,6 @@ const CredentialView = (props: Props) => {
         console.log(error, "Something went WONG")
       } 
     }
-
     FetchServiceData()
   }, [value])
 

@@ -34,6 +34,11 @@ export const columns: ColumnDef<Service>[] = [
     }
   },
   {
+     accessorKey: "id",
+     header: () => <div className="remove-header"></div>,
+     cell:() => <div className="remove-header"></div>,
+    },
+  {
     accessorKey: "user_name",
     header: "Username",
     cell: ({ row }) => {
@@ -43,13 +48,14 @@ export const columns: ColumnDef<Service>[] = [
   },
   {
     accessorKey: 'is_sso',
-    header: () => <div className="hidden"></div>,
-    cell:() => <div className="hidden"></div>
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
+    
   },
   {
     accessorKey: 'sso_name',
-    header: () => <div className="hidden"></div>,
-    cell:() => <div className="hidden"></div>
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
   },
   {
     accessorKey: "password",
@@ -86,8 +92,11 @@ export const columns: ColumnDef<Service>[] = [
       const rowPasswordData: string = row.getValue('password')
       const rowServicenameData: string = row.getValue('service_name')
       const boolean: boolean = row.getValue('is_sso')
+      const serviceId:number = row.getValue('id')
+      
       return(
         <DataTableDropDown 
+          id={serviceId}
           checkState={boolean}
           rowUsernameData={rowUsernameData} 
           rowPasswordData={rowPasswordData}

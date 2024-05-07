@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
 
-import { deleteItem, getServiceRowDetails } from '@/lib/queries'
+import { deleteItem, getServiceRowDetails, getServiceURL } from '@/lib/queries'
 import { 
   MoreHorizontal, 
   Trash2Icon 
@@ -33,13 +33,16 @@ type Props = {
   rowUsernameData: string,
   rowPasswordData: string,
   rowServicenameData: string,
-  checkState: boolean
+  checkState: boolean,
+  id: number
 }
 
-const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData, checkState }: Props) => {
+const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData, checkState, id }: Props) => {
 
   const { setAlertTitle, setAlertDescription, value } = useGlobalContext()
   const [ initValues, setInitValues ] = useState<any>()
+  const [ serviceURL, setServiceURL ] = useState<string>("");
+
 
   const getAlertContainer = () => {
     let alertContainer = document.querySelector('.alert')
@@ -94,13 +97,22 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   useEffect(() => {
     async function SetInitialValues() {
       let data:any = await getServiceRowDetails(rowServicenameData)
-      setInitValues((prevValue: any) => {
+      setInitValues(() => {
         let currentValue = data[0]
         return currentValue;
       })
     }
     SetInitialValues()
 }, [value, rowServicenameData])
+
+useEffect(() => {
+  async function getURLData() {
+    let data = await getServiceURL(id)
+    setServiceURL(() => data)
+    console.log(serviceURL)
+  }
+  getURLData();
+}, [serviceURL, id])
 
   return (
     <DropdownMenu>
@@ -124,7 +136,11 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
         >
           Copy Username
         </DropdownMenuItem>
-        <DropdownMenuItem>Visit Login</DropdownMenuItem>
+        <DropdownMenuItem className='px-0'>
+          <a className='w-full px-2' href={serviceURL} target='_blank'>
+            Visit Login
+          </a>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={PasswordCopy}
         >

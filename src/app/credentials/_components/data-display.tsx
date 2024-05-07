@@ -5,6 +5,7 @@ import SettingView from '@/components/global/setting-view'
 import SubscriptionView from '@/components/global/subscription-view'
 import { createClient } from '@/utils/supabase/client'
 import React, { useEffect, useState } from 'react'
+import { Resend } from "resend"
 
 type Props = {}
 
@@ -25,7 +26,7 @@ const DataDisplay = (props: Props) => {
         return usersAllData?.filter((user) => user.email === getCurrentUserEmail);
       })
     } 
-    userCheckAndFetchData()
+    userCheckAndFetchData();
 
     async function filteredUsersData() {
       const getCurrentUserEmail = (await supabase.auth.getUser()).data.user?.email;
@@ -36,26 +37,38 @@ const DataDisplay = (props: Props) => {
       })
     }
 
-    filteredUsersData()
+    filteredUsersData();
   }, [])
 
 
+  const resend = new Resend("re_8dot1kyB_4fxQ2XefBnEaQH7PjhBBWZJZ")
+
+  const handleEmailSubmit = async () => {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: "abhilash@gradical.xyz",
+      subject: 'test mail',
+      html: '<p>Congrats boiiii!! <strong>first email</strong>!</p>'
+    })
+  }
+
   return (
     <div className='max-w-[90%] w-[1000px]'>
-      {linkValue === "Credentials"
-        ?
-        <CredentialView />
+      {/* <div onClick={handleEmailSubmit}>
+        Click me to send a test mail
+      </div> */}
+      {linkValue === "Credentials" ?
+          <CredentialView 
+          />
         :
-        linkValue === "Subscriptions"
-        ?
-        <SubscriptionView />
+        linkValue === "Subscriptions" ?
+          <SubscriptionView />
         :
-        linkValue === "Settings"
-        ?
-        <SettingView 
-          filteredUsers={filteredUsers}
-          currentUser={currentUser}
-        />
+        linkValue === "Settings" ?
+          <SettingView 
+            filteredUsers={filteredUsers}
+            currentUser={currentUser}
+          />
         :
         null}
     </div>
