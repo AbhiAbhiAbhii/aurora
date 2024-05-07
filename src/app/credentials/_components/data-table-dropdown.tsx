@@ -28,6 +28,7 @@ import {
   Trash2Icon 
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { inputClassName } from '@/utils/classnames'
 
 type Props = {
   rowUsernameData: string,
@@ -43,6 +44,12 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   const [ initValues, setInitValues ] = useState<any>()
   const [ serviceURL, setServiceURL ] = useState<string>("");
 
+  const [ storeUsernameData, setStoreUsernameData ] = useState<string>("");
+  const [ passwordData, setPasswordData ] = useState<string>("");
+  const [ storeReceivermail, setStoreReceivermail ] = useState<string>("");
+  const [ storeServicenameData, setStoreServicenameData ] = useState<string>("");
+
+  let alertDialog: string = "Enter receiver's email"
 
   const getAlertContainer = () => {
     let alertContainer = document.querySelector('.alert')
@@ -53,14 +60,14 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   }
 
   const copyToClipBoard = (data:string) => {
-      navigator.clipboard.writeText(data)
+    navigator.clipboard.writeText(data)
   }
 
   const UserNameCopy = () => {
-      copyToClipBoard(rowUsernameData)
-      getAlertContainer()
-      setAlertTitle('Username Copied!')
-      setAlertDescription('Your credential username is ready to be pasted.')
+    copyToClipBoard(rowUsernameData)
+    getAlertContainer()
+    setAlertTitle('Username Copied!')
+    setAlertDescription('Your credential username is ready to be pasted.')
   }
 
   const PasswordCopy = () => {
@@ -109,10 +116,39 @@ useEffect(() => {
   async function getURLData() {
     let data = await getServiceURL(id)
     setServiceURL(() => data)
-    console.log(serviceURL)
   }
   getURLData();
 }, [serviceURL, id])
+
+useEffect(() => {
+  setPasswordData(() => rowPasswordData);
+  setStoreUsernameData(() => rowUsernameData);
+  setStoreServicenameData(() => rowServicenameData);
+  console.log(rowServicenameData, "service name data")
+}, [rowUsernameData, rowPasswordData, rowServicenameData]);
+
+const storeReceivermailInput = (e:any) => setStoreReceivermail(() => e.target.value);
+
+const sendEmail = async () => {
+
+  const ourData = { passwordData, storeUsernameData, storeReceivermail, rowServicenameData };
+
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ourData})
+    });
+    if(response.ok) {
+      console.log("Response is ok");
+      return await response.json();
+    }
+  } catch(error) {
+    console.log(error, "Mail failed to send")
+  }
+}
 
   return (
     <DropdownMenu>
@@ -146,7 +182,39 @@ useEffect(() => {
         >
           Copy Password
         </DropdownMenuItem>
-        <DropdownMenuItem>Share Credential</DropdownMenuItem>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <div className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]'>
+              Share Credential
+            </div>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{alertDialog}</AlertDialogTitle>
+              <AlertDialogDescription>
+                <input 
+                  placeholder='thahaseer@gradical.xyz'
+                  onChange={storeReceivermailInput}
+                  className={inputClassName}
+                />
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <DropdownMenuItem className='px-0 py-0 space-x-2'>
+                <AlertDialogAction
+                  className='p-0'
+                >
+                  <Button
+                    onClick={sendEmail}
+                  >
+                    Share Credentials
+                  </Button>
+                </AlertDialogAction>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+              </DropdownMenuItem>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <DropdownMenuSeparator />
         <AlertDialog>
           <AlertDialogTrigger asChild>

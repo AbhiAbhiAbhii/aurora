@@ -15,6 +15,8 @@ const DataDisplay = (props: Props) => {
   const [ currentUser, setCurrentUser ] = useState<any>();
   const [ filteredUsers, setFilteredUsers ] = useState<any>();
 
+  const [ dummyData, setDummyData ] = useState<string>("Abhilash");
+
   useEffect(() => {
     const supabase = createClient();
     
@@ -41,22 +43,8 @@ const DataDisplay = (props: Props) => {
   }, [])
 
 
-  const resend = new Resend("re_8dot1kyB_4fxQ2XefBnEaQH7PjhBBWZJZ")
-
-  const handleEmailSubmit = async () => {
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: "abhilash@gradical.xyz",
-      subject: 'test mail',
-      html: '<p>Congrats boiiii!! <strong>first email</strong>!</p>'
-    })
-  }
-
   return (
     <div className='max-w-[90%] w-[1000px]'>
-      {/* <div onClick={handleEmailSubmit}>
-        Click me to send a test mail
-      </div> */}
       {linkValue === "Credentials" ?
           <CredentialView 
           />
