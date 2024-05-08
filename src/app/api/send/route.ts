@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     try {
 
       const { data, error } = await resend.emails.send({
-        from: 'abhilash@gradical.xyz',
+        from: 'noreply@aurora.gradical.xyz',
         to: `${storeReceivermail}`,
         subject: "Credentials",
         react: EmailTemplate({password: passwordData, username: storeUsernameData, servicename: rowServicenameData }) as React.ReactElement,
