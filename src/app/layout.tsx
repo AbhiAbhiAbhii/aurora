@@ -22,6 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+    <meta name="robots" content="noindex"></meta>
       <body 
         className={`${GeistVariable.variable} ${inter.variable}`}
       >
