@@ -50,17 +50,20 @@ export const getCompanyImage = async(folderName?:string) => {
 }
 
 export const addNewCredentials = async(
-    companyname?: string,
+    companyname?: string, 
     social?: string, 
     servicename?: string, 
     username?: string, 
     password?: string, 
     url?: string, 
-    additionalnotes?: string,
-    managedby?:string
+    additionalnotes?: string, 
+    managedby?: string,
+    is_sso?: string, 
+    ssoName?: string, 
+    login_type?: string, 
 ) => {
     const supabase = createClient()
-    await supabase.from("Service").insert({
+    const { error } = await supabase.from("Service").insert({
         company_name: companyname, 
         type: social, 
         service_name: servicename, 
@@ -68,8 +71,13 @@ export const addNewCredentials = async(
         password: password, 
         URL: url, 
         additional_notes: additionalnotes,
-        managed_by: managedby
+        managed_by: managedby,
+        is_sso: is_sso,
+        sso_name: ssoName,
+        login_type: login_type
     })
+
+    return error
 }
 
 export const getAuthUsers = async () => {

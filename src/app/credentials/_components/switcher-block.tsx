@@ -20,12 +20,12 @@ import {
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { getAuthUsers, getUserDetails } from "@/lib/queries"
+import { addNewCredentials, getAuthUsers, getUserDetails } from "@/lib/queries"
 import { Textarea } from "@/components/ui/textarea"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { EyeNoneIcon } from "@radix-ui/react-icons"
 
@@ -52,10 +52,9 @@ const SwitcherBlock = (props: Props) => {
         },
     ]
 
+    const clickRef: any = useRef();
     const { setTabValue, value, setAlertTitle, setAlertDescription } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
-    const [ authUser, setAuthUser ] = useState<any>()
-    const [ detectRole, setDetectRole ] = useState<any>()
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
     const [ isSSO, setIsSSO ] = useState<any>(false)
     const [ ssoName, setSsoName ] = useState<string>("")
@@ -65,6 +64,11 @@ const SwitcherBlock = (props: Props) => {
         social: z.string().min(1, { message: "Select the type field" }),
         service_name: z.string().min(1, { message: "Enter Service Name" }),
         user_name: z.string().min(1, { message: 'Enter User Name' }),
+        login_type: 
+            isSSO ?
+            z.string()
+            :
+            z.string().min(1, { message: "Select a field" }),
         password: 
             isSSO ?
             z.string()
@@ -82,6 +86,7 @@ const SwitcherBlock = (props: Props) => {
             social: "",
             service_name: "",
             user_name: "",
+            login_type: "",
             password: "",
             url: "",
             additional_notes: ""
@@ -112,30 +117,64 @@ const SwitcherBlock = (props: Props) => {
     }
 
     const addCredentialSubmit = async (values: z.infer<typeof AddCredentialsFormSchema>) => {
-       const {  social, service_name, user_name, password, url, additional_notes, managedby } = values
-        try {
-            const supabase = createClient()
-            const res = await supabase.from("Service").insert({
-                company_name: value, 
-                type: social, 
-                service_name: service_name, 
-                user_name: user_name, 
-                password: password, 
-                URL: url, 
-                additional_notes: additional_notes,
-                managed_by: managedby,
-                is_sso: isSSO,
-                sso_name: ssoName
-            }) 
-            if(res.error) {
-                notSuccessNotification()
+       const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values
+       if(isSSO) {
+        console.log("SSO CHECKED", values)
+        const supabase = createClient();
+        // now we add conditions
+        if(ssoName.toLowerCase() === "google") {
+            const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail');
+            if(error) {
+                console.log("Could not find rowData");
+                alert("Could not find rowData");
             } else {
-                successNotification()
+                console.log("Found rowData", data[0].password);
+                let extractedPassword:string = data[0].password;
+                const res = await addNewCredentials(
+                    value, 
+                    social, 
+                    service_name, 
+                    user_name, 
+                    extractedPassword, 
+                    url, 
+                    additional_notes, 
+                    managedby, 
+                    isSSO, 
+                    ssoName, 
+                    login_type
+                )
+                if(!res) {
+                    clickRef.current.click();
+                    successNotification();
+                } else {
+                    notSuccessNotification();
+                }
             }
-            
-        } catch(error) {
-            console.log(error, "Something went WONG")
         }
+       } else {
+
+        console.log("SSO UNCHECKED", values)
+        const res = await addNewCredentials(
+            value, 
+            social, 
+            service_name, 
+            user_name, 
+            password, 
+            url, 
+            additional_notes, 
+            managedby, 
+            isSSO, 
+            ssoName, 
+            login_type
+        )
+        if(!res) {
+            clickRef.current.click();
+            successNotification();
+        } else {
+            notSuccessNotification();
+        }
+
+       }
     }
 
     useEffect(() => {
@@ -144,22 +183,6 @@ const SwitcherBlock = (props: Props) => {
         }
         fetchUserDetails()
     }, [])
-
-    useEffect(() => {
-        const fetchAuthUserDetails = async () => {
-            setAuthUser(await getAuthUsers())
-        }
-        fetchAuthUserDetails()
-    }, [])
-
-    useEffect(() => {
-        const setDetectRoleFunction = async () => {
-            users.filter((item:any) => item.email === authUser.user.email).map((filterValue:any) => {
-                setDetectRole(filterValue)
-            })
-        }
-        setDetectRoleFunction()
-    }, [users])
 
    function detectCheckBox() {
     setIsSSO((prevValue:any) => !prevValue)
@@ -301,7 +324,8 @@ const SwitcherBlock = (props: Props) => {
                                                 </div>
                                         </div>
                                         {
-                                            isSSO && (
+                                            isSSO ?
+                                            (
                                                 <div
                                                     className="space-y-2 mb-4 flex flex-col"
                                                 >
@@ -323,40 +347,74 @@ const SwitcherBlock = (props: Props) => {
                                                     />
                                                 </div>
                                             )
-                                        }
-                                        {
-                                            !isSSO && (
-                                                <FormField 
-                                                    control={form.control}
-                                                    name="password"
-                                                    render={({ field }) => (
-                                                        <FormItem
-                                                            className="mb-4"
-                                                        >
-                                                            <FormLabel>
-                                                                Password
-                                                            </FormLabel>
-                                                            <div className="w-full relative">
-                                                                <Input 
-                                                                    type={
-                                                                        togglePassClick ?
-                                                                        "text"
-                                                                        :
-                                                                        "password"
-                                                                    }
-                                                                    {...field}
-                                                                />
-                                                                <div
-                                                                    onClick={() => setTogglePassClick(!togglePassClick)}
-                                                                    className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
-                                                                >
-                                                                    <EyeNoneIcon />
-                                                                </div>
+                                            :
+                                            <>
+                                            <FormField 
+                                                control={form.control}
+                                                name="login_type"
+                                                render={({ field }) => (
+                                                    <FormItem
+                                                        className="mb-4"
+                                                    >
+                                                        <FormLabel>
+                                                            Login type
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue 
+                                                                        className="text-black"
+                                                                        placeholder={""}
+                                                                    />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectGroup>
+                                                                        <SelectLabel>Types</SelectLabel>
+                                                                        {
+                                                                            ['Gmail', 'Other'].map((item, index) => (
+                                                                                <SelectItem value={item} key={index}>{item}</SelectItem>
+                                                                            ))
+                                                                        }                                                          
+                                                                    </SelectGroup>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField 
+                                                control={form.control}
+                                                name="password"
+                                                render={({ field }) => (
+                                                    <FormItem
+                                                        className="mb-4"
+                                                    >
+                                                        <FormLabel>
+                                                            Password
+                                                        </FormLabel>
+                                                        <div className="w-full relative">
+                                                            <Input 
+                                                                type={
+                                                                    togglePassClick ?
+                                                                    "text"
+                                                                    :
+                                                                    "password"
+                                                                }
+                                                                {...field}
+                                                            />
+                                                            <div
+                                                                onClick={() => setTogglePassClick(!togglePassClick)}
+                                                                className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                                            >
+                                                                <EyeNoneIcon />
                                                             </div>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            )
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            </>
                                         }
                                         <FormField 
                                             control={form.control}
@@ -374,41 +432,39 @@ const SwitcherBlock = (props: Props) => {
                                                 </FormItem>
                                             )}
                                         />
-                                        {/* {
-                                            detectRole?.is_god && ( */}
-                                                <FormField 
-                                                control={form.control}
-                                                name="managedby"
-                                                render={({ field }) => (
-                                                    <FormItem
-                                                        className="mb-4"
+                                        <FormField 
+                                            control={form.control}
+                                            name="managedby"
+                                            render={({ field }) => (
+                                                <FormItem
+                                                    className="mb-4"
+                                                >
+                                                    <FormLabel>
+                                                        Managed by
+                                                    </FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
                                                     >
-                                                        <FormLabel>
-                                                            Managed by
-                                                        </FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                        >
-                                                            <SelectTrigger>
-                                                                    <SelectValue 
-                                                                        className="text-black"
-                                                                        placeholder={""}
-                                                                    />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectGroup>
-                                                                    <SelectLabel>Users</SelectLabel>
-                                                                    {
-                                                                        users.map((item:any, index:number) => (
-                                                                            <SelectItem value={item.user_name} key={index}>{item.user_name}</SelectItem>
-                                                                        ))    
-                                                                    }                                                           
-                                                                </SelectGroup>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                                        <SelectTrigger>
+                                                                <SelectValue 
+                                                                    className="text-black"
+                                                                    placeholder={""}
+                                                                />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectGroup>
+                                                                <SelectLabel>Users</SelectLabel>
+                                                                {
+                                                                    users.map((item:any, index:number) => (
+                                                                        <SelectItem value={item.user_name} key={index}>{item.user_name}</SelectItem>
+                                                                    ))    
+                                                                }                                                           
+                                                            </SelectGroup>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormItem>
+                                            )}
+                                        />
                                         <FormField 
                                             control={form.control}
                                             name="additional_notes"
@@ -423,13 +479,17 @@ const SwitcherBlock = (props: Props) => {
                                             )}
                                         />
                                         <SheetFooter className="mt-10">
-                                            <SheetClose asChild>
                                                 <Button
                                                     type="submit"
                                                 >
                                                     Save Credential
                                                 </Button>
-                                            </SheetClose>
+                                            <SheetClose
+                                                className="hidden"
+                                                ref={clickRef} 
+                                            >
+                                                Close me
+                                                </SheetClose>
                                             <SheetClose>
                                                 <Button
                                                     className="bg-zinc-100 text-zinc-950 transition-all hover:opacity-75 hover:bg-zinc-100"

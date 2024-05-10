@@ -17,8 +17,8 @@ export async function Login(email: string, password: string) {
 
   if(error) redirect("/error")
 
-  revalidatePath('/', 'layout')
-  redirect("/")
+  revalidatePath('/credentials', 'layout')
+  redirect("/credentials")
 }
 
 

@@ -3,7 +3,7 @@ import { CopyIcon } from 'lucide-react'
 import React from 'react'
 
 type Props = {
-    data: string
+  data: string
 }
 
 const UsernameBox = ({ data }: Props) => {

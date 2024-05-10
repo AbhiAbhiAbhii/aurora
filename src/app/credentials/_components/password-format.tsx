@@ -4,12 +4,10 @@ import { CopyIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
-    data: string
-    checkValue: boolean
-    ssoName: string
+  data: string
 }
 
-const PasswordFormat = ({ data, checkValue, ssoName }: Props) => {
+const PasswordFormat = ({ data }: Props) => {
     const { setAlertTitle, setAlertDescription } = useGlobalContext()
     const CopyClick = () => {
       navigator.clipboard.writeText(data)
@@ -24,23 +22,14 @@ const PasswordFormat = ({ data, checkValue, ssoName }: Props) => {
 
   return (
     <div className="flex items-center space-x-2">
-        {
-          checkValue ?
-          <>
-            {ssoName} SSO
-          </>
-          :
-          <>
-            <p className="password-format">
-              Entha Mwone ?
-            </p>
-            <CopyIcon 
-              className="cursor-pointer"
-              onClick={CopyClick}
-              size={16}
-            />
-          </>
-        }
+      <p className="password-format">
+        Entha Mwone ?
+      </p>
+      <CopyIcon 
+        className="cursor-pointer"
+        onClick={CopyClick}
+        size={16}
+      />
     </div>
   )
 }

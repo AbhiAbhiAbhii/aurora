@@ -6,6 +6,7 @@ import UsernameBox from "./_components/username-box"
 import DataTableDropDown from "./_components/data-table-dropdown"
 import AllAction from "./_components/all-action"
 import ServiceCheckBox from "./_components/service-checkbox"
+import LoginType from "./_components/table-header/login-type"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -21,6 +22,7 @@ export type Service = {
   managed_by: string
   is_sso: boolean
   sso_name: string
+  login_type: string
 }
 
 export const columns: ColumnDef<Service>[] = [
@@ -40,10 +42,21 @@ export const columns: ColumnDef<Service>[] = [
     },
   {
     accessorKey: "user_name",
-    header: "Username",
+    header: "Username/Email",
     cell: ({ row }) => {
       const data: string = row.getValue('user_name')
       return <UsernameBox data={data} />
+    }
+  },
+  {
+    accessorKey: 'login_type',
+    header: "Login type",
+    cell: ({ row }) => {
+      const data: string = row.getValue('login_type');
+      const ssoData: string = row.getValue('sso_name');
+      const isSSO: boolean = row.getValue('is_sso');
+
+      return <LoginType ssoName={ssoData} isSSO={isSSO} data={data} />
     }
   },
   {
@@ -62,9 +75,7 @@ export const columns: ColumnDef<Service>[] = [
     header: "Password",
     cell: ({ row }) => {
       const data: string = row.getValue('password')
-      const boolean: boolean = row.getValue('is_sso')
-      const ssoValue: string = row.getValue('sso_name')
-      return <PasswordFormat ssoName={ssoValue} checkValue={boolean} data={data} />
+      return <PasswordFormat data={data} />
     }
   },
   {

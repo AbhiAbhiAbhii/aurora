@@ -15,8 +15,6 @@ const DataDisplay = (props: Props) => {
   const [ currentUser, setCurrentUser ] = useState<any>();
   const [ filteredUsers, setFilteredUsers ] = useState<any>();
 
-  const [ dummyData, setDummyData ] = useState<string>("Abhilash");
-
   useEffect(() => {
     const supabase = createClient();
     
