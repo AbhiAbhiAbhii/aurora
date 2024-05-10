@@ -18,9 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
 import { Button } from "@/components/ui/button"
-
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
@@ -54,7 +52,6 @@ export function DataTable<TData, TValue>({
       columnFilters
     }
   })
-
 
   let buttonVariant:any = 'outline'
   let size:any = 'sm'
@@ -133,16 +130,16 @@ export function DataTable<TData, TValue>({
                           table.setPageSize(Number(value))
                           }}
                       >
-                          <SelectTrigger className="h-8 w-[70px]">
+                        <SelectTrigger className="h-8 w-[70px]">
                           <SelectValue placeholder={table.getState().pagination.pageSize} />
-                          </SelectTrigger>
-                          <SelectContent side="top">
-                          {[3, 5, 8, 10, 20].map((pageSize) => (
-                            <SelectItem key={pageSize} value={`${pageSize}`}>
-                              {pageSize}
-                            </SelectItem>
-                          ))}
-                          </SelectContent>
+                        </SelectTrigger>
+                        <SelectContent side="top">
+                        {[3, 5, 8, 10, 20].map((pageSize) => (
+                          <SelectItem key={pageSize} value={`${pageSize}`}>
+                            {pageSize}
+                          </SelectItem>
+                        ))}
+                        </SelectContent>
                       </Select>
                   </div>
                   <div className="flex w-[100px] items-center justify-center text-sm font-medium">

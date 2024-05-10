@@ -92,6 +92,15 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     setAlertDescription('Something went wrong and credential was not deleted')
   }
 
+  const emailSendSuccess = () => {
+    getAlertContainer()
+    setAlertTitle('Email Sent')
+    setAlertDescription(`Your selected credential was sent to ${storeReceivermail}`)
+    setTimeout(() => {
+      location.reload()
+    }, 2500)
+  }
+
   const DeleteItem = async () => {
     let dataDeleted = await deleteItem(rowServicenameData)
     if(!dataDeleted.error) {
@@ -142,6 +151,7 @@ const sendEmail = async () => {
     });
     if(response.ok) {
       console.log("Response is ok");
+      emailSendSuccess();
       return await response.json();
     }
   } catch(error) {
