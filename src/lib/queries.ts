@@ -128,6 +128,7 @@ export const updateItem = async(
 ) => {
     const supabase = createClient()
     try {
+        
       const { error } = await supabase.from("Service").update({
             id: rowId,
             company_name: companyname,
@@ -170,4 +171,16 @@ export const getServiceURL = async (id: number) => {
     } else {
         return data[0].URL;
     }
+}
+
+export const editLinkedPassword = async (
+    passwordData: string,
+    userNameData: string
+) => {
+    const supabase = createClient()
+    const { error } = await supabase.from("Service").update({
+        password: passwordData
+    }).eq('user_name', userNameData)
+    
+    return error
 }

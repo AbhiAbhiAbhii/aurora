@@ -117,18 +117,16 @@ const SwitcherBlock = (props: Props) => {
     }
 
     const addCredentialSubmit = async (values: z.infer<typeof AddCredentialsFormSchema>) => {
-       const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values
+       const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values;
+
        if(isSSO) {
-        console.log("SSO CHECKED", values)
         const supabase = createClient();
-        // now we add conditions
         if(ssoName.toLowerCase() === "google") {
             const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail');
             if(error) {
                 console.log("Could not find rowData");
                 alert("Could not find rowData");
             } else {
-                console.log("Found rowData", data[0].password);
                 let extractedPassword:string = data[0].password;
                 const res = await addNewCredentials(
                     value, 
@@ -150,10 +148,10 @@ const SwitcherBlock = (props: Props) => {
                     notSuccessNotification();
                 }
             }
+        } else {
+            null
         }
        } else {
-
-        console.log("SSO UNCHECKED", values)
         const res = await addNewCredentials(
             value, 
             social, 
@@ -173,19 +171,18 @@ const SwitcherBlock = (props: Props) => {
         } else {
             notSuccessNotification();
         }
-
        }
     }
 
     useEffect(() => {
         const fetchUserDetails = async () => {
-            setUsers(await getUserDetails())
+            setUsers(await getUserDetails());
         }
         fetchUserDetails()
     }, [])
 
    function detectCheckBox() {
-    setIsSSO((prevValue:any) => !prevValue)
+    setIsSSO((prevValue:any) => !prevValue);
    }
 
    let inactiveCheckBox = <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"></button>

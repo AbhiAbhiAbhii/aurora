@@ -124,7 +124,6 @@ useEffect(() => {
   setPasswordData(() => rowPasswordData);
   setStoreUsernameData(() => rowUsernameData);
   setStoreServicenameData(() => rowServicenameData);
-  console.log(rowServicenameData, "service name data")
 }, [rowUsernameData, rowPasswordData, rowServicenameData]);
 
 const storeReceivermailInput = (e:any) => setStoreReceivermail(() => e.target.value);
@@ -165,7 +164,6 @@ const sendEmail = async () => {
         <EditCredentialForm 
           checkState={checkState}
           serviceRowData={initValues}
-          rowServicenameData={rowServicenameData}
         />
         <DropdownMenuItem
           onClick={UserNameCopy}

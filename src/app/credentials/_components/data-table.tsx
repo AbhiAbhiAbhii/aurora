@@ -6,6 +6,8 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
+  ColumnFiltersState,
+  getFilteredRowModel
 } from "@tanstack/react-table"
 
 import {
@@ -26,6 +28,8 @@ import {
     DoubleArrowRightIcon,
 } from "@radix-ui/react-icons"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import React from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -36,11 +40,19 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    getPaginationRowModel: getPaginationRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      columnFilters
+    }
   })
 
 
@@ -50,6 +62,16 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter username/email"
+          value={(table.getColumn("user_name")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("user_name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm text-black"
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -115,7 +137,7 @@ export function DataTable<TData, TValue>({
                           <SelectValue placeholder={table.getState().pagination.pageSize} />
                           </SelectTrigger>
                           <SelectContent side="top">
-                          {[3, 5, 8, 10].map((pageSize) => (
+                          {[3, 5, 8, 10, 20].map((pageSize) => (
                             <SelectItem key={pageSize} value={`${pageSize}`}>
                               {pageSize}
                             </SelectItem>
@@ -130,46 +152,46 @@ export function DataTable<TData, TValue>({
               </div>
               {/* Pagination Buttons */}
               <div className="flex space-x-2">
-                  <Button
-                    variant={buttonVariant}
-                    size={size}
-                    onClick={() => table.firstPage()}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                    <DoubleArrowLeftIcon 
-                      fontSize={iconSize}
-                    />
-                  </Button>
-                  <Button
-                    variant={buttonVariant}
-                    size={size}
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                      <ChevronLeftIcon 
-                          fontSize={16}
-                      />
-                  </Button>
-                  <Button
-                    variant={buttonVariant}
-                    size={size}
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                  >
-                      <ChevronRightIcon 
-                        fontSize={iconSize}
-                      />
-                  </Button>
-                  <Button
-                    variant={buttonVariant}
-                    size={size}
-                    onClick={() => table.lastPage()}
-                    disabled={!table.getCanNextPage()}
-                  >
-                    <DoubleArrowRightIcon 
-                      fontSize={iconSize}
-                    />
-                  </Button>
+                <Button
+                  variant={buttonVariant}
+                  size={size}
+                  onClick={() => table.firstPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <DoubleArrowLeftIcon 
+                    fontSize={iconSize}
+                  />
+                </Button>
+                <Button
+                  variant={buttonVariant}
+                  size={size}
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronLeftIcon 
+                      fontSize={16}
+                  />
+                </Button>
+                <Button
+                  variant={buttonVariant}
+                  size={size}
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronRightIcon 
+                    fontSize={iconSize}
+                  />
+                </Button>
+                <Button
+                  variant={buttonVariant}
+                  size={size}
+                  onClick={() => table.lastPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <DoubleArrowRightIcon 
+                    fontSize={iconSize}
+                  />
+                </Button>
               </div>
           </div>
       </div>

@@ -9,7 +9,7 @@ import {
     SheetTitle, 
     SheetTrigger 
 } from '@/components/ui/sheet'
-import { deleteRowItem, getAuthUsers, getServiceRowDetails, getUserDetails, updateItem } from '@/lib/queries'
+import { deleteRowItem, editLinkedPassword, getAuthUsers, getServiceRowDetails, getUserDetails, updateItem } from '@/lib/queries'
 import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
 import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
@@ -19,7 +19,6 @@ import { EyeNoneIcon } from '@radix-ui/react-icons'
 
 
 type Props = {
-    rowServicenameData: string
     serviceRowData: any
     checkState: boolean
 }
@@ -28,7 +27,7 @@ interface TabValue {
     tab: string
 }
 
-const EditCredentialForm = ({rowServicenameData, serviceRowData, checkState }: Props) => {
+const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
 
     const tabs: TabValue[] = [
         {
@@ -99,19 +98,24 @@ const EditCredentialForm = ({rowServicenameData, serviceRowData, checkState }: P
 
     const editCredentialItemSubmit = async (e:any) => {
         e.preventDefault()
-        await updateItem(
-            serviceRowData.id,
-            serviceRowData.company_name,
-            serviceNameData,
-            passwordData,
-            typeData,
-            userNameData,
-            urlData,
-            additionalNotesData,
-            managedbyData,
-            ssoNameData
-        )
-        updateSuccess()
+        const err = await editLinkedPassword(passwordData, userNameData)
+        if(err) {
+            console.log("Something went WONG")
+        } else {
+            await updateItem(
+                serviceRowData.id,
+                serviceRowData.company_name,
+                serviceNameData,
+                passwordData,
+                typeData,
+                userNameData,
+                urlData,
+                additionalNotesData,
+                managedbyData,
+                ssoNameData
+            )
+            updateSuccess()
+        }   
     }
 
     const deleteRow = async (e?: any) => {
@@ -434,9 +438,6 @@ const EditCredentialForm = ({rowServicenameData, serviceRowData, checkState }: P
                                                 >
                                                     Cancel
                                                 </AlertDialogCancel>
-                                                {/* <AlertDialogCancel
-                                                    className='p-0'
-                                                > */}
                                                     <DropdownMenuItem
                                                         ref={ref}
                                                         className='p-0 hidden'
@@ -450,7 +451,6 @@ const EditCredentialForm = ({rowServicenameData, serviceRowData, checkState }: P
                                                     >
                                                         Continue
                                                     </Button>
-                                                {/* </AlertDialogCancel> */}
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>
