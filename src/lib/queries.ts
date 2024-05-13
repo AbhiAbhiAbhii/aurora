@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/client"
+import { redirect } from "next/navigation"
 
 export const getCompanyDetails = async () => { 
     const db =  createClient()
@@ -94,6 +95,19 @@ export const getAuthUsers = async () => {
     }
 }
 
+export const getCurrentUserAllDetail = async () => {
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.getUser();
+    if(error) {
+        console.log("Something went WONG")
+        redirect('/error')
+    } else {
+        const authUserEmail = data.user?.email
+        const fetchedData = await supabase.from("User_Details").select("*").eq("email", authUserEmail)
+        return fetchedData
+    }
+}
+
 export const deleteItem = async (service_name:string) => {
     const supabase = createClient()
     const data = await supabase.from("Service").delete().eq('service_name', service_name)
@@ -183,4 +197,66 @@ export const editLinkedPassword = async (
     }).eq('user_name', userNameData)
     
     return error
+}
+
+export const insertEditLog = async (
+    name: string,
+    email: string,
+    date: string,
+    time: string,
+    service_name: string,
+    items_edited: string
+) => {
+    const supabase = createClient()
+    const { error } = await supabase.from("Edit_Log").insert({
+        name: name,
+        email: email,
+        date: date,
+        time: time,
+        service_edited: service_name,
+        items_edited: items_edited
+    })
+    if(error) {
+        alert("Something went wrong")
+    } 
+}
+
+export const getEditLogs = async (service_name: string) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from("Edit_Log").select("*").eq("service_edited", service_name)
+    if(error) {
+        alert("Something went Wong")
+    } else {
+        return data
+    }
+}
+
+export const insertCreatedAtLog = async (
+    name: string,
+    email: string,
+    date: string,
+    time: string,
+    service_name: string
+) => {
+    const supabase = createClient()
+    const { error } = await supabase.from("Created_at").insert({
+        name: name,
+        email: email,
+        date: date,
+        time: time,
+        service_name: service_name
+    })
+    if(error) {
+        alert("Something went Wong")
+    }
+}
+
+export const getCreatedAtLog = async (service_name: string) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from("Created_at").select("*").eq("service_name", service_name)
+    if(error) {
+        alert("Error in fetching created log")
+    } else {
+        return data
+    }
 }

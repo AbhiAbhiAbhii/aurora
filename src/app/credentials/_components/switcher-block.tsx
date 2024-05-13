@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { addNewCredentials, getAuthUsers, getUserDetails } from "@/lib/queries"
+import { addNewCredentials, getAuthUsers, getCurrentUserAllDetail, getUserDetails, insertCreatedAtLog } from "@/lib/queries"
 import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
@@ -58,6 +58,8 @@ const SwitcherBlock = (props: Props) => {
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
     const [ isSSO, setIsSSO ] = useState<any>(false)
     const [ ssoName, setSsoName ] = useState<string>("")
+
+    const [ currentUser, setCurrentUser ] = useState<any>()
 
     const AddCredentialsFormSchema = z.object({
         managedby: z.string().min(1, { message: 'Select a field'}),
@@ -116,18 +118,63 @@ const SwitcherBlock = (props: Props) => {
         setAlertDescription('Something went WONG')  
     }
 
+    function detectCheckBox() {
+        setIsSSO((prevValue:any) => !prevValue)
+    }
+
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            setUsers(await getUserDetails())
+        }
+        fetchUserDetails()
+    }, [])
+
+    useEffect(() => {
+        async function fetchCurrentUser() {
+            let data: any = await getCurrentUserAllDetail()
+            setCurrentUser(() => data.data[0])
+        }
+        fetchCurrentUser()
+    }, [])
+
     const addCredentialSubmit = async (values: z.infer<typeof AddCredentialsFormSchema>) => {
-       const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values;
+
+        const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values
+        const { name, email } = currentUser  
+
+        const date = new Date()
+
+        const day = date.getDate()
+        let hours = date.getHours()
+        const minutes = date.getMinutes()
+        const month = date.getMonth() + 1
+        const year = date.getFullYear()
+        
+        let amPm
+
+        if(hours === 0) { // midnight
+            hours = 12
+            amPm = "AM"
+        } else if(hours === 12) { // afternoon
+            amPm = "PM"
+        } else {
+            amPm = hours >= 12 ? 'PM':'AM'
+        }
+        // Ensure hours are not 0 for midnight or 12 for noon
+        const formattedHours = hours === 0 ? 12 : hours
+
+        const dateString = `${day}/${month}/${year}`
+        const timeString = `${formattedHours}:${minutes}${amPm}`
 
        if(isSSO) {
         const supabase = createClient();
         if(ssoName.toLowerCase() === "google") {
-            const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail');
+            const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail')
             if(error) {
-                console.log("Could not find rowData");
-                alert("Could not find rowData");
+                console.log("Could not find rowData")
+                alert("Could not find rowData")
             } else {
-                let extractedPassword:string = data[0].password;
+                let extractedPassword:string = data[0].password
                 const res = await addNewCredentials(
                     value, 
                     social, 
@@ -142,10 +189,11 @@ const SwitcherBlock = (props: Props) => {
                     login_type
                 )
                 if(!res) {
-                    clickRef.current.click();
-                    successNotification();
+                    clickRef.current.click()
+                    successNotification()
+                    await insertCreatedAtLog(name, email, dateString, timeString, service_name)
                 } else {
-                    notSuccessNotification();
+                    notSuccessNotification()
                 }
             }
         } else {
@@ -166,24 +214,14 @@ const SwitcherBlock = (props: Props) => {
             login_type
         )
         if(!res) {
-            clickRef.current.click();
-            successNotification();
+            clickRef.current.click()
+            successNotification()
+            await insertCreatedAtLog(name, email, dateString, timeString, service_name)
         } else {
-            notSuccessNotification();
+            notSuccessNotification()
         }
        }
     }
-
-    useEffect(() => {
-        const fetchUserDetails = async () => {
-            setUsers(await getUserDetails());
-        }
-        fetchUserDetails()
-    }, [])
-
-   function detectCheckBox() {
-    setIsSSO((prevValue:any) => !prevValue);
-   }
 
    let inactiveCheckBox = <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"></button>
    let activeCheckBox = <button type="button" role="checkbox" aria-checked="true" data-state="checked" value="on" className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground !mt-0"><span data-state="checked" className="flex items-center justify-center text-current" style={{pointerEvents: 'none'}}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-check h-4 w-4"><path d="M20 6 9 17l-5-5"></path></svg></span></button>

@@ -22,13 +22,14 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
 
-import { deleteItem, getServiceRowDetails, getServiceURL } from '@/lib/queries'
+import { deleteItem, getAuthUsers, getCreatedAtLog, getCurrentUserAllDetail, getEditLogs, getServiceRowDetails, getServiceURL } from '@/lib/queries'
 import { 
   MoreHorizontal, 
   Trash2Icon 
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { inputClassName } from '@/utils/classnames'
+import VersionHistory from '@/components/logs/version_history/edit-version-history'
 
 type Props = {
   rowUsernameData: string,
@@ -42,14 +43,18 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
 
   const { setAlertTitle, setAlertDescription, value } = useGlobalContext()
   const [ initValues, setInitValues ] = useState<any>()
-  const [ serviceURL, setServiceURL ] = useState<string>("");
+  const [ serviceURL, setServiceURL ] = useState<string>("")
 
-  const [ storeUsernameData, setStoreUsernameData ] = useState<string>("");
-  const [ passwordData, setPasswordData ] = useState<string>("");
-  const [ storeReceivermail, setStoreReceivermail ] = useState<string>("");
-  const [ storeServicenameData, setStoreServicenameData ] = useState<string>("");
+  const [ storeUsernameData, setStoreUsernameData ] = useState<string>("")
+  const [ passwordData, setPasswordData ] = useState<string>("")
+  const [ storeReceivermail, setStoreReceivermail ] = useState<string>("")
+  const [ storeServicenameData, setStoreServicenameData ] = useState<string>("")
+
+  const [ editLogs, setEditLogs ] = useState<any>()
+  const [ createdAtLog, setCreatedAtLog ] = useState<any>()
 
   let alertDialog: string = "Enter receiver's email"
+  let itemClassName: string = "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]"
 
   const getAlertContainer = () => {
     let alertContainer = document.querySelector('.alert')
@@ -63,24 +68,25 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     navigator.clipboard.writeText(data)
   }
 
+  const messageFunction = (title: string, description: string) => {
+    getAlertContainer()
+    setAlertTitle(title)
+    setAlertDescription(description)
+  }
+
   const UserNameCopy = () => {
     copyToClipBoard(rowUsernameData)
-    getAlertContainer()
-    setAlertTitle('Username Copied!')
-    setAlertDescription('Your credential username is ready to be pasted.')
+    messageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
   }
 
   const PasswordCopy = () => {
-      copyToClipBoard(rowPasswordData)
-      getAlertContainer()
-      setAlertTitle('Password Copied!')
-      setAlertDescription('Your credential password is ready to be pasted.')
+    copyToClipBoard(rowPasswordData)
+    messageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
   }
 
   const ItemDeletedSuccess = () => {
     getAlertContainer()
-    setAlertTitle('Item Deleted')
-    setAlertDescription('Your selected credential were deleted')
+    messageFunction('Item Deleted', 'Your selected credential were deleted')
     setTimeout(() => {
       location.reload()
     }, 2500)
@@ -88,14 +94,12 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
 
   const ItemDeletedError = () => {
     getAlertContainer()
-    setAlertTitle('Item not deleted')
-    setAlertDescription('Something went wrong and credential was not deleted')
+    messageFunction('Item not deleted', 'Something went wrong and credential was not deleted')
   }
 
   const emailSendSuccess = () => {
     getAlertContainer()
-    setAlertTitle('Email Sent')
-    setAlertDescription(`Your selected credential was sent to ${storeReceivermail}`)
+    messageFunction('Email Sent', `Your selected credential was sent to ${storeReceivermail}`)
     setTimeout(() => {
       location.reload()
     }, 2500)
@@ -135,11 +139,25 @@ useEffect(() => {
   setStoreServicenameData(() => rowServicenameData);
 }, [rowUsernameData, rowPasswordData, rowServicenameData]);
 
-const storeReceivermailInput = (e:any) => setStoreReceivermail(() => e.target.value);
+useEffect(() => {
+  const fetchEditLogs = async () => {
+    setEditLogs(await getEditLogs(rowServicenameData))
+  }
+  fetchEditLogs()
+}, [])
+
+useEffect(() => {
+  const fetchCreatedAtLog = async () => {
+    setCreatedAtLog(await getCreatedAtLog(rowServicenameData))
+  }
+  fetchCreatedAtLog()
+}, [])
+
+const storeReceivermailInput = (e:any) => setStoreReceivermail(() => e.target.value)
 
 const sendEmail = async () => {
 
-  const ourData = { passwordData, storeUsernameData, storeReceivermail, rowServicenameData };
+  const ourData = { passwordData, storeUsernameData, storeReceivermail, rowServicenameData }
 
   try {
     const response = await fetch('/api/send', {
@@ -185,6 +203,15 @@ const sendEmail = async () => {
             Visit Login
           </a>
         </DropdownMenuItem>
+        <div
+          className={itemClassName}
+        >
+          <VersionHistory 
+            rowServicenameData={rowServicenameData}
+            createdAtLog={createdAtLog}
+            editLogs={editLogs}
+          />
+        </div>
         <DropdownMenuItem
           onClick={PasswordCopy}
         >
@@ -192,7 +219,7 @@ const sendEmail = async () => {
         </DropdownMenuItem>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <div className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]'>
+            <div className={itemClassName}>
               Share Credential
             </div>
           </AlertDialogTrigger>
@@ -227,9 +254,7 @@ const sendEmail = async () => {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <div role="menuitem" 
-              className="relative flex cursor-default select-none items-center
-                justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
-                focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
+              className={`${itemClassName} justify-between`} 
               data-orientation="vertical" data-radix-collection-item=""
             >
               <AuroraText 

@@ -9,7 +9,7 @@ import {
     SheetTitle, 
     SheetTrigger 
 } from '@/components/ui/sheet'
-import { deleteRowItem, editLinkedPassword, getAuthUsers, getServiceRowDetails, getUserDetails, updateItem } from '@/lib/queries'
+import { deleteRowItem, editLinkedPassword, getAuthUsers, getCurrentUserAllDetail, getServiceRowDetails, getUserDetails, insertEditLog, updateItem } from '@/lib/queries'
 import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
 import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
@@ -69,6 +69,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
     const [ ssoNameData, setSsoNameData ] = useState<string>("")
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
 
+    const [ currentUser, setCurrentUser ] = useState<any>()
 
     const updateSuccess = () => {
         let alertContainer = document.querySelector('.alert')
@@ -94,28 +95,6 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         setTimeout(() => {
             location.reload()
         }, 2500)
-    }
-
-    const editCredentialItemSubmit = async (e:any) => {
-        e.preventDefault()
-        const err = await editLinkedPassword(passwordData, userNameData)
-        if(err) {
-            console.log("Something went WONG")
-        } else {
-            await updateItem(
-                serviceRowData.id,
-                serviceRowData.company_name,
-                serviceNameData,
-                passwordData,
-                typeData,
-                userNameData,
-                urlData,
-                additionalNotesData,
-                managedbyData,
-                ssoNameData
-            )
-            updateSuccess()
-        }   
     }
 
     const deleteRow = async (e?: any) => {
@@ -177,14 +156,121 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         serviceRowData.sso_name
     ])
 
+    useEffect(() => {
+        async function getCurrentUser() {
+          let data: any = await getCurrentUserAllDetail()
+          setCurrentUser(() => data.data[0])
+        }
+        getCurrentUser()
+    }, [])
+
+
+    const editCredentialItemSubmit = async (e:any) => {
+        e.preventDefault()
+        const { name, email } = currentUser
+        const date = new Date()
+
+        // Get month name
+        const monthName = date.toLocaleString('default', { month: 'long' })
+        
+        // Get day of the month
+        const day = date.getDate()
+        
+        // Get hours, minutes, and AM/PM
+        let hours = date.getHours()
+        const minutes = date.getMinutes()
+        let amPm
+        
+        if (hours === 0) {
+            hours = 12
+            amPm = 'AM' // midnight
+        } else if (hours === 12) {
+            amPm = 'PM' // noon
+        } else {
+            amPm = hours >= 12 ? 'PM' : 'AM'
+            hours = hours % 12 // Convert hours to 12-hour format
+        }
+        
+        // Ensure hours are not 0 for midnight or 12 for noon
+        const formattedHours = hours === 0 ? 12 : hours
+        
+        // Construct the string
+        const dateString = `${monthName} ${day}`
+        const timeString = `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${amPm}`
+
+        const err = await editLinkedPassword(passwordData, userNameData)
+        if(err) {
+            console.log("Something went WONG")
+        } else {
+
+            // compare logic 
+            let itemsEdited: any
+            let prevData: any = {
+                type: serviceRowData.type,
+                service_name: serviceRowData.service_name,
+                username: serviceRowData.user_name,
+                password: serviceRowData.password,
+                URL: serviceRowData.URL,
+                managed_by: serviceRowData.managed_by,
+                additional_notes: serviceRowData.additional_notes,
+                sso_name: serviceRowData.sso_name
+            }
+            
+            let updatedData: any = {
+                type: typeData,
+                service_name: serviceNameData,
+                username: userNameData,
+                password: passwordData,
+                URL: urlData,
+                managed_by: managedbyData,
+                additional_notes: additionalNotesData,
+                sso_name: ssoNameData
+            }
+
+            const differentKeys = []
+
+            const prevDataKeys = Object.keys(prevData)
+            const updatedDataKeys = Object.keys(updatedData)
+            
+            if (prevDataKeys.length !== updatedDataKeys.length) {
+                alert("Objects do not have the same length")
+            } else {
+                for (let key of prevDataKeys) {
+                    if(prevData[key] !== updatedData[key]) {
+                        differentKeys.push(key)
+                    } 
+                    if(differentKeys.length > 0) {
+                        itemsEdited = `Items edited ${differentKeys.join(", ")}`
+                        updateSuccess()
+                    } else {
+                        console.log("No changes were found")
+                    }
+                }
+            }
+            await insertEditLog(name, email, dateString, timeString, serviceNameData, itemsEdited)
+            await updateItem(
+                serviceRowData.id,
+                serviceRowData.company_name,
+                serviceNameData,
+                passwordData,
+                typeData,
+                userNameData,
+                urlData,
+                additionalNotesData,
+                managedbyData,
+                ssoNameData
+            )
+            
+        }   
+
+
+    }
+
   return (
     <Sheet>
         <SheetTrigger asChild>
             <div role="menuitem" 
-                className="relative flex cursor-default select-none items-center
-                    justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
-                    focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"  
-                data-orientation="vertical" data-radix-collection-item=""
+                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]" 
             >
                 Edit
             </div>
@@ -256,7 +342,10 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
                                 value={serviceNameData}
                                 placeholder={serviceNameData}
                                 onChange={(e) => {
-                                    setServiceNameData(e.target.value)
+                                    setServiceNameData(() => {
+                                        let updatedServiceNameData = e.target.value
+                                        return updatedServiceNameData
+                                    })
                                 }}
                                 name='service_name'
                                 className={`${inputClassName}`}
