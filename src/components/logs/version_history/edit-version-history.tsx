@@ -21,7 +21,7 @@ const VersionHistory = ({ editLogs, createdAtLog, rowServicenameData }: Props) =
         >
           <div className="w-[380px] min-w-[80%] ml-4 mt-12">
             <AuroraText 
-              text='Last Edited'
+              text='Version History'
               className='mb-4'
             />
               {

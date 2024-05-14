@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
 
-import { deleteItem, getAuthUsers, getCreatedAtLog, getCurrentUserAllDetail, getEditLogs, getServiceRowDetails, getServiceURL } from '@/lib/queries'
+import { deleteItem, getAuthUsers, getCreatedAtLog, getCurrentUserAllDetail, getEditLogs, getServiceRowDetails, getServiceURL, insertEditLog } from '@/lib/queries'
 import { 
   MoreHorizontal, 
   Trash2Icon 
@@ -52,6 +52,7 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
 
   const [ editLogs, setEditLogs ] = useState<any>()
   const [ createdAtLog, setCreatedAtLog ] = useState<any>()
+  const [ getCurrentAuthUser, setGetCurrentAuthUser ] = useState<any>()
 
   let alertDialog: string = "Enter receiver's email"
   let itemClassName: string = "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]"
@@ -153,11 +154,48 @@ useEffect(() => {
   fetchCreatedAtLog()
 }, [])
 
+useEffect(() => {
+  const fetchCurrentAuthUser = async () => {
+    let data: any = await getCurrentUserAllDetail()
+    setGetCurrentAuthUser(() => data.data[0])
+  }
+  fetchCurrentAuthUser()
+}, [])
+
 const storeReceivermailInput = (e:any) => setStoreReceivermail(() => e.target.value)
+
 
 const sendEmail = async () => {
 
   const ourData = { passwordData, storeUsernameData, storeReceivermail, rowServicenameData }
+  
+  const { name, email } = getCurrentAuthUser
+
+  const date = new Date()
+  const day = date.getDate()
+  const monthName = date.toLocaleString('default', { month: 'long' })
+
+  let hours= date.getHours()
+  const minutes = date.getMinutes()
+  let amPm
+
+  if(hours === 0) {
+    hours = 12
+    amPm = "AM"
+  } else if(hours === 12) {
+    amPm = "PM"
+  } else {
+    amPm = hours >=12 ? 'PM':'AM'
+    hours = hours % 12
+  }
+
+  // Ensure hours are not 0 for midnight or 12 for noon
+  const formattedHours = hours === 0 ? 12 : hours
+
+  const dateString = `${monthName} ${day}`
+  const timeString = `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${amPm}`
+
+  const itemsEdited = `${rowServicenameData} credentials was shared by ${name} to ${storeReceivermail}`
 
   try {
     const response = await fetch('/api/send', {
@@ -170,6 +208,7 @@ const sendEmail = async () => {
     if(response.ok) {
       console.log("Response is ok");
       emailSendSuccess();
+      await insertEditLog(name, email, dateString, timeString, rowServicenameData, itemsEdited)
       return await response.json();
     }
   } catch(error) {
