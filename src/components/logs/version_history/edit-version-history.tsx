@@ -2,12 +2,14 @@
 import React from 'react'
 import { Sheet, SheetContent, SheetTrigger } from '../../ui/sheet'
 import AuroraText from '@/components/global/aurora-text'
+import { HistoryIcon } from 'lucide-react'
 
 type Props = {
   editLogs: any
   createdAtLog: any
   rowServicenameData: string
 }
+
 
 const VersionHistory = ({ editLogs, createdAtLog, rowServicenameData }: Props) => {
   const { name, time, date } = createdAtLog[0]
@@ -27,10 +29,33 @@ const VersionHistory = ({ editLogs, createdAtLog, rowServicenameData }: Props) =
               {
                 editLogs.slice().reverse().map((item: any) => {
                   return(
-                    <div className='mb-2' key={item.name}>
-                      {item.name}
-                      {item.time}&nbsp;
-                      {item.items_edited}
+                    <div
+                      className='mb-7 flex flex-col' 
+                      key={item.name}
+                    >
+                      <div 
+                        className='flex items-start'
+                        key={item.name}>
+                        <div className='mr-2'>
+                          <HistoryIcon 
+                            size={18}
+                          />
+                        </div>
+                        <AuroraText 
+                          text={item.items_edited}
+                          className='font-inter font-normal text-sm text-black flex items-end'
+                        />
+                      </div>
+                      <div className='ml-7 mt-2 flex space-x-1'>
+                        <AuroraText 
+                          text={item.name}
+                          className='font-inter text-muted-foreground text-xs'
+                        />
+                        <AuroraText 
+                          text={`- ${item.date} - ${item.time}`}
+                          className='font-inter text-muted-foreground text-xs'
+                        />
+                      </div>
                     </div>
                   )
                 })

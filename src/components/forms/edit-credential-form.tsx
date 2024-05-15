@@ -240,7 +240,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
                         differentKeys.push(key)
                     } 
                     if(differentKeys.length > 0) {
-                        itemsEdited = `Items edited ${differentKeys.join(", ")}`
+                        itemsEdited = `Credential fields ${differentKeys.join(", ")} edited`
                         updateSuccess()
                     } else {
                         console.log("No changes were found")

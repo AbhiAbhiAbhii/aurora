@@ -195,7 +195,7 @@ const sendEmail = async () => {
   const dateString = `${monthName} ${day}`
   const timeString = `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${amPm}`
 
-  const itemsEdited = `${rowServicenameData} credentials was shared by ${name} to ${storeReceivermail}`
+  const itemsEdited = `${rowServicenameData} credentials was shared to ${storeReceivermail}`
 
   try {
     const response = await fetch('/api/send', {
