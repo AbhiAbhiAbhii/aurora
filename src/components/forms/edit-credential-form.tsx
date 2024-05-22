@@ -16,6 +16,10 @@ import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
 import { useGlobalContext } from '../global/my-global-context'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
 import { EyeNoneIcon } from '@radix-ui/react-icons'
+import { inputClassName } from '@/utils/classnames'
+import { getCurrentDate } from '@/utils/functions/date'
+import { getAlertContainer } from '@/utils/functions/alert-function'
+import { reloadPage } from '@/utils/functions/reload'
 
 
 type Props = {
@@ -45,7 +49,6 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
     ]
 
     let labelClassName: string = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2"
-    let inputClassName: string = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
     let selectCustomClassName: string = "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 relative"
     let textAreaClassName: string = "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
     let alertDialogTriggerClassName: string = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/90 h-10 px-4 py-2 bg-[#631F0A] text-zinc-50"
@@ -71,30 +74,21 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
 
     const [ currentUser, setCurrentUser ] = useState<any>()
 
+
+    const messageFunction = (title: string, description: string) => {
+        getAlertContainer()
+        setAlertTitle(title)
+        setAlertDescription(description)
+    }
+
     const updateSuccess = () => {
-        let alertContainer = document.querySelector('.alert')
-        alertContainer?.classList.add('alert-active')
-        setAlertTitle('Item Updated')
-        setAlertDescription('Your credential has been updated successfully')
-        setTimeout(() => {
-            alertContainer?.classList.remove('alert-active')
-        }, 2000)
-        setTimeout(() => {
-            location.reload()
-        }, 2500)
+        messageFunction("Item Updated", "Your credential has been updated successfully")
+        setTimeout(() => reloadPage(), 1500)
     }
 
     const deleteSuccess = () => {
-        let alertContainer = document.querySelector('.alert')
-        alertContainer?.classList.add('alert-active')
-        setAlertTitle('Item Deleted')
-        setAlertDescription('Your selected credential were deleted')
-        setTimeout(() => {
-            alertContainer?.classList.remove('alert-active')
-        }, 2000)
-        setTimeout(() => {
-            location.reload()
-        }, 2500)
+        messageFunction("Item Deleted", "Your selected credential were deleted")
+        setTimeout(() => reloadPage(), 1500)
     }
 
     const deleteRow = async (e?: any) => {
@@ -105,12 +99,12 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
 
     const handleButtonSelectClick = (e:any) => {
         e.preventDefault()
-        setButtonSelectClick(!buttonSelectClick)
+        setButtonSelectClick((prevState) => !prevState)
     } 
 
-    const handleManagedButtonClick = (e:any) => {
+    const handleManagedButtonClick = (e:any) => { // only available to superadmin for edit form
         e.preventDefault()
-        setButtonManagedSelectClick(!buttonManagedSelectClick)
+        setButtonManagedSelectClick((prevState) => !prevState)
     }
 
     useEffect(() => {
@@ -168,41 +162,12 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
     const editCredentialItemSubmit = async (e:any) => {
         e.preventDefault()
         const { name, email } = currentUser
-        const date = new Date()
-
-        // Get month name
-        const monthName = date.toLocaleString('default', { month: 'long' })
-        
-        // Get day of the month
-        const day = date.getDate()
-        
-        // Get hours, minutes, and AM/PM
-        let hours = date.getHours()
-        const minutes = date.getMinutes()
-        let amPm
-        
-        if (hours === 0) {
-            hours = 12
-            amPm = 'AM' // midnight
-        } else if (hours === 12) {
-            amPm = 'PM' // noon
-        } else {
-            amPm = hours >= 12 ? 'PM' : 'AM'
-            hours = hours % 12 // Convert hours to 12-hour format
-        }
-        
-        // Ensure hours are not 0 for midnight or 12 for noon
-        const formattedHours = hours === 0 ? 12 : hours
-        
-        // Construct the string
-        const dateString = `${monthName} ${day}`
-        const timeString = `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${amPm}`
+        const { dateString, timeString } = getCurrentDate()
 
         const err = await editLinkedPassword(passwordData, userNameData)
         if(err) {
             console.log("Something went WONG")
         } else {
-
             // compare logic 
             let itemsEdited: any
             let prevData: any = {
@@ -260,10 +225,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
                 managedbyData,
                 ssoNameData
             )
-            
         }   
-
-
     }
 
   return (

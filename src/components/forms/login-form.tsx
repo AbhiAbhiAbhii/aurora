@@ -8,14 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { Login, SignUp } from '@/app/login/actions'
+import { Login } from '@/app/login/actions'
 
 type Props = {}
 // Define our Form Schema/data type
 const FormSchema = z.object({
-    // username: z.string().min(1, {
-    //     message: "Must be 5 characters or more"
-    // }),
     email: z.string().email({
         message: 'Invalid email address'
     }).min(1),
@@ -26,13 +23,10 @@ const FormSchema = z.object({
 
 const LoginForm = (props: Props) => {   
     
-    const [ boolean, setBoolean ] = useState(true)
-
     // 1. Define our form
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            // username: "" ,
             email: "",
             password: "",
         }
@@ -40,21 +34,7 @@ const LoginForm = (props: Props) => {
 
     const handleLogin = async (values: z.infer<typeof FormSchema>) => {
         const {email, password} = values
-        Login(
-            email,
-            password
-        )
-        // try {
-        //     SignUpTest(
-        //         password,
-        //         email,
-        //         username,
-        //         // boolean
-        //     )
-        //     alert("Success")
-        // } catch(error) {
-        //     alert("something went wong")
-        // }
+        Login(email,password)
     }
 
   return (
@@ -95,22 +75,6 @@ const LoginForm = (props: Props) => {
                             </FormItem>
                         )}
                     />
-                    {/* <FormField 
-                        control={form.control}
-                        name='username'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>User name</FormLabel>
-                                <FormControl>
-                                    <Input 
-                                        {...field}
-                                        placeholder='enter your username' 
-                                    />
-                                </FormControl>
-                                <FormMessage className='font-geist' />
-                            </FormItem>
-                        )}
-                    /> */}
                     <FormField 
                         control={form.control}
                         name='password'

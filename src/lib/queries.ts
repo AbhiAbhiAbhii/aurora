@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/client"
 import { redirect } from "next/navigation"
+import { NextResponse } from "next/server"
 
 export const getCompanyDetails = async () => { 
     const db =  createClient()
@@ -258,5 +259,21 @@ export const getCreatedAtLog = async (service_name: string) => {
         alert("Error in fetching created log")
     } else {
         return data
+    }
+}
+
+export const signOut = async () => {
+    const supabase = createClient()
+    try {
+        const { error } = await supabase.auth.signOut()
+        if(!error) {
+            console.log("Signed out successfully")
+            return NextResponse.json({ message: "Successfully signed out" }, { status: 200 })
+        } else {
+            throw new Error("Error during Sign out")
+        }
+    } catch(error) {
+        console.log("Error", error)
+        return NextResponse.json({ message: "Error signing out" }, { status: 500 })
     }
 }

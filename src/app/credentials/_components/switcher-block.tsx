@@ -28,6 +28,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { EyeNoneIcon } from "@radix-ui/react-icons"
+import { getAlertContainer } from "@/utils/functions/alert-function"
+import { reloadPage } from "@/utils/functions/reload"
+import { getCurrentDate } from "@/utils/functions/date"
 
 type Props = {}
 
@@ -95,27 +98,21 @@ const SwitcherBlock = (props: Props) => {
         }
     })
 
+    const messageFunction = (title: string, description: string) => {
+        getAlertContainer()
+        setAlertTitle(title)
+        setAlertDescription(description)
+    }
+
+
     const successNotification = () => {
-        let alertContainer = document.querySelector('.alert')
-        alertContainer?.classList.add('alert-active')
-        setAlertTitle('Success')
-        setAlertDescription('Your credential is added successfully')
-        setTimeout(() => {
-            alertContainer?.classList.remove('alert-active')
-        }, 2000)
-        setTimeout(() => {
-            location.reload()
-        }, 3000)
+        messageFunction('Success', 'Your credential is added successfully')
+        setTimeout(() => reloadPage(), 1500)
     }
 
     const notSuccessNotification = () => {
-        let alertContainer = document.querySelector('.alert')
-        alertContainer?.classList.add('alert-active')
-        setTimeout(() => {
-            alertContainer?.classList.remove('alert-active')
-        }, 2000)
-        setAlertTitle('Not Success')
-        setAlertDescription('Something went WONG')  
+        messageFunction("Not Success", "Something went WONG")
+        setTimeout(() => reloadPage(), 1500)
     }
 
     function detectCheckBox() {
@@ -142,29 +139,7 @@ const SwitcherBlock = (props: Props) => {
         const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values
         const { name, email } = currentUser  
 
-        const date = new Date()
-
-        const day = date.getDate()
-        let hours = date.getHours()
-        const minutes = date.getMinutes()
-        const month = date.getMonth() + 1
-        const year = date.getFullYear()
-        
-        let amPm
-
-        if(hours === 0) { // midnight
-            hours = 12
-            amPm = "AM"
-        } else if(hours === 12) { // afternoon
-            amPm = "PM"
-        } else {
-            amPm = hours >= 12 ? 'PM':'AM'
-        }
-        // Ensure hours are not 0 for midnight or 12 for noon
-        const formattedHours = hours === 0 ? 12 : hours
-
-        const dateString = `${day}/${month}/${year}`
-        const timeString = `${formattedHours}:${minutes}${amPm}`
+        const { dateString, timeString } = getCurrentDate()
 
        if(isSSO) {
         const supabase = createClient();

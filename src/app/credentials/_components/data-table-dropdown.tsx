@@ -30,6 +30,9 @@ import {
 import { useEffect, useState } from 'react'
 import { inputClassName } from '@/utils/classnames'
 import VersionHistory from '@/components/logs/version_history/edit-version-history'
+import { MessageFunction } from '@/utils/functions/alert-function'
+import { reloadPage } from '@/utils/functions/reload'
+import { getCurrentDate } from '@/utils/functions/date'
 
 type Props = {
   rowUsernameData: string,
@@ -57,6 +60,10 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   let alertDialog: string = "Enter receiver's email"
   let itemClassName: string = "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]"
 
+  const copyToClipBoard = (data:string) => {
+    navigator.clipboard.writeText(data)
+  }
+
   const getAlertContainer = () => {
     let alertContainer = document.querySelector('.alert')
     alertContainer?.classList.add('alert-active')
@@ -65,8 +72,14 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     }, 2000)
   }
 
-  const copyToClipBoard = (data:string) => {
-    navigator.clipboard.writeText(data)
+  const UserNameCopy = () => {
+    copyToClipBoard(rowUsernameData)
+    MessageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
+  }
+
+  const PasswordCopy = () => {
+    copyToClipBoard(rowPasswordData)
+    MessageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
   }
 
   const messageFunction = (title: string, description: string) => {
@@ -75,35 +88,16 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     setAlertDescription(description)
   }
 
-  const UserNameCopy = () => {
-    copyToClipBoard(rowUsernameData)
-    messageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
-  }
-
-  const PasswordCopy = () => {
-    copyToClipBoard(rowPasswordData)
-    messageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
-  }
-
   const ItemDeletedSuccess = () => {
-    getAlertContainer()
     messageFunction('Item Deleted', 'Your selected credential were deleted')
-    setTimeout(() => {
-      location.reload()
-    }, 2500)
   }
 
   const ItemDeletedError = () => {
-    getAlertContainer()
     messageFunction('Item not deleted', 'Something went wrong and credential was not deleted')
   }
 
   const emailSendSuccess = () => {
-    getAlertContainer()
     messageFunction('Email Sent', `Your selected credential was sent to ${storeReceivermail}`)
-    setTimeout(() => {
-      location.reload()
-    }, 2500)
   }
 
   const DeleteItem = async () => {
@@ -112,7 +106,8 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
       ItemDeletedSuccess()
     } else {
       ItemDeletedError()
-    }
+    } 
+    setTimeout(() => reloadPage(), 1500)
   }
 
   useEffect(() => {
@@ -170,30 +165,7 @@ const sendEmail = async () => {
   const ourData = { passwordData, storeUsernameData, storeReceivermail, rowServicenameData }
   
   const { name, email } = getCurrentAuthUser
-
-  const date = new Date()
-  const day = date.getDate()
-  const monthName = date.toLocaleString('default', { month: 'long' })
-
-  let hours= date.getHours()
-  const minutes = date.getMinutes()
-  let amPm
-
-  if(hours === 0) {
-    hours = 12
-    amPm = "AM"
-  } else if(hours === 12) {
-    amPm = "PM"
-  } else {
-    amPm = hours >=12 ? 'PM':'AM'
-    hours = hours % 12
-  }
-
-  // Ensure hours are not 0 for midnight or 12 for noon
-  const formattedHours = hours === 0 ? 12 : hours
-
-  const dateString = `${monthName} ${day}`
-  const timeString = `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${amPm}`
+  const { dateString, timeString } = getCurrentDate() // destructure time and date
 
   const itemsEdited = `${rowServicenameData} credentials was shared to ${storeReceivermail}`
 
@@ -207,7 +179,7 @@ const sendEmail = async () => {
     });
     if(response.ok) {
       console.log("Response is ok");
-      emailSendSuccess();
+      emailSendSuccess()
       await insertEditLog(name, email, dateString, timeString, rowServicenameData, itemsEdited)
       return await response.json();
     }
