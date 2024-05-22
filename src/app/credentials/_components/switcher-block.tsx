@@ -112,7 +112,7 @@ const SwitcherBlock = (props: Props) => {
 
     const notSuccessNotification = () => {
         messageFunction("Not Success", "Something went WONG")
-        setTimeout(() => reloadPage(), 1500)
+        // setTimeout(() => reloadPage(), 1500)
     }
 
     function detectCheckBox() {
@@ -150,7 +150,7 @@ const SwitcherBlock = (props: Props) => {
                 alert("Could not find rowData")
             } else {
                 let extractedPassword:string = data[0].password
-                const res = await addNewCredentials(
+                const formData = {
                     value, 
                     social, 
                     service_name, 
@@ -162,12 +162,21 @@ const SwitcherBlock = (props: Props) => {
                     isSSO, 
                     ssoName, 
                     login_type
-                )
-                if(!res) {
+                }
+                const res = await fetch("/api/AddCredential", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                if(res.ok) {
                     clickRef.current.click()
                     successNotification()
                     await insertCreatedAtLog(name, email, dateString, timeString, service_name)
+               
                 } else {
+                    clickRef.current.click()
                     notSuccessNotification()
                 }
             }
@@ -175,7 +184,7 @@ const SwitcherBlock = (props: Props) => {
             null
         }
        } else {
-        const res = await addNewCredentials(
+        const formData = {
             value, 
             social, 
             service_name, 
@@ -187,14 +196,24 @@ const SwitcherBlock = (props: Props) => {
             isSSO, 
             ssoName, 
             login_type
-        )
-        if(!res) {
+        }
+
+        const res = await fetch("/api/AddCredential", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+
+        if(res.ok) {
             clickRef.current.click()
             successNotification()
             await insertCreatedAtLog(name, email, dateString, timeString, service_name)
         } else {
             notSuccessNotification()
         }
+
        }
     }
 
