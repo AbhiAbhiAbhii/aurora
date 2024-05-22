@@ -15,10 +15,10 @@ const DataDisplay = (props: Props) => {
   const [ currentUser, setCurrentUser ] = useState<any>();
   const [ filteredUsers, setFilteredUsers ] = useState<any>();
 
-  useEffect(() => {
+  useEffect(() => { // function to keep current user logged in at the top of settings view
     const supabase = createClient();
     
-    async function userCheckAndFetchData() {
+    async function userCheckAndFetchData() { // checking current user logged in
       const getCurrentUserEmail = (await supabase.auth.getUser()).data.user?.email;
       const usersAllData = (await supabase.from("User_Details").select("*")).data;
 
@@ -32,7 +32,7 @@ const DataDisplay = (props: Props) => {
       const getCurrentUserEmail = (await supabase.auth.getUser()).data.user?.email;
       const usersAllData = (await supabase.from("User_Details").select("*")).data;
 
-      setFilteredUsers(() => {
+      setFilteredUsers(() => { // fetching user details not logged in
         return usersAllData?.filter((user) => user.email !== getCurrentUserEmail);
       })
     }
