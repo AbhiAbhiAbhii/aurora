@@ -6,7 +6,6 @@ export async function POST(req: NextRequest) {
     const supabase = createClient()
     const body = await req.json()
     const { value, social, service_name, user_name, password, url, additional_notes, managedby, isSSO, ssoName, login_type } = body
-    console.log(body, "our Body")
 
     try {
         const { error } = await supabase.from("Service").insert({ 
@@ -23,7 +22,6 @@ export async function POST(req: NextRequest) {
             login_type: login_type
         })
 
-        console.log(error, "our ERROR")
         if(error) {
             throw new Error("Failed to insert credential")
         } else {

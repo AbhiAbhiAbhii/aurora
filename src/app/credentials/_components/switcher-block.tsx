@@ -7,7 +7,7 @@ import {
 import AuroraText from "@/components/global/aurora-text"
 import { useGlobalContext } from "@/components/global/my-global-context"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { LucideSparkles, Plus } from "lucide-react"
 import { 
     Sheet, 
     SheetClose, 
@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { addNewCredentials, getAuthUsers, getCurrentUserAllDetail, getUserDetails, insertCreatedAtLog } from "@/lib/queries"
+import { getAuthUsers, getCurrentUserAllDetail, getUserDetails, insertCreatedAtLog } from "@/lib/queries"
 import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
@@ -40,29 +40,20 @@ interface TabValue {
 
 const SwitcherBlock = (props: Props) => {
 
-    const tabs: TabValue[] = [
-        {
-            tab: 'All'
-        },
-        {
-            tab: 'Operations'
-        },
-        {
-            tab: 'Socials'
-        },
-        {
-            tab: 'Subscriptions'
-        },
-    ]
-
     const clickRef: any = useRef();
-    const { setTabValue, value, setAlertTitle, setAlertDescription } = useGlobalContext()
+    const { setTabValue, value, setAlertTitle, setAlertDescription, isGodCheck } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
     const [ isSSO, setIsSSO ] = useState<any>(false)
     const [ ssoName, setSsoName ] = useState<string>("")
 
     const [ currentUser, setCurrentUser ] = useState<any>()
+
+    const tabs: TabValue[] = 
+    isGodCheck ?
+    [{tab: 'All'},{tab: 'Operations'},{tab: 'Socials'},{tab: 'Subscriptions'}]
+    :
+    [{tab: 'All'},{tab: 'Operations'},{tab: 'Socials'},{tab: 'Subscriptions'}, {tab: 'Shared'}]
 
     const AddCredentialsFormSchema = z.object({
         managedby: z.string().min(1, { message: 'Select a field'}),
@@ -112,7 +103,6 @@ const SwitcherBlock = (props: Props) => {
 
     const notSuccessNotification = () => {
         messageFunction("Not Success", "Something went WONG")
-        // setTimeout(() => reloadPage(), 1500)
     }
 
     function detectCheckBox() {
@@ -237,7 +227,21 @@ const SwitcherBlock = (props: Props) => {
                                     className="font-inter font-medium text-sm text-muted-foreground"
                                     onClick={(e) => setTabValue(e.currentTarget.innerText)}
                                 >
-                                    {item.tab}
+                                    {
+                                        item.tab === "Shared" ?
+                                        <div
+                                            className="flex items-center justify-center space-x-1"
+                                        >
+                                            <LucideSparkles 
+                                                size={16}
+                                            />
+                                            <p>
+                                                {item.tab}
+                                            </p>
+                                        </div>
+                                        :
+                                        item.tab
+                                    }
                                 </TabsTrigger>
                             ))
                         }

@@ -277,3 +277,12 @@ export const signOut = async () => {
         return NextResponse.json({ message: "Error signing out" }, { status: 500 })
     }
 }
+
+export const currentSessionUserDetails = async () => {
+    const supabase = createClient()
+
+    const getCurrentUserEmail = (await supabase.auth.getUser()).data.user?.email
+    const usersAllData = (await supabase.from("User_Details").select("*")).data
+
+    return { getCurrentUserEmail, usersAllData }
+}
