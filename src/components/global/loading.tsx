@@ -1,4 +1,5 @@
 import React from 'react'
+import { PacmanLoader } from 'react-spinners'
 
 const Loading = () => {
   return (
@@ -20,6 +21,10 @@ const Loading = () => {
         />
       </svg>
     </div>
+    // <PacmanLoader 
+    //   speedMultiplier={2.4}
+    //   color='#000'
+    // />
   )
 }
 

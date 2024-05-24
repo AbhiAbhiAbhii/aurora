@@ -7,14 +7,16 @@ export type GlobalContent = {
   setLinkValue:(v: string) => void
   tabValue: string
   setTabValue:(v: string) => void,
-  credentialInsert: boolean,
-  setCredentialInsert: (v: boolean) => void
   alertTitle: string
   setAlertTitle: (v: string) => void
   alertDescription: string
   setAlertDescription: (v: string) => void
   checkBoxIdValue: any
   setCheckBoxIdValue: (v: any) => void
+  isGodCheck: any
+  setIsGodCheck: (v: any) => void
+  currentSessionUser: any
+  setCurrentSessionUser: (v: any) => void
 }
 export const MyGlobalContext = createContext<GlobalContent>({
 value: '', // set a default value
@@ -23,13 +25,15 @@ linkValue: '',
 setLinkValue: () => {},
 tabValue: '',
 setTabValue: () => {},
-credentialInsert: false,
-setCredentialInsert: () => {},
 alertTitle: '',
 setAlertTitle: () => {},
 alertDescription: '',
 setAlertDescription: () => {},
 checkBoxIdValue: '',
 setCheckBoxIdValue: () => {},
+isGodCheck: '',
+setIsGodCheck: () => {},
+currentSessionUser: '',
+setCurrentSessionUser: () => {}
 })
 export const useGlobalContext = () => useContext(MyGlobalContext)
