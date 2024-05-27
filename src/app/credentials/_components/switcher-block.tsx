@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { getAuthUsers, getCurrentUserAllDetail, getUserDetails, insertCreatedAtLog } from "@/lib/queries"
+import { getAuthUsers, getClients, getCurrentUserAllDetail, getUserDetails, insertCreatedAtLog } from "@/lib/queries"
 import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
@@ -47,6 +47,7 @@ const SwitcherBlock = (props: Props) => {
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
     const [ isSSO, setIsSSO ] = useState<any>(false)
     const [ ssoName, setSsoName ] = useState<string>("")
+    const [ clientsArray, setClientsArray ] = useState(null)
 
     const [ currentUser, setCurrentUser ] = useState<any>()
 
@@ -125,6 +126,19 @@ const SwitcherBlock = (props: Props) => {
         fetchCurrentUser()
     }, [])
 
+
+    useEffect(() => {
+        async function fetchClients() {
+            if(currentSessionUser[0].is_team_lead) {
+                let data: any = await getClients()
+                setClientsArray(() => data)
+            } else {
+                setClientsArray(() => null)
+            }
+        }
+        fetchClients()
+    }, [])
+
     const addCredentialSubmit = async (values: z.infer<typeof AddCredentialsFormSchema>) => {
 
         const {  social, service_name, user_name, password, url, additional_notes, managedby, login_type } = values
@@ -133,7 +147,7 @@ const SwitcherBlock = (props: Props) => {
         const { dateString, timeString } = getCurrentDate()
 
        if(isSSO) {
-        const supabase = createClient();
+        const supabase = createClient()
         if(ssoName.toLowerCase() === "google") {
             const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail')
             if(error) {
@@ -540,7 +554,7 @@ const SwitcherBlock = (props: Props) => {
                                         </Form>
                                     )
                                     :
-                                    (<UserAddCredentialForm currentSessionUser={currentSessionUser} />)
+                                    (<UserAddCredentialForm tabs={tabs} clientsArray={clientsArray} currentSessionUser={currentSessionUser} />)
                                 }
                             </div>
                         </div>
