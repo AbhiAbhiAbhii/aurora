@@ -31,6 +31,7 @@ import { EyeNoneIcon } from "@radix-ui/react-icons"
 import { getAlertContainer } from "@/utils/functions/alert-function"
 import { reloadPage } from "@/utils/functions/reload"
 import { getCurrentDate } from "@/utils/functions/date"
+import UserAddCredentialForm from "@/components/forms/user-forms/user-add-credential-form"
 
 type Props = {}
 
@@ -41,7 +42,7 @@ interface TabValue {
 const SwitcherBlock = (props: Props) => {
 
     const clickRef: any = useRef();
-    const { setTabValue, value, setAlertTitle, setAlertDescription, isGodCheck } = useGlobalContext()
+    const { setTabValue, value, setAlertTitle, setAlertDescription, isGodCheck, currentSessionUser } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
     const [ isSSO, setIsSSO ] = useState<any>(false)
@@ -273,267 +274,274 @@ const SwitcherBlock = (props: Props) => {
                             <div 
                                 className="mt-4"
                             >
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(addCredentialSubmit)}>
-                                        <FormField 
-                                            control={form.control}
-                                            name="social"
-                                            render={({ field }) => (
-                                                <FormItem 
-                                                    className="mb-4"
-                                                >
-                                                    <FormLabel>
-                                                        What type of credential is this?
-                                                    </FormLabel>
-                                                    <Select onValueChange={field.onChange}>
-                                                        <SelectTrigger>
-                                                            <SelectValue 
-                                                                placeholder="Select type"
-                                                            />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectGroup>
-                                                                <SelectLabel>Types of Credential</SelectLabel>
-                                                                {
-                                                                    tabs.slice(1).map((item, index) => (
-                                                                        <SelectItem value={item.tab} key={index}>{item.tab}</SelectItem>
-                                                                    ))
-                                                                }
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField 
-                                            control={form.control}
-                                            name="service_name"
-                                            render={({ field }) => (
-                                                <FormItem
-                                                    className="mb-4"
-                                                >
-                                                    <FormLabel>
-                                                        Service Name
-                                                    </FormLabel>
-                                                    <Input placeholder="" {...field} />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField 
-                                            control={form.control}
-                                            name="user_name"
-                                            render={({ field }) => (
-                                                <FormItem
-                                                    className="mb-4"
-                                                >
-                                                    <FormLabel>
-                                                        Username
-                                                    </FormLabel>
-                                                    <Input 
-                                                        placeholder=""
-                                                        {...field}
-                                                    />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <div
-                                            className="space-y-2 mb-6 mt-6 flex items-center"
-                                        >
-                                            <label
-                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                            >
-                                                Is it a SSO(Single sign-on)?
-                                            </label>
-                                                <div
-                                                    className="flex items-center justify-center !m-0 !ml-2"
-                                                    onClick={detectCheckBox}
-                                                >
-                                                    {
-                                                        isSSO ?
-                                                        activeCheckBox
-                                                        :
-                                                        inactiveCheckBox
-                                                    }
-                                                </div>
-                                        </div>
-                                        {
-                                            isSSO ?
-                                            (
-                                                <div
-                                                    className="space-y-2 mb-4 flex flex-col"
-                                                >
-                                                    <label
-                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2"
-                                                    >
-                                                        Which Service?
-                                                    </label>
-                                                    <input 
-                                                        onChange={(e) => {
-                                                            setSsoName(() => {
-                                                                let inputValue = e.target.value
-                                                                return inputValue
-                                                            })
-                                                        }}
-                                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                        type="text"
-                                                        placeholder="Enter Service Name"
-                                                    />
-                                                </div>
-                                            )
-                                            :
-                                            <>
-                                            <FormField 
-                                                control={form.control}
-                                                name="login_type"
-                                                render={({ field }) => (
-                                                    <FormItem
-                                                        className="mb-4"
-                                                    >
-                                                        <FormLabel>
-                                                            Login type
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Select
-                                                                onValueChange={field.onChange}
-                                                            >
+                                {
+                                    isGodCheck ?
+                                    (
+                                        <Form {...form}>
+                                            <form onSubmit={form.handleSubmit(addCredentialSubmit)}>
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="social"
+                                                    render={({ field }) => (
+                                                        <FormItem 
+                                                            className="mb-4"
+                                                        >
+                                                            <FormLabel>
+                                                                What type of credential is this?
+                                                            </FormLabel>
+                                                            <Select onValueChange={field.onChange}>
                                                                 <SelectTrigger>
                                                                     <SelectValue 
-                                                                        className="text-black"
-                                                                        placeholder={""}
+                                                                        placeholder="Select type"
                                                                     />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectGroup>
-                                                                        <SelectLabel>Types</SelectLabel>
+                                                                        <SelectLabel>Types of Credential</SelectLabel>
                                                                         {
-                                                                            ['Gmail', 'Other'].map((item, index) => (
-                                                                                <SelectItem value={item} key={index}>{item}</SelectItem>
+                                                                            tabs.slice(1).map((item, index) => (
+                                                                                <SelectItem value={item.tab} key={index}>{item.tab}</SelectItem>
                                                                             ))
-                                                                        }                                                          
+                                                                        }
                                                                     </SelectGroup>
                                                                 </SelectContent>
                                                             </Select>
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField 
-                                                control={form.control}
-                                                name="password"
-                                                render={({ field }) => (
-                                                    <FormItem
-                                                        className="mb-4"
-                                                    >
-                                                        <FormLabel>
-                                                            Password
-                                                        </FormLabel>
-                                                        <div className="w-full relative">
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="service_name"
+                                                    render={({ field }) => (
+                                                        <FormItem
+                                                            className="mb-4"
+                                                        >
+                                                            <FormLabel>
+                                                                Service Name
+                                                            </FormLabel>
+                                                            <Input placeholder="" {...field} />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="user_name"
+                                                    render={({ field }) => (
+                                                        <FormItem
+                                                            className="mb-4"
+                                                        >
+                                                            <FormLabel>
+                                                                Username
+                                                            </FormLabel>
                                                             <Input 
-                                                                type={
-                                                                    togglePassClick ?
-                                                                    "text"
-                                                                    :
-                                                                    "password"
-                                                                }
+                                                                placeholder=""
                                                                 {...field}
                                                             />
-                                                            <div
-                                                                onClick={() => setTogglePassClick(!togglePassClick)}
-                                                                className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
-                                                            >
-                                                                <EyeNoneIcon />
-                                                            </div>
-                                                        </div>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            </>
-                                        }
-                                        <FormField 
-                                            control={form.control}
-                                            name="url"
-                                            render={({ field }) => (
-                                                <FormItem
-                                                    className="mb-4"
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <div
+                                                    className="space-y-2 mb-6 mt-6 flex items-center"
                                                 >
-                                                    <FormLabel>
-                                                        URL
-                                                    </FormLabel>
-                                                    <Input 
-                                                        {...field}
-                                                    />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField 
-                                            control={form.control}
-                                            name="managedby"
-                                            render={({ field }) => (
-                                                <FormItem
-                                                    className="mb-4"
-                                                >
-                                                    <FormLabel>
-                                                        Managed by
-                                                    </FormLabel>
-                                                    <Select
-                                                        onValueChange={field.onChange}
+                                                    <label
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                     >
-                                                        <SelectTrigger>
-                                                                <SelectValue 
-                                                                    className="text-black"
-                                                                    placeholder={""}
-                                                                />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectGroup>
-                                                                <SelectLabel>Users</SelectLabel>
-                                                                {
-                                                                    users.map((item:any, index:number) => (
-                                                                        <SelectItem value={item.user_name} key={index}>{item.user_name}</SelectItem>
-                                                                    ))    
-                                                                }                                                           
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField 
-                                            control={form.control}
-                                            name="additional_notes"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Additional Notes</FormLabel>
-                                                    <Textarea 
-                                                        {...field}
-                                                        className="resize-none"
+                                                        Is it a SSO(Single sign-on)?
+                                                    </label>
+                                                        <div
+                                                            className="flex items-center justify-center !m-0 !ml-2"
+                                                            onClick={detectCheckBox}
+                                                        >
+                                                            {
+                                                                isSSO ?
+                                                                activeCheckBox
+                                                                :
+                                                                inactiveCheckBox
+                                                            }
+                                                        </div>
+                                                </div>
+                                                {
+                                                    isSSO ?
+                                                    (
+                                                        <div
+                                                            className="space-y-2 mb-4 flex flex-col"
+                                                        >
+                                                            <label
+                                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2"
+                                                            >
+                                                                Which Service?
+                                                            </label>
+                                                            <input 
+                                                                onChange={(e) => {
+                                                                    setSsoName(() => {
+                                                                        let inputValue = e.target.value
+                                                                        return inputValue
+                                                                    })
+                                                                }}
+                                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                                type="text"
+                                                                placeholder="Enter Service Name"
+                                                            />
+                                                        </div>
+                                                    )
+                                                    :
+                                                    <>
+                                                    <FormField 
+                                                        control={form.control}
+                                                        name="login_type"
+                                                        render={({ field }) => (
+                                                            <FormItem
+                                                                className="mb-4"
+                                                            >
+                                                                <FormLabel>
+                                                                    Login type
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Select
+                                                                        onValueChange={field.onChange}
+                                                                    >
+                                                                        <SelectTrigger>
+                                                                            <SelectValue 
+                                                                                className="text-black"
+                                                                                placeholder={""}
+                                                                            />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            <SelectGroup>
+                                                                                <SelectLabel>Types</SelectLabel>
+                                                                                {
+                                                                                    ['Gmail', 'Other'].map((item, index) => (
+                                                                                        <SelectItem value={item} key={index}>{item}</SelectItem>
+                                                                                    ))
+                                                                                }                                                          
+                                                                            </SelectGroup>
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
                                                     />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <SheetFooter className="mt-10">
-                                                <Button
-                                                    type="submit"
-                                                >
-                                                    Save Credential
-                                                </Button>
-                                            <SheetClose
-                                                className="hidden"
-                                                ref={clickRef} 
-                                            >
-                                                Close me
-                                                </SheetClose>
-                                            <SheetClose>
-                                                <Button
-                                                    className="bg-zinc-100 text-zinc-950 transition-all hover:opacity-75 hover:bg-zinc-100"
-                                                    onClick={() => console.log("Cancel")}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                            </SheetClose>
-                                        </SheetFooter>
-                                    </form>
-                                </Form>
+                                                    <FormField 
+                                                        control={form.control}
+                                                        name="password"
+                                                        render={({ field }) => (
+                                                            <FormItem
+                                                                className="mb-4"
+                                                            >
+                                                                <FormLabel>
+                                                                    Password
+                                                                </FormLabel>
+                                                                <div className="w-full relative">
+                                                                    <Input 
+                                                                        type={
+                                                                            togglePassClick ?
+                                                                            "text"
+                                                                            :
+                                                                            "password"
+                                                                        }
+                                                                        {...field}
+                                                                    />
+                                                                    <div
+                                                                        onClick={() => setTogglePassClick(!togglePassClick)}
+                                                                        className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                                                                    >
+                                                                        <EyeNoneIcon />
+                                                                    </div>
+                                                                </div>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    </>
+                                                }
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="url"
+                                                    render={({ field }) => (
+                                                        <FormItem
+                                                            className="mb-4"
+                                                        >
+                                                            <FormLabel>
+                                                                URL
+                                                            </FormLabel>
+                                                            <Input 
+                                                                {...field}
+                                                            />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="managedby"
+                                                    render={({ field }) => (
+                                                        <FormItem
+                                                            className="mb-4"
+                                                        >
+                                                            <FormLabel>
+                                                                Managed by
+                                                            </FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                            >
+                                                                <SelectTrigger>
+                                                                        <SelectValue 
+                                                                            className="text-black"
+                                                                            placeholder={""}
+                                                                        />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectGroup>
+                                                                        <SelectLabel>Users</SelectLabel>
+                                                                        {
+                                                                            users.map((item:any, index:number) => (
+                                                                                <SelectItem value={item.user_name} key={index}>{item.user_name}</SelectItem>
+                                                                            ))    
+                                                                        }                                                           
+                                                                    </SelectGroup>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField 
+                                                    control={form.control}
+                                                    name="additional_notes"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Additional Notes</FormLabel>
+                                                            <Textarea 
+                                                                {...field}
+                                                                className="resize-none"
+                                                            />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <SheetFooter className="mt-10">
+                                                        <Button
+                                                            type="submit"
+                                                        >
+                                                            Save Credential
+                                                        </Button>
+                                                    <SheetClose
+                                                        className="hidden"
+                                                        ref={clickRef} 
+                                                    >
+                                                        Close me
+                                                        </SheetClose>
+                                                    <SheetClose>
+                                                        <Button
+                                                            className="bg-zinc-100 text-zinc-950 transition-all hover:opacity-75 hover:bg-zinc-100"
+                                                            onClick={() => console.log("Cancel")}
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    </SheetClose>
+                                                </SheetFooter>
+                                            </form>
+                                        </Form>
+                                    )
+                                    :
+                                    (<UserAddCredentialForm currentSessionUser={currentSessionUser} />)
+                                }
                             </div>
                         </div>
                     </SheetContent>
