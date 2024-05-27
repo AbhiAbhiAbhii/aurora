@@ -8,6 +8,7 @@ import { columns } from "@/app/credentials/columns"
 import { RocketIcon }  from "@radix-ui/react-icons"
 import { useGlobalContext } from "../my-global-context"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { userCredentialColumn } from "./user-columns"
 type Props = {}
 
 const UserCredentialView = (props: Props) => {
@@ -48,7 +49,7 @@ const UserCredentialView = (props: Props) => {
           tabValue !== "All" ?
           <>
             <DataTable 
-              columns={columns}
+              columns={userCredentialColumn}
               data={serviceData}
             //   data={filteredData()}
             />
@@ -56,7 +57,7 @@ const UserCredentialView = (props: Props) => {
             :
           <>
             <DataTable 
-              columns={columns}
+              columns={userCredentialColumn}
               data={serviceData}
             />
           </>

@@ -4,6 +4,7 @@ import Loading from '@/components/global/loading'
 import { useGlobalContext } from '@/components/global/my-global-context'
 import SettingView from '@/components/global/setting-view'
 import UserCredentialView from '@/components/global/user/user-credential-view'
+import WorkSpace from '@/components/global/workspace'
 import { currentSessionUserDetails } from '@/lib/queries'
 import React, { useEffect, useState } from 'react'
 import { PacmanLoader } from "react-spinners"
@@ -50,7 +51,7 @@ const DataDisplay = (props: Props) => {
           isGodCheck ? <CredentialView /> : <UserCredentialView />
           :
           linkValue === "Workspace" ?
-          "Workspace"
+            <WorkSpace />
           :
           linkValue === "Settings" ?
             <SettingView 

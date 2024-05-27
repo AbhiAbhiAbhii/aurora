@@ -20,14 +20,14 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import {
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    DoubleArrowLeftIcon,
-    DoubleArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
 } from "@radix-ui/react-icons"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import React, { Suspense } from "react"
+import React from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -110,7 +110,7 @@ export function DataTable<TData, TValue>({
               (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
+                    No results
                   </TableCell>
                 </TableRow>
               )
