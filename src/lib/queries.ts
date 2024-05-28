@@ -286,3 +286,18 @@ export const currentSessionUserDetails = async () => {
 
     return { getCurrentUserEmail, usersAllData }
 }
+
+export const getClients = async () => {
+    const supabase = createClient()
+    try {
+        const { data, error } = await supabase.from("Clients").select("client_name")
+        if(error) {
+            throw new Error("Failed to fetch clients")
+        } else {
+            return data
+        }
+        
+    } catch(err) {
+        console.log("Failed to fetch", err)
+    }
+}
