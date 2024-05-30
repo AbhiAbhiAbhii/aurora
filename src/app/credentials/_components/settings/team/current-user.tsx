@@ -35,7 +35,7 @@ const CurrentUser = ({ email, username, god }: Props) => {
                     god ?
                     'God'
                     :
-                    'Admin'
+                    'User'
                 }
             </Badge>
         </div>
