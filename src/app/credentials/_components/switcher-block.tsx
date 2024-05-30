@@ -129,11 +129,14 @@ const SwitcherBlock = (props: Props) => {
 
     useEffect(() => {
         async function fetchClients() {
-            if(currentSessionUser[0].is_team_lead) {
-                let data: any = await getClients()
-                setClientsArray(() => data)
+            const res = await fetch("/api/NewClientName", {
+                cache: "no-store"
+            })
+            if(!res.ok) {
+                alert("Error")
             } else {
-                setClientsArray(() => null)
+                const data: any = await res.json()
+                setClientsArray(() => data.data)
             }
         }
         fetchClients()

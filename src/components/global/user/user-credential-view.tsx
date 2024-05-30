@@ -2,65 +2,58 @@
 
 import SwitcherBlock from "@/app/credentials/_components/switcher-block"
 import { useEffect, useState } from "react"
-import { getServiceDetails } from "@/lib/queries"
 import { DataTable } from "@/app/credentials/_components/data-table"
-import { columns } from "@/app/credentials/columns"
-import { RocketIcon }  from "@radix-ui/react-icons"
 import { useGlobalContext } from "../my-global-context"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { userCredentialColumn } from "./user-columns"
+import AlertContainer from "../alert"
 type Props = {}
 
 const UserCredentialView = (props: Props) => {
 
-  const {  tabValue, alertTitle, alertDescription } = useGlobalContext()
-
-  const [ serviceData, setServiceData ] = useState<any>([])
+  const {  tabValue, alertTitle, alertDescription, currentSessionUser } = useGlobalContext()
+  const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
 
   useEffect(() => {
-  }, [])
 
-  const filteredData = () => {
-    // return serviceData.filter((item: any) => item.company_name === value && item.type === tabValue)
-  }
+    const sessionUserEmail = currentSessionUser[0].email
+    const url = "/api/UserCredential/SessionUserCredential"
+
+    async function getUserCredentialsData() {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({sessionUserEmail})
+      })
+      if(!res.ok) {
+        console.log("Network request is not okay")
+      } else {
+        const { data } = await res.json()
+        return setUserCredentialsData(() => data)
+      }
+    }
+    getUserCredentialsData()
+  }, [])
   
+  const filteredData = () =>  userCredentialsData.filter((item: any) => item.type === tabValue)
+
   return (
     <div>
-      <div 
-        className="alert"
-      >
-        <Alert>
-          <RocketIcon
-            height={20}
-            width={20}
-            className="mt-1"
-          />
-          <AlertTitle className="font-inter font-medium text-sm">
-            {alertTitle}
-          </AlertTitle>
-          <AlertDescription className="font-inter font-normal text-sm leading-3">
-            {alertDescription}
-          </AlertDescription>
-        </Alert>
-      </div>
+      <AlertContainer />
       <SwitcherBlock />
        <div className="mt-12">
         {
           tabValue !== "All" ?
-          <>
-            <DataTable 
-              columns={userCredentialColumn}
-              data={serviceData}
-            //   data={filteredData()}
-            />
-          </>
-            :
-          <>
-            <DataTable 
-              columns={userCredentialColumn}
-              data={serviceData}
-            />
-          </>
+          <DataTable 
+            columns={userCredentialColumn}
+            data={filteredData()}
+          />
+          :
+          <DataTable 
+            columns={userCredentialColumn}
+            data={userCredentialsData}
+          />
         }
        </div>
     </div>

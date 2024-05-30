@@ -29,9 +29,11 @@ export const getServiceDetails = async (value?:any) => {
     return data
 }
 
-export const getServiceRowDetails = async(value?:string) => {
+
+
+export const getServiceRowDetails = async(value?:string, tableName?: string) => {
     const supabase = createClient()
-    const { data, error } = await supabase.from("Service").select("*").eq('service_name', value)
+    const { data, error } = await supabase.from(`${tableName}`).select("*").eq('service_name', value)
     if(!error) {
         return data
     } else {
@@ -123,9 +125,9 @@ export const deleteRowItem = async (dataId: string) => {
     }
 }
 
-export const deleteAllItems = async (data: any) => {
+export const deleteAllItems = async (data: any, tableName?: string) => {
     const supabase = createClient()
-    const allData = await supabase.from("Service").delete().in('id', [...data])
+    const allData = await supabase.from(`${tableName}`).delete().in('id', [...data])
     return allData
 }
 
@@ -136,28 +138,46 @@ export const updateItem = async(
     pass: string,
     type: string,
     username: string,
-    url: string,
+    urll: string,
     additionalnotes: string,
     managedby: string,
+    tableName: string,
     sso_name?: string
 ) => {
     const supabase = createClient()
     try {
-        
-      const { error } = await supabase.from("Service").update({
+        let serviceTable: any = {
             id: rowId,
             company_name: companyname,
             service_name: servicename,
             password: pass,
             type: type,
             user_name: username,
-            URL: url,
+            URL: urll,
             additional_notes: additionalnotes,
             managed_by: managedby,
             sso_name: sso_name
-        }).eq('id', rowId)
+        }
+
+        let otherTable: any = {
+            id: rowId,
+            company_name: companyname,
+            service_name: servicename,
+            password: pass,
+            type: type,
+            user_name: username,
+            url: urll,
+            additional_notes: additionalnotes,
+            managed_by: managedby,
+            sso_name: sso_name
+        }
+
+        let updateValue: any = tableName === "Service" ? serviceTable : otherTable
+
+        const { error } = await supabase.from(`${tableName}`).update(updateValue).eq('id', rowId)
         if(error) {
             alert("Something went WONG")
+            console.log(error, "ERROR")
         }
     } catch(err) {
         console.log(err, "Something went WONG")
@@ -178,13 +198,14 @@ export const editAccountDetails = async (
     await supabase.auth.updateUser({ password: password });
 }
 
-export const getServiceURL = async (id: number) => {
-    const supabase = createClient();
-    const { data, error } = await supabase.from("Service").select('URL').eq('id', id);
+export const getServiceURL = async (id: number, tableName: any) => {
+    const supabase = createClient()
+    let value = tableName == "Service" ? 'URL' : 'url'
+    const { data, error } = await supabase.from(`${tableName}`).select(value).eq('id', id)
     if(error) {
-        return alert('Something went wrong');
+        return alert('Something went wrong')
     } else {
-        return data[0].URL;
+        return data[0]
     }
 }
 
@@ -198,6 +219,21 @@ export const editLinkedPassword = async (
     }).eq('user_name', userNameData)
     
     return error
+}
+
+export const updateCreatedAtLog = async(serviceName: string, prevServiceName: any) => {
+    const supabase = createClient()
+
+    try {
+        const { error } = await supabase.from("Created_at").update({service_name: serviceName}).eq('service_name', prevServiceName)
+        if(error) {
+            throw new Error("Error updating created at log")
+        } else {
+            console.log("Success")
+        }
+    } catch(err) {
+        console.log("Error", err)
+    }
 }
 
 export const insertEditLog = async (

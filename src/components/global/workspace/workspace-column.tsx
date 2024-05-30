@@ -6,8 +6,9 @@ import ServiceCheckBox from "@/app/credentials/_components/service-checkbox"
 import TypeBadge from "@/app/credentials/_components/type-badge"
 import UsernameBox from "@/app/credentials/_components/username-box"
 import { ColumnDef } from "@tanstack/react-table"
+import OwnerBadge from "./owner-badge"
 
-export type UserCredentialsType = {
+export type WorkSpaceCredentialsType = {
     id: string 
     created_at: string
     service_name: string
@@ -22,7 +23,7 @@ export type UserCredentialsType = {
     shared_to_workspace: boolean
 }
 
-export const userCredentialColumn: ColumnDef<UserCredentialsType>[] = [
+export const workSpaceColumn: ColumnDef<WorkSpaceCredentialsType>[] = [
     {
         accessorKey: "id",
         header: () => <div className="remove-header"></div>,
@@ -67,6 +68,14 @@ export const userCredentialColumn: ColumnDef<UserCredentialsType>[] = [
         cell: ({row}) => {
             const data: string = row.getValue("type")
             return <TypeBadge data={data} />
+        }
+    },
+    {
+        accessorKey: "created_by_name",
+        header: "Owner",
+        cell: ({row}) => {
+            const data: string = row.getValue("created_by_name")
+            return <OwnerBadge data={data} />
         }
     },
     {

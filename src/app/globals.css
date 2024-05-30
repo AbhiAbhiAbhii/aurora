@@ -123,3 +123,6 @@ body {
 td:has(.remove-header), th:has(.remove-header) {
   display: none;
 }
+th, td {
+  /* text-align: center !important; */
+}

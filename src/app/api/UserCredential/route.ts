@@ -2,6 +2,20 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 
+export async function GET() {
+    const supabase = createClient()
+    try {
+        const { data, error } = await supabase.from("Users_Servicenames").select("*")
+        if(error) {
+            throw new Error("Error fetching")
+        } else {
+            return NextResponse.json({ data }, { status: 200 })
+        }
+    } catch(err) {
+        return NextResponse.json({ message: "Error fetching data", err }, { status: 500 })
+    }
+}
+
 export async function POST(req: NextRequest) {
     const supabase = createClient()
 
@@ -33,3 +47,5 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Error", err }, { status: 500 })
     }
 }
+
+

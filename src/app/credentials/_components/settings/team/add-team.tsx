@@ -6,6 +6,7 @@ import React from 'react'
 import CurrentUser from './current-user'
 import TeamUsers from './team-users'
 import AddTeamForm from '@/components/forms/add-team-form'
+import { useGlobalContext } from '@/components/global/my-global-context'
 
 type Props = {
     currentUser: any
@@ -14,6 +15,7 @@ type Props = {
 
 const AddTeam = ({ currentUser, filteredUsers }: Props) => {
 
+    const { currentSessionUser, isGodCheck } = useGlobalContext()
   return (
     <div>
         <Sheet>
@@ -70,7 +72,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
                 god={currentUser[0].is_god}
             />
             <div className='space-y-4'>
-                {
+                {isGodCheck && (
                     filteredUsers.map((user:any) => (
                         <TeamUsers
                             god={user.is_god}
@@ -79,7 +81,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
                             username={user.name}
                         />
                     ))
-                }
+                )}
             </div>
         </div>
     </div>
