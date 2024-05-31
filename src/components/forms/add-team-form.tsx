@@ -47,6 +47,12 @@ const AddTeamForm = (props: Props) => {
     
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
         const { name, email, username, password, additionalNotes, role, isLead } = values
+        let userStatus
+        if(role !== "God") {
+            userStatus = false
+        } else {
+            userStatus = true
+        }
         const teamLeadMail = currentSessionUser[0].email
         const URL = "/api/AddUser"
         try {
@@ -56,7 +62,7 @@ const AddTeamForm = (props: Props) => {
                 headers: {
                     'Content-type': 'application/json'
                 },
-                body: JSON.stringify({ name, email, username, password, additionalNotes, role, isLead, teamLeadMail }) 
+                body: JSON.stringify({ name, email, username, password, additionalNotes, userStatus, isLead, teamLeadMail }) 
             })
             if(!res.ok) {
                 console.log("Network response not okay")
@@ -66,8 +72,8 @@ const AddTeamForm = (props: Props) => {
                 console.log("Network response okay")
                 const data = await res.json()
                 console.log(data)
+                ref.current.click()
             }
-            // ref.current.click()
         } catch(err) {
             console.log(err)
         }

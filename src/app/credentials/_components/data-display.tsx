@@ -17,6 +17,8 @@ const DataDisplay = (props: Props) => {
   const [ workSpaceData, setWorkSpaceData ] = useState<any>()
 
 
+  console.log(currentSessionUser, "AAAAA")
+
   useEffect(() => {
     if(currentSessionUser) {
       setIsGodCheck(() => currentSessionUser[0].is_god)

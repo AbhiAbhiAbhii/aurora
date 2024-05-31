@@ -12,29 +12,29 @@ type Props = {
 
 const EditAccountForm = ({ currentUser }: Props) => {
 
-    let UserData = currentUser[0];
+    let UserData = currentUser[0]
 
-    const [ nameData, setNameData ] = useState<string>("");
-    const [ passwordData, setPasswordData ] = useState<string>("");
-    const [ emailData, setEmailData ] = useState<string>("");
-    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false);
+    const [ nameData, setNameData ] = useState<string>("")
+    const [ passwordData, setPasswordData ] = useState<string>("")
+    const [ emailData, setEmailData ] = useState<string>("")
+    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
 
     let labelClassName: string = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2"
 
     async function handleEditAccountSubmit(e: any) {
-        e.preventDefault();
+        e.preventDefault()
         await editAccountDetails(passwordData, nameData, UserData.id);
-        setTogglePassClick(false);
+        setTogglePassClick(false)
         setTimeout(() => {
-            location.reload();
+            location.reload()
         }, 1000)
     }
 
     useEffect(() => {
-        setNameData(() => UserData.name);
-        setPasswordData(() => UserData.password);
-        setEmailData(() => UserData.email);
-    }, [UserData]);
+        setNameData(() => UserData.name)
+        setPasswordData(() => UserData.password)
+        setEmailData(() => UserData.email)
+    }, [UserData])
 
   return (
     <div>
