@@ -2,7 +2,7 @@ import AuroraText from '@/components/global/aurora-text'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Plus } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import CurrentUser from './current-user'
 import TeamUsers from './team-users'
 import AddTeamForm from '@/components/forms/add-team-form'
@@ -16,6 +16,7 @@ type Props = {
 const AddTeam = ({ currentUser, filteredUsers }: Props) => {
 
     const { currentSessionUser, isGodCheck } = useGlobalContext()
+
   return (
     <div>
         <Sheet>
@@ -67,18 +68,14 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
             className='mt-12'
         >
             <CurrentUser 
-                email={currentUser[0].email}
-                username={currentUser[0].name}
-                god={currentUser[0].is_god}
+                currentUser={currentSessionUser}
             />
             <div className='space-y-4'>
                 {isGodCheck && (
                     filteredUsers.map((user:any) => (
                         <TeamUsers
-                            god={user.is_god}
+                            user={user}
                             key={user.email}
-                            email={user.email}
-                            username={user.name}
                         />
                     ))
                 )}

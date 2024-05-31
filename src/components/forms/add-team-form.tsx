@@ -12,6 +12,7 @@ import { Button } from '../ui/button'
 import { SignUpTeam } from '@/app/login/signup-test'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
 import { Checkbox } from '../ui/checkbox'
+import { useGlobalContext } from '../global/my-global-context'
 
 type Props = {}
 
@@ -38,16 +39,35 @@ const AddTeamForm = (props: Props) => {
             role: '',
             isLead: false
         }
-    });
+    })
 
+    const { currentSessionUser } = useGlobalContext()
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false);
     const ref:MutableRefObject<any> = useRef();
     
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
         const { name, email, username, password, additionalNotes, role, isLead } = values
+        const teamLeadMail = currentSessionUser[0].email
+        const URL = "/api/AddUser"
         try {
-            SignUpTeam(name, password, email, username, additionalNotes, role, isLead)
-            ref.current.click()
+            // SignUpTeam(name, password, email, username, additionalNotes, role, isLead)
+            const res = await fetch(URL, {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, username, password, additionalNotes, role, isLead, teamLeadMail }) 
+            })
+            if(!res.ok) {
+                console.log("Network response not okay")
+                console.log("Not in a team")
+                console.log(res)
+            } else {
+                console.log("Network response okay")
+                const data = await res.json()
+                console.log(data)
+            }
+            // ref.current.click()
         } catch(err) {
             console.log(err)
         }

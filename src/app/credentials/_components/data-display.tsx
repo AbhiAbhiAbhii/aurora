@@ -15,15 +15,17 @@ const DataDisplay = (props: Props) => {
   const { linkValue, isGodCheck, setIsGodCheck, currentSessionUser, setCurrentSessionUser, setServiceTableName } = useGlobalContext()
   const [ filteredUsers, setFilteredUsers ] = useState<any>()
   const [ workSpaceData, setWorkSpaceData ] = useState<any>()
- 
-  
-  if(currentSessionUser) {
-    setIsGodCheck(() => currentSessionUser[0].is_god)
-    setServiceTableName(() => {
-      let text = isGodCheck ? 'Service' : 'Users_Servicenames'
-      return text
-    })
-  }
+
+
+  useEffect(() => {
+    if(currentSessionUser) {
+      setIsGodCheck(() => currentSessionUser[0].is_god)
+      setServiceTableName(() => {
+        let text = isGodCheck ? 'Service' : 'Users_Servicenames'
+        return text
+      })
+    }
+  }, [])
 
 
   useEffect(() => { // function to keep current user logged in at the top of settings view
