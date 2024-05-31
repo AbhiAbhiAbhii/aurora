@@ -1,15 +1,33 @@
 import AuroraText from '@/components/global/aurora-text'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 type Props = {
-    username: any
-    email: any
-    god: any
+    currentUser: any
 }
 
-const CurrentUser = ({ email, username, god }: Props) => {
+const CurrentUser = ({ currentUser }: Props) => {
+    const { user_name, email, is_god, is_team_lead } = currentUser[0]
+    const [ userTitle, setUserTitle ] = useState("")
+    
+    useEffect(() => {
+        function runUserCheck() {
+            if(is_god && is_team_lead) {
+                return setUserTitle(() => "God && Lead")
+            }
+            else if(!is_god && is_team_lead) {
+                return setUserTitle(() => "Lead")
+            }
+            else if(!is_god && !is_team_lead) {
+                return setUserTitle(() => "User")
+            } 
+            else {
+                return setUserTitle(() => "God")
+            } 
+        }
+        runUserCheck()
+    }, [])
   return (
     <div className='flex items-center gap-3 mb-6'>
         <Avatar>
@@ -20,7 +38,7 @@ const CurrentUser = ({ email, username, god }: Props) => {
         </Avatar>
         <div>
             <AuroraText
-                text={`${username}(you)`}
+                text={`${user_name}(you)`}
                 className='font-inter font-medium text-sm'
             />
             <AuroraText 
@@ -31,12 +49,7 @@ const CurrentUser = ({ email, username, god }: Props) => {
                 variant={'outline'}
                 className='rounded-md px-2 py-1 font-inter font-medium text-xs'
             >
-                {
-                    god ?
-                    'God'
-                    :
-                    'Admin'
-                }
+                {userTitle}
             </Badge>
         </div>
     </div>

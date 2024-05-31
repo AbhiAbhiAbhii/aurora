@@ -44,18 +44,19 @@ type Props = {
 
 const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData, checkState, id }: Props) => {
 
-  const { setAlertTitle, setAlertDescription, value } = useGlobalContext()
+  const { setAlertTitle, setAlertDescription, value, isGodCheck, serviceTableName } = useGlobalContext()
   const [ initValues, setInitValues ] = useState<any>()
-  const [ serviceURL, setServiceURL ] = useState<string>("")
+  const [ serviceURL, setServiceURL ] = useState<any>()
 
   const [ storeUsernameData, setStoreUsernameData ] = useState<string>("")
   const [ passwordData, setPasswordData ] = useState<string>("")
   const [ storeReceivermail, setStoreReceivermail ] = useState<string>("")
-  const [ storeServicenameData, setStoreServicenameData ] = useState<string>("")
 
   const [ editLogs, setEditLogs ] = useState<any>()
   const [ createdAtLog, setCreatedAtLog ] = useState<any>()
   const [ getCurrentAuthUser, setGetCurrentAuthUser ] = useState<any>()
+
+  let tableName
 
   let alertDialog: string = "Enter receiver's email"
   let itemClassName: string = "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]"
@@ -72,22 +73,21 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     }, 2000)
   }
 
-  const UserNameCopy = () => {
-    copyToClipBoard(rowUsernameData)
-    MessageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
-  }
-
-  const PasswordCopy = () => {
-    copyToClipBoard(rowPasswordData)
-    MessageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
-  }
-
   const messageFunction = (title: string, description: string) => {
     getAlertContainer()
     setAlertTitle(title)
     setAlertDescription(description)
   }
-
+  const PasswordCopy = () => {
+    copyToClipBoard(rowPasswordData)
+    messageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
+  }
+  
+  const UserNameCopy = () => {
+    copyToClipBoard(rowUsernameData)
+    messageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
+  }
+  
   const ItemDeletedSuccess = () => {
     messageFunction('Item Deleted', 'Your selected credential were deleted')
   }
@@ -101,18 +101,26 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
   }
 
   const DeleteItem = async () => {
-    let dataDeleted = await deleteItem(rowServicenameData)
-    if(!dataDeleted.error) {
-      ItemDeletedSuccess()
-    } else {
+    tableName = isGodCheck ? 'Service' : 'Users_Servicenames'
+    const deleteData = {rowServicenameData, tableName}
+    const res = await fetch("/api/UserCredential/DropDownDelete", {
+      method: "DELETE",
+      headers: {
+        'Content-type': 'applications/json'
+      },
+      body: JSON.stringify(deleteData)
+    })
+    if(!res.ok) {
       ItemDeletedError()
-    } 
-    setTimeout(() => reloadPage(), 1500)
+    } else {
+      ItemDeletedSuccess()
+      setTimeout(() => reloadPage(), 1500)
+    }
   }
 
   useEffect(() => {
     async function SetInitialValues() {
-      let data:any = await getServiceRowDetails(rowServicenameData)
+      let data:any = await getServiceRowDetails(rowServicenameData, serviceTableName)
       setInitValues(() => {
         let currentValue = data[0]
         return currentValue;
@@ -123,17 +131,17 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
 
 useEffect(() => {
   async function getURLData() {
-    let data = await getServiceURL(id)
-    setServiceURL(() => data)
+    let data: any = await getServiceURL(id, serviceTableName)
+    let ourData: any = isGodCheck ? data.URL : data.url
+    setServiceURL(() => ourData)
   }
-  getURLData();
-}, [serviceURL, id])
+  getURLData()
+}, [id])
 
 useEffect(() => {
-  setPasswordData(() => rowPasswordData);
-  setStoreUsernameData(() => rowUsernameData);
-  setStoreServicenameData(() => rowServicenameData);
-}, [rowUsernameData, rowPasswordData, rowServicenameData]);
+  setPasswordData(() => rowPasswordData)
+  setStoreUsernameData(() => rowUsernameData)
+}, [rowUsernameData, rowPasswordData])
 
 useEffect(() => {
   const fetchEditLogs = async () => {
@@ -176,12 +184,12 @@ const sendEmail = async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ourData})
-    });
+    })
     if(response.ok) {
-      console.log("Response is ok");
+      console.log("Response is ok")
       emailSendSuccess()
       await insertEditLog(name, email, dateString, timeString, rowServicenameData, itemsEdited)
-      return await response.json();
+      return await response.json()
     }
   } catch(error) {
     console.log(error, "Mail failed to send")

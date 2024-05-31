@@ -7,6 +7,7 @@ import DataTableDropDown from "./_components/data-table-dropdown"
 import AllAction from "./_components/all-action"
 import ServiceCheckBox from "./_components/service-checkbox"
 import LoginType from "./_components/table-header/login-type"
+import TypeBadge from "./_components/type-badge"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -36,10 +37,10 @@ export const columns: ColumnDef<Service>[] = [
     }
   },
   {
-     accessorKey: "id",
-     header: () => <div className="remove-header"></div>,
-     cell:() => <div className="remove-header"></div>,
-    },
+    accessorKey: "id",
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
+  },
   {
     accessorKey: "user_name",
     header: "Username/Email",
@@ -83,16 +84,7 @@ export const columns: ColumnDef<Service>[] = [
     header: "Type",
     cell: ({ row }) => {
       const data:string = row.getValue('type')
-      return (
-        <Badge
-          variant={'outline'} 
-          className="
-            bg-white text-foreground rounded-[6px]
-             p-2 w-[97px] hover:bg-white hover:text-foreground
-            font-inter font-semibold text-xs flex items-center justify-center">
-          {data}
-        </Badge>
-      )
+      return <TypeBadge data={data} />
     }
   },
   {

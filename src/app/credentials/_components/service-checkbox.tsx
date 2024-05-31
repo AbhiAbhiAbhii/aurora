@@ -4,19 +4,18 @@ import { getServiceRowDetails } from '@/lib/queries'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
-    data: string
-    rowServicenameData: string
+  data: string
+  rowServicenameData: string
 }
 
 const ServiceCheckBox = ({ data, rowServicenameData }: Props) => {
 
     const [ initValues, setInitValues ] = useState<any>()
-    const { checkBoxIdValue, setCheckBoxIdValue } = useGlobalContext()
-
+    const { checkBoxIdValue, setCheckBoxIdValue, serviceTableName } = useGlobalContext()
     useEffect(() => {
         async function SetInitialValues() {
-          let data:any = await getServiceRowDetails(rowServicenameData)
-          setInitValues(data[0])
+          let data:any = await getServiceRowDetails(rowServicenameData, serviceTableName)
+          setInitValues(() => data[0])
         }
         SetInitialValues()
     }, [])
@@ -35,14 +34,14 @@ const ServiceCheckBox = ({ data, rowServicenameData }: Props) => {
 
   return (
     <div className='flex items-center space-x-2'>
-        <Checkbox 
-         key={initValues?.id}
-         checked={checkBoxIdValue.includes(initValues?.id)}
-         onCheckedChange={() => handleCheckBoxChange(initValues?.id)}
-        />
-        <div>
-          {data}
-        </div>
+      <Checkbox 
+        key={initValues?.service_name}
+        checked={checkBoxIdValue.includes(initValues?.service_name)}
+        onCheckedChange={() => handleCheckBoxChange(initValues?.service_name)}
+      />
+      <div>
+        {data}
+      </div>
     </div>
   )
 }

@@ -11,7 +11,7 @@ type Props = {}
 
 const AllAction = (props: Props) => {
 
-    const { checkBoxIdValue, setAlertTitle, setAlertDescription } = useGlobalContext()
+    const { checkBoxIdValue, setAlertTitle, setAlertDescription, serviceTableName } = useGlobalContext()
     const ref: any = useRef()
 
     const getAlertContainer = () => {
@@ -38,14 +38,32 @@ const AllAction = (props: Props) => {
     }
   
     async function deleteItems() {
-        let allDataDeleted = await deleteAllItems(checkBoxIdValue)
-        ref.current.click()
-        if(checkBoxIdValue.length > 0) {
-            if(!allDataDeleted.error) {
-                ItemDeletedSuccess()
-            }
-        } else {
+        // let allDataDeleted = await deleteAllItems(checkBoxIdValue, serviceTableName)
+        // ref.current.click()
+        // if(checkBoxIdValue.length > 0) {
+        //     if(!allDataDeleted.error) {
+        //         ItemDeletedSuccess()
+        //     }
+        // } else {
+        //     ItemDeletedError()
+        // }
+        const deleteData = {
+            checkBoxIdValue,
+            serviceTableName
+        }
+        const res = await fetch("/api/UserCredential/DeleteAll", {
+            method: "DELETE",
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(deleteData)
+        })
+        if(!res.ok) {
             ItemDeletedError()
+            console.log("Network response not okay")
+        } else {
+            console.log("All items deleted")
+            ItemDeletedSuccess()
         }
     }
 

@@ -11,6 +11,8 @@ import { SheetClose, SheetFooter } from '../ui/sheet'
 import { Button } from '../ui/button'
 import { SignUpTeam } from '@/app/login/signup-test'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
+import { Checkbox } from '../ui/checkbox'
+import { useGlobalContext } from '../global/my-global-context'
 
 type Props = {}
 
@@ -20,7 +22,8 @@ const AddNewMemberFormSchema = z.object({
     username: z.string().min(1, { message: 'This field is required ' }),
     password: z.string().min(5, { message: 'Must be 5 characters or more' }),
     additionalNotes: z.string(),
-    role: z.string()
+    role: z.string(),
+    isLead: z.boolean()
 })
 
 const AddTeamForm = (props: Props) => {
@@ -33,18 +36,44 @@ const AddTeamForm = (props: Props) => {
             username: '',
             password: '',
             additionalNotes: '',
-            role: ''
+            role: '',
+            isLead: false
         }
-    });
+    })
 
+    const { currentSessionUser } = useGlobalContext()
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false);
     const ref:MutableRefObject<any> = useRef();
     
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
-        const { name, email, username, password, additionalNotes, role } = values
+        const { name, email, username, password, additionalNotes, role, isLead } = values
+        let userStatus
+        if(role !== "God") {
+            userStatus = false
+        } else {
+            userStatus = true
+        }
+        const teamLeadMail = currentSessionUser[0].email
+        const URL = "/api/AddUser"
         try {
-            SignUpTeam(name, password, email, username, additionalNotes, role);
-            ref.current.click()
+            // SignUpTeam(name, password, email, username, additionalNotes, role, isLead)
+            const res = await fetch(URL, {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, username, password, additionalNotes, userStatus, isLead, teamLeadMail }) 
+            })
+            if(!res.ok) {
+                console.log("Network response not okay")
+                console.log("Not in a team")
+                console.log(res)
+            } else {
+                console.log("Network response okay")
+                const data = await res.json()
+                console.log(data)
+                ref.current.click()
+            }
         } catch(err) {
             console.log(err)
         }
@@ -152,13 +181,31 @@ const AddTeamForm = (props: Props) => {
                                 <SelectGroup>
                                     <SelectLabel>Types of Roles</SelectLabel>
                                     {
-                                        ['God', 'Admin'].map((item: any) => (
+                                        ['God', 'User'].map((item: any) => (
                                             <SelectItem value={item} key={item}>{item}</SelectItem>
                                         ))
                                     }
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                    </FormItem>
+                )}
+            />
+            {/* Is Lead */}
+            <FormField 
+                control={form.control}
+                name="isLead"
+                render={({ field }) => (
+                    <FormItem 
+                        className="space-x-2 mb-6 mt-6 flex items-center"
+                    >
+                        <FormLabel className='mt-2'>
+                            Team leader?
+                        </FormLabel>
+                        <Checkbox 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
                     </FormItem>
                 )}
             />

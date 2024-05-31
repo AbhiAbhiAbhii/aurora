@@ -1,7 +1,7 @@
 import { useGlobalContext } from '@/components/global/my-global-context'
 import { createClient } from '@/utils/supabase/client'
 import { CopyIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 type Props = {
   data: string
@@ -21,7 +21,7 @@ const PasswordFormat = ({ data }: Props) => {
     }
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 mx-auto">
       <p className="password-format">
         Entha Mwone ?
       </p>

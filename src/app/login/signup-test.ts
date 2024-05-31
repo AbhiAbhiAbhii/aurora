@@ -3,14 +3,13 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 
-export async function SignUpTeam(name: string, password: string, email: string, username?: string, additionalNotes?: string, role?: string) {
+export async function SignUpTeam(name: string, password: string, email: string, username?: string, additionalNotes?: string, role?: string, isLead?: boolean) {
     const supabase = createClient()
     const data = {
         password,
         email,
     }
-
-    let god;
+    let god
 
     if(role === "God") {
         god = "TRUE"
@@ -28,7 +27,8 @@ export async function SignUpTeam(name: string, password: string, email: string, 
             user_name: username,
             password: password,
             additional_notes: additionalNotes,
-            name: name 
+            name: name,
+            is_team_lead: isLead
         })
     }
 }
