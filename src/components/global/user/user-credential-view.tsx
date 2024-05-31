@@ -14,10 +14,12 @@ const UserCredentialView = (props: Props) => {
   const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
 
   useEffect(() => {
+    let sessionUserEmail: any
 
-    const sessionUserEmail = currentSessionUser[0].email
+    if(currentSessionUser) {
+      sessionUserEmail = currentSessionUser[0].email
+    }
     const url = "/api/UserCredential/SessionUserCredential"
-
     async function getUserCredentialsData() {
       const res = await fetch(url, {
         method: "POST",
