@@ -1,23 +1,23 @@
-import { createClient } from "@/utils/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server"
+import { NextRequest, NextResponse } from "next/server"
 
 
 export async function POST(req: NextRequest) {
     const supabase = createClient()
+    let tableName: string = "User_Details"
 
     const { name, email, username, password, additionalNotes, userStatus, isLead, teamLeadMail } = await req.json()
-    const singupData = { email, password }
-    console.log(email, "AAAAAAAAAAAAAAAAA")
-    let tableName: string = "User_Details"
+    const signupData = { email, password }
+    console.log("AAAAAAAAAAAAAAAAA")
     try {
         // Check A if user is in database
         const { data, error } = await supabase.from(`${tableName}`).select().eq("email", email)
-        console.log(error, "BBBBBBBBBBBBBBBBBBBBBB")
+        console.log("BBBBBBBBBBBBBBBBBBBBBB")
         if(error === null) {
             // User not found in database
             // forward to signup
             // add to team under teamLead
-            const { error } =  await supabase.auth.signUp(singupData)
+            const { error } =  await supabase.auth.signUp(signupData)
             if(!error) {
                 await supabase.from(`${tableName}`).insert({ // insert data into table
                     is_god: userStatus,

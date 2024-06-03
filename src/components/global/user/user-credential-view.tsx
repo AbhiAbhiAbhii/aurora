@@ -17,7 +17,7 @@ const UserCredentialView = (props: Props) => {
     let sessionUserEmail: any
 
     if(currentSessionUser) {
-      // sessionUserEmail = currentSessionUser[0].email
+      sessionUserEmail = currentSessionUser[0].email
     }
     const url = "/api/UserCredential/SessionUserCredential"
     async function getUserCredentialsData() {
