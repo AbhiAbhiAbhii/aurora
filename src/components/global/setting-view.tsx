@@ -21,7 +21,7 @@ const SettingView = ({ currentUser, filteredUsers }: Props) => {
         setTabState={setTabState}
       />
       <div className='w-[60%]'>
-        {
+        {/* {
           tabState === "Account" && (
             <AccountView 
               currentUser={currentUser}
@@ -35,6 +35,16 @@ const SettingView = ({ currentUser, filteredUsers }: Props) => {
               currentUser={currentUser}
             />
           )
+        } */}
+        {tabState === 'Account' ?
+          <AccountView 
+            currentUser={currentUser}
+          />
+          :
+          <AddTeam 
+            filteredUsers={filteredUsers}
+            currentUser={currentUser}
+          />
         }
       </div>
     </div>

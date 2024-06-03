@@ -16,7 +16,6 @@ const DataDisplay = (props: Props) => {
   const [ filteredUsers, setFilteredUsers ] = useState<any>()
   const [ workSpaceData, setWorkSpaceData ] = useState<any>()
 
-
     if(currentSessionUser) {
       setIsGodCheck(() => currentSessionUser[0].is_god)
       setServiceTableName(() => {

@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Login } from '@/app/login/actions'
+import { PacmanLoader } from 'react-spinners'
+import { redirect, useRouter } from 'next/navigation'
 
 type Props = {}
 // Define our Form Schema/data type
@@ -22,7 +24,9 @@ const FormSchema = z.object({
 })
 
 const LoginForm = (props: Props) => {   
-    
+
+    const [ loading, setLoading ] = useState(false)
+    const router = useRouter()
     // 1. Define our form
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -34,7 +38,25 @@ const LoginForm = (props: Props) => {
 
     const handleLogin = async (values: z.infer<typeof FormSchema>) => {
         const {email, password} = values
-        Login(email,password)
+        // Login(email,password)
+
+        setLoading((prevState) => !prevState)
+        const URL = '/api/Signin'
+
+        const res = await fetch(URL, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({email, password})
+        })
+
+        if(!res.ok) {
+            console.log('Network response not okay')
+        } else {
+            router.push('/credentials')
+        }
+
     }
 
   return (
@@ -95,7 +117,16 @@ const LoginForm = (props: Props) => {
                         type='submit'
                         className='w-full'
                     >
-                        Continue
+                        {
+                            loading ?
+                            <PacmanLoader 
+                                color='#FFF'
+                                speedMultiplier={5}
+                                size={14}
+                            />
+                            :
+                            "Login"
+                        }
                     </Button>
                 </form>
             </Form>

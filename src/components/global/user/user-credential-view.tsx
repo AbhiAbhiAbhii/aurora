@@ -12,13 +12,11 @@ const UserCredentialView = (props: Props) => {
 
   const {  tabValue, currentSessionUser } = useGlobalContext()
   const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
-  console.log(currentSessionUser)
+  let sessionUserEmail: any
+  if(currentSessionUser) {
+    sessionUserEmail = currentSessionUser[0].email
+  }
   useEffect(() => {
-    let sessionUserEmail: any
-
-    if(currentSessionUser) {
-      sessionUserEmail = currentSessionUser[0].email
-    }
     const url = "/api/UserCredential/SessionUserCredential"
     async function getUserCredentialsData() {
       const res = await fetch(url, {
