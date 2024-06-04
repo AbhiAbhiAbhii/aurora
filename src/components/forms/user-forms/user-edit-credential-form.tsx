@@ -27,6 +27,10 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { alertDialogTriggerClassName, inputClassName, labelClassName, selectCustomClassName, textAreaClassName } from '@/utils/classnames'
 import { EyeNoneIcon } from '@radix-ui/react-icons'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useGlobalContext } from '@/components/global/my-global-context'
+import { getCurrentDate } from '@/utils/functions/date'
+import { getAlertContainer } from '@/utils/functions/alert-function'
+import { reloadPage } from '@/utils/functions/reload'
 
 type Props = {
     serviceRowData: any
@@ -35,10 +39,12 @@ type Props = {
 
 const UserEditCredentialForm = ({ serviceRowData }: Props) => {
 
-
-    const { service_name, client_name, password, shared_to_workspace, type, url, user_name, additional_notes } = serviceRowData
-
-    const ref: MutableRefObject<any> = useRef()
+    const { currentSessionUser, setAlertTitle, setAlertDescription } = useGlobalContext()
+    const { name, email} = currentSessionUser[0]
+    const { service_name, client_name, password, shared_to_workspace, type, url, user_name, additional_notes, id } = serviceRowData
+    
+    const ref: any = useRef()
+    const closeRef: any = useRef()
     const [ buttonSelectClick, setButtonSelectClick ] = useState<boolean>(false)
     const [ clientSelectClick, setClientSelectClick ] = useState<boolean>(false)
     const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
@@ -80,12 +86,70 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
         setWorkSpaceData(() => shared_to_workspace)
     }, [serviceRowData])
 
+    const messageFunction = (title: string, description: string) => {
+        getAlertContainer()
+        setAlertTitle(title)
+        setAlertDescription(description)
+    }
+
+    const updateSuccess = () => {
+        messageFunction("Item Updated", "Your credential has been updated successfully")
+        setTimeout(() => reloadPage(), 1500)
+    }
+
+    const updateError = () => {
+        messageFunction("Update error", 'Error updating credential')
+    }
+
+    const deleteSuccess = () => {
+        messageFunction("Item Deleted", "Your selected credential were deleted")
+        setTimeout(() => reloadPage(), 1500)
+    }
+    const deleteError = () => {
+        messageFunction("Error deleting", "Your selected credential were not deleted")
+        setTimeout(() => reloadPage(), 1500)
+    }
+
     async function editCredentialItemSubmit(e: any) {
         e.preventDefault()
 
+        const editURL = "/api/UserCredential/Edit/EditLog"
+        const URl = '/api/UserCredential/Edit'
+        const editCreatedAtLogURL = '/api/UserCredential/Edit/EditCreatedAtServiceName'
+        const { dateString, timeString } = getCurrentDate()
+
+        const formData = {
+            id,
+            serviceNameData,
+            clientNameData,
+            userNameData,
+            typeData,
+            passwordData,
+            urlData,
+            additionalNotesData,
+            workSpaceData
+        }
+
+        const res = await fetch(URl, {
+            method: "POST",
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+
+        if(!res.ok) {
+            console.log("Error updating")
+            // not success error handling
+            closeRef.current.click()
+            setTimeout(() => updateError(), 800)
+        } else {
+
+        console.log("Success updating data")
+        
         // To reflect in the edit log, which key values have been edited
         // Compare two object keys and the value for any difference
-
+        
         // Object A
         const initObject: any= {
             type: type,
@@ -97,7 +161,7 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
             workspace: shared_to_workspace,
             additionalnotes: additional_notes,
         }
-
+        
         // Object B
         const updatedObject: any = {
             type: typeData,
@@ -109,14 +173,14 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
             workspace: workSpaceData,
             additionalnotes: additionalNotesData
         }
-
-        const differentKeys = [] // push any different values to this array
+        
+        let differentKeys = [] // push any different values to this array
         let itemsEdited: any
-
+        
         // Get the object keys of both object
         const initObjectKeys = Object.keys(initObject) 
         const updatedObjectKeys = Object.keys(updatedObject)
-
+        
         if(initObjectKeys.length !== updatedObjectKeys.length) {
             console.log("Error, object lengths are not equal")
         } else {
@@ -126,9 +190,53 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
                     itemsEdited = `Credential fields ${differentKeys.join(", ")} edited`
                 } 
             }
+            const editLogData = {
+                name,
+                email,
+                dateString,
+                timeString,
+                itemsEdited,
+                serviceNameData,
+            }
+            const res = await fetch(editURL, {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(editLogData)
+            })
+            
+            if(!res.ok) {
+                console.log("Error inserting into edit log")
+            } else {
+                console.log("Success inserting edit log")
+                // Check if service name has been changed to update the Created_at log
+                let prevServiceName: any = service_name
+                
+                if(serviceNameData !== service_name) {
+                    const res = await fetch(editCreatedAtLogURL, {
+                        method: "POST",
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                        body: JSON.stringify({serviceNameData, prevServiceName})
+                    })
+                    
+                    if(!res.ok) {
+                        console.log("Error updating created at log")
+                    } else {
+                        closeRef.current.click()
+                        setTimeout(() => updateSuccess(), 500)
+                        console.log("Success updating created at log")
+                    }
+                } else {
+                    closeRef.current.click()
+                    setTimeout(() => updateSuccess(), 500)
+                }
+            }
         }
     }
-
+}
 
     const handleButtonSelectClick = (e:any) => {
         e.preventDefault()
@@ -140,8 +248,25 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
         setClientSelectClick((prevState) => !prevState)
     }
 
-    const deleteRow = (e:any) => {
+    const deleteRow = async (e:any) => {
         e.preventDefault()
+
+        const delURL = '/api/UserCredential/Delete/DeleteRow'
+        console.log(id, "hello")
+        const res = await fetch(delURL, {
+            method: "DELETE",
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({id})
+        })
+
+        if(!res.ok) {
+            console.log("Network response is not okay")
+        } else {
+            console.log("Network response is okay")
+            setTimeout(() => deleteSuccess(), 800)
+        }
     }
 
   return (
@@ -259,10 +384,7 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
                             value={serviceNameData}
                             placeholder={serviceNameData}
                             onChange={(e) => {
-                                setServiceNameData(() => {
-                                    let updatedServiceNameData = e.target.value
-                                    return updatedServiceNameData
-                                })
+                                setServiceNameData(() => e.target.value)
                             }}
                             name='service_name'
                             className={`${inputClassName}`}
@@ -348,6 +470,7 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
                     <SheetFooter>
                         <div className='flex items-center justify-end space-x-2 w-full'>
                             <SheetClose
+                                ref={closeRef}
                                 asChild>
                                 <DropdownMenuItem
                                     className='p-0'>
