@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         // Check A if user is in database
         const { data, error } = await supabase.from(`${tableName}`).select().eq("email", email)
         console.log("BBBBBBBBBBBBBBBBBBBBBB")
-        if(error === null) {
+        if(error !== null) {
             // User not found in database
             // forward to signup
             // add to team under teamLead
@@ -30,12 +30,13 @@ export async function POST(req: NextRequest) {
                     in_team: teamLeadMail
                 }) 
                 console.log("DDDDDDDD")
-                return NextResponse.json({ message: "Successfully sent mail for signup" })
+                return NextResponse.json({ title: 'Success', message: "Successfully sent mail for signup" })
             } else {
                 console.log("CCCCCCC")
                 return NextResponse.json({ message: "Error signing up", error})
             }
         } else {
+            console.log("EEEEEEEEEEEEEEE")
             // User found in database
             const ourData: any = data
             const userData = ourData[0]
@@ -44,13 +45,13 @@ export async function POST(req: NextRequest) {
                 // update in_team
                 const { error } = await supabase.from(`${tableName}`).update({ in_team: teamLeadMail }).eq('email', userData.email)
                 if(!error) {
-                    return NextResponse.json({ message: "User is not in a team, user has been assigned to your team" })
+                    return NextResponse.json({ title: 'Success', message: "User is not in a team, user has been assigned to your team" })
                 }
             } 
             else if(userData.in_team !== teamLeadMail) { 
-                return NextResponse.json({ message: "User is already in another team" })
+                return NextResponse.json({ title: 'Error', message: "User is already in another team" })
             } else { // user already in your team
-                return NextResponse.json({ message: "User is already in your team" })
+                return NextResponse.json({ title: 'Error', message: "User is already in your team" })
             }
         }
     } catch(err) {

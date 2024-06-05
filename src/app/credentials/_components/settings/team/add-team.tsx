@@ -8,13 +8,13 @@ import TeamUsers from './team-users'
 import AddTeamForm from '@/components/forms/add-team-form'
 import { useGlobalContext } from '@/components/global/my-global-context'
 import { Separator } from '@/components/ui/separator'
+import TeamLeadUser from './team-lead-user'
 
 type Props = {
-    currentUser: any
     filteredUsers: any
 }
 
-const AddTeam = ({ currentUser, filteredUsers }: Props) => {
+const AddTeam = ({ filteredUsers }: Props) => {
 
     const { currentSessionUser, isGodCheck } = useGlobalContext()
     const { is_team_lead, email, in_team } = currentSessionUser[0]
@@ -24,14 +24,13 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
     let findingTeamLead: any
     let otherTeamMembers: any
 
-
     if(is_team_lead || (isGodCheck && is_team_lead)) {
         // Get team lead mail
         teamLeadMail = email
         // Get in_team field to compare mail
         teamMembers = filteredUsers.filter((user: any) => user.in_team === teamLeadMail)
     } 
-    else if(!is_team_lead || (!isGodCheck && !is_team_lead)) {
+    else if((!isGodCheck && !is_team_lead)) {
         // Get users in_team value
         // Compare the unique value with other users mail
         findingTeamLead = filteredUsers.filter((user: any) => user.email === in_team)
@@ -53,9 +52,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
                         />
                     </div>
                     {isGodCheck || is_team_lead && (
-                        <SheetTrigger
-                            asChild
-                        >
+                        <SheetTrigger asChild>
                             <Button 
                                 className="flex items-center font-inter font-medium text-sm"
                             >
@@ -126,7 +123,7 @@ const AddTeam = ({ currentUser, filteredUsers }: Props) => {
                 {!isGodCheck && !is_team_lead && (
                     <>
                     {/* Display the team lead */}
-                    <CurrentUser 
+                    <TeamLeadUser 
                         currentUser={findingTeamLead}
                     />
                     <Separator className='mb-4'/>
