@@ -2,13 +2,14 @@ import AuroraText from '@/components/global/aurora-text'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Plus } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import CurrentUser from './current-user'
 import TeamUsers from './team-users'
 import AddTeamForm from '@/components/forms/add-team-form'
 import { useGlobalContext } from '@/components/global/my-global-context'
 import { Separator } from '@/components/ui/separator'
 import TeamLeadUser from './team-lead-user'
+import AddTeamMemberForm from '@/components/forms/user-forms/add-team-member-form'
 
 type Props = {
     filteredUsers: any
@@ -30,7 +31,7 @@ const AddTeam = ({ filteredUsers }: Props) => {
         // Get in_team field to compare mail
         teamMembers = filteredUsers.filter((user: any) => user.in_team === teamLeadMail)
     } 
-    else if((!isGodCheck && !is_team_lead)) {
+    else if((!isGodCheck && !is_team_lead) && (in_team !== null && in_team !== '')) {
         // Get users in_team value
         // Compare the unique value with other users mail
         findingTeamLead = filteredUsers.filter((user: any) => user.email === in_team)
@@ -51,7 +52,7 @@ const AddTeam = ({ filteredUsers }: Props) => {
                             className='font-inter font-normal text-sm text-muted-foreground'
                         />
                     </div>
-                    {isGodCheck || is_team_lead && (
+                    {isGodCheck || is_team_lead ? (
                         <SheetTrigger asChild>
                             <Button 
                                 className="flex items-center font-inter font-medium text-sm"
@@ -62,8 +63,9 @@ const AddTeam = ({ filteredUsers }: Props) => {
                                 />
                                 Add Member
                             </Button>
-                        </SheetTrigger>
-                    )}
+                        </SheetTrigger>)
+                        :
+                    null}
                 </div>
                 <SheetContent 
                     className="w-[80%] min-w-[500px] overflow-y-scroll"
@@ -79,7 +81,14 @@ const AddTeam = ({ filteredUsers }: Props) => {
                         <div 
                             className="mt-4"
                         >
-                            <AddTeamForm />
+                            {isGodCheck ?
+                                (<AddTeamForm />)
+                            :
+                            is_team_lead ?
+                            (<AddTeamMemberForm />)
+                            :
+                            null
+                            }
                         </div>
                     </div>
                 </SheetContent>
@@ -123,21 +132,27 @@ const AddTeam = ({ filteredUsers }: Props) => {
                 {!isGodCheck && !is_team_lead && (
                     <>
                     {/* Display the team lead */}
-                    <TeamLeadUser 
-                        currentUser={findingTeamLead}
-                    />
-                    <Separator className='mb-4'/>
+                    {findingTeamLead && (
+                        <>
+                        <TeamLeadUser 
+                            currentUser={findingTeamLead}
+                        />
+                        <Separator className='mb-4'/>
+                        </>
+                    )}
                     {/* Display user as first team member */}
                     <CurrentUser 
                         currentUser={currentSessionUser}
                     />
                     {/* Display the rest of the team members */}
-                    {otherTeamMembers.map((user: any) => (
-                        <TeamUsers 
-                            user={user}
-                            key={user.email}
-                        />
-                    ))}
+                    {findingTeamLead && (
+                        otherTeamMembers.map((user: any) => (
+                            <TeamUsers 
+                                user={user}
+                                key={user.email}
+                            />
+                        ))
+                    )}
                     </>
                 )}
             </div>
