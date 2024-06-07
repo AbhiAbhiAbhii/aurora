@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
         if(!error) {
             return NextResponse.json({ title: 'Success', message: "Successfully signed up, please confirm the link sent to your email" }, { status: 201 })
         } else {
-            return NextResponse.json({ title: 'Error', message: 'User already has an account with this mail' }, { status: 401 })
+            return NextResponse.json({ title: 'Error', message: error }, { status: 401 })
         }
     } else {
-        return NextResponse.json({ title: 'Error', message: 'User already has an account with this mail' }, { status: 401 })
+        return NextResponse.json({ title: 'Error', message: error }, { status: 401 })
     }
 }
