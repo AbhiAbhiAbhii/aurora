@@ -16,6 +16,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import React, { MutableRefObject, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { PacmanLoader } from 'react-spinners'
+import { EyeNoneIcon } from "@radix-ui/react-icons"
 import { z } from "zod"
 
 type Props = {
@@ -50,6 +52,7 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
   const [ newClientValue, setNewClientValue ]= useState<any>("")
   const [ disableSelect, setDisableSelect ] = useState(false)
   const [ loadingState, setLoadingState ] = useState(false)
+  const [ togglePassClick, setTogglePassClick ] = useState(false)
 
   const form = useForm<z.infer<typeof UserAddCredentialFormSchema>>({
     resolver: zodResolver(UserAddCredentialFormSchema),
@@ -221,7 +224,12 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
                             >
                               {
                                 loadingState ?
-                                  <Loading className='h-6 w-6' />
+                                  // <Loading className='h-6 w-6' />
+                                  <PacmanLoader 
+                                      color='#FFF'
+                                      speedMultiplier={5}
+                                      size={14}
+                                  />
                                 :
                                 "Add new client"
                               }
@@ -293,9 +301,25 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder='' />
-                </FormControl>
+                <div className='w-full relative'>
+                  <FormControl>
+                    <Input
+                      type={
+                        togglePassClick ?
+                        "text"
+                        :
+                        "password"
+                      } 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <div
+                      onClick={() => setTogglePassClick(!togglePassClick)}
+                      className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                  >
+                      <EyeNoneIcon />
+                  </div>
+                </div>
               </FormItem>
             )}
           />

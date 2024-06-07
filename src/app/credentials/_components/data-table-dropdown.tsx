@@ -33,6 +33,7 @@ import VersionHistory from '@/components/logs/version_history/edit-version-histo
 import { MessageFunction } from '@/utils/functions/alert-function'
 import { reloadPage } from '@/utils/functions/reload'
 import { getCurrentDate } from '@/utils/functions/date'
+import UserEditCredentialForm from '@/components/forms/user-forms/user-edit-credential-form'
 
 type Props = {
   rowUsernameData: string,
@@ -208,10 +209,15 @@ const sendEmail = async () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <EditCredentialForm 
-          checkState={checkState}
+        {isGodCheck ? 
+          <EditCredentialForm 
+            checkState={checkState}
+            serviceRowData={initValues}
+          />
+        :
+        <UserEditCredentialForm 
           serviceRowData={initValues}
-        />
+        />}
         <DropdownMenuItem
           onClick={UserNameCopy}
         >

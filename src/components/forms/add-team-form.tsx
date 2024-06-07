@@ -13,6 +13,8 @@ import { SignUpTeam } from '@/app/login/signup-test'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
 import { Checkbox } from '../ui/checkbox'
 import { useGlobalContext } from '../global/my-global-context'
+import { getAlertContainer } from '@/utils/functions/alert-function'
+import { reloadPage } from '@/utils/functions/reload'
 
 type Props = {}
 
@@ -41,17 +43,42 @@ const AddTeamForm = (props: Props) => {
         }
     })
 
-    const { currentSessionUser } = useGlobalContext()
-    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false);
-    const ref:MutableRefObject<any> = useRef();
+    const { currentSessionUser, setAlertTitle, setAlertDescription } = useGlobalContext()
+    const { is_team_lead } = currentSessionUser[0]
+    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
+    const ref:MutableRefObject<any> = useRef()
+
+    const messageFunction = (title: string, description: string) => {
+        getAlertContainer()
+        setAlertTitle(title)
+        setAlertDescription(description)
+    }
+
+    const updateMessage = (title: any, description: any) => {
+        messageFunction(title, description)
+    }
+
     
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
         const { name, email, username, password, additionalNotes, role, isLead } = values
         let userStatus
-        if(role !== "God") {
+
+        const addTeamData = {
+            name,
+            email,
+            username,
+            password,
+            additionalNotes,
+            userStatus,
+            isLead
+        }
+
+        if(role === "God") {
+            userStatus = true
+        } else if(is_team_lead){
             userStatus = false
         } else {
-            userStatus = true
+            userStatus = false
         }
         const teamLeadMail = currentSessionUser[0].email
         const URL = "/api/AddUser"
@@ -64,15 +91,13 @@ const AddTeamForm = (props: Props) => {
                 },
                 body: JSON.stringify({ name, email, username, password, additionalNotes, userStatus, isLead, teamLeadMail }) 
             })
+            ref.current.click()
             if(!res.ok) {
-                console.log("Network response not okay")
-                console.log("Not in a team")
-                console.log(res)
+                let { message } = await res.json()
+                console.log(message, "Error")
             } else {
-                console.log("Network response okay")
-                const data = await res.json()
-                console.log(data)
-                ref.current.click()
+                const { message, title } = await res.json()
+                updateMessage(title, message)
             }
         } catch(err) {
             console.log(err)
@@ -166,12 +191,14 @@ const AddTeamForm = (props: Props) => {
                 name="role"
                 render={({ field }) => (
                     <FormItem 
-                        className="mb-4"
+                        className={`mb-4 ${is_team_lead ? 'hidden': null}`}
                     >
                         <FormLabel>
                             Role of this user
                         </FormLabel>
-                        <Select onValueChange={field.onChange}>
+                        <Select 
+                            onValueChange={field.onChange}
+                        >
                             <SelectTrigger>
                                 <SelectValue 
                                     placeholder="Select Role"
@@ -181,10 +208,8 @@ const AddTeamForm = (props: Props) => {
                                 <SelectGroup>
                                     <SelectLabel>Types of Roles</SelectLabel>
                                     {
-                                        ['God', 'User'].map((item: any) => (
-                                            <SelectItem value={item} key={item}>{item}</SelectItem>
-                                        ))
-                                    }
+                                        ['God', 'User'].map((item: any) => <SelectItem value={item} key={item}>{item}</SelectItem>
+                                    )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
@@ -197,7 +222,7 @@ const AddTeamForm = (props: Props) => {
                 name="isLead"
                 render={({ field }) => (
                     <FormItem 
-                        className="space-x-2 mb-6 mt-6 flex items-center"
+                        className={`space-x-2 mb-6 mt-6 flex items-center ${is_team_lead ? 'hidden' : null}`}
                     >
                         <FormLabel className='mt-2'>
                             Team leader?

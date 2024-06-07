@@ -16,10 +16,6 @@ const DataDisplay = (props: Props) => {
   const [ filteredUsers, setFilteredUsers ] = useState<any>()
   const [ workSpaceData, setWorkSpaceData ] = useState<any>()
 
-
-  console.log(currentSessionUser, "AAAAA")
-
-  useEffect(() => {
     if(currentSessionUser) {
       setIsGodCheck(() => currentSessionUser[0].is_god)
       setServiceTableName(() => {
@@ -27,8 +23,6 @@ const DataDisplay = (props: Props) => {
         return text
       })
     }
-  }, [])
-
 
   useEffect(() => { // function to keep current user logged in at the top of settings view
     
