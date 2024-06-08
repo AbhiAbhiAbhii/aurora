@@ -5,12 +5,15 @@ import { useGlobalContext } from '@/components/global/my-global-context'
 import SettingView from '@/components/global/setting-view'
 import UserCredentialView from '@/components/global/user/user-credential-view'
 import WorkSpace from '@/components/global/workspace/workspace'
-import { currentSessionUserDetails } from '@/lib/queries'
+import { currentSessionUserDetails, getServiceDetails } from '@/lib/queries'
 import React, { useEffect, useState } from 'react'
 import { PacmanLoader } from "react-spinners"
 type Props = {}
 
 const DataDisplay = (props: Props) => {
+
+
+  
 
   // Shared by team lead emails done
   // Team Lead mail done
@@ -19,13 +22,18 @@ const DataDisplay = (props: Props) => {
   // Acquired all 3
   // Now workspacedata must be equal to these values
 
-  const { linkValue, isGodCheck, setIsGodCheck, currentSessionUser, setCurrentSessionUser, setServiceTableName } = useGlobalContext()
+  const { linkValue, isGodCheck, setIsGodCheck, currentSessionUser, setCurrentSessionUser, setServiceTableName, value, tabValue } = useGlobalContext()
   const [ filteredUsers, setFilteredUsers ] = useState<any>()
   const [ workSpaceData, setWorkSpaceData ] = useState<any>([])
-  const [ getAllWorkSpaceData, setGetAllWorkSpaceData ] = useState<any>([])
-  const [ getSharedByLeadEmail, setGetSharedByLeadEmail ] = useState<any>()
+  const [ serviceData, setServiceData ] = useState<any>([])
+  const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
   const [ isTeamLeadMail, setIsTeamLeadMail ] = useState<any>('')
   const [ inTeamMail, setInTeamMail ] = useState<any>('')
+
+
+
+  // -------------------------
+  // Workspace data
 
   if(currentSessionUser) {
     setIsGodCheck(() => currentSessionUser[0].is_god)
@@ -34,6 +42,46 @@ const DataDisplay = (props: Props) => {
       return text
     })
   }
+
+  useEffect(() => {
+      if(currentSessionUser) {
+        if(isGodCheck) {
+          const FetchServiceData = async() => {
+            try {
+              console.log("BBBBBBBB")
+              const serviceDetails = await getServiceDetails(value)
+              if(serviceDetails) return setServiceData(serviceDetails)
+            } catch (error) {
+              console.log(error, "Something went WONG")
+            } 
+          }
+          FetchServiceData()
+        } else {
+          const url = "/api/UserCredential/SessionUserCredential"
+          let sessionUserEmail: any = currentSessionUser[0].email
+          async function getUserCredentialsData() {
+            const res = await fetch(url, {
+              method: "POST",
+              headers: {
+                'Content-type': 'application/json'
+              },
+              body: JSON.stringify({sessionUserEmail})
+            })
+            if(!res.ok) {
+              console.log("Network request is not okay")
+            } else {
+              const { data } = await res.json()
+              return setUserCredentialsData(() => data)
+            }
+          }
+          getUserCredentialsData()
+        }
+      }
+  }, [value, currentSessionUser])
+
+  const userFilteredData = () =>  userCredentialsData.filter((item: any) => item.type === tabValue)
+
+  const filteredData = () => serviceData.filter((item: any) => item.company_name === value && item.type === tabValue)
 
   useEffect(() => { // function to keep current user logged in at the top of settings view
     
@@ -99,13 +147,29 @@ const DataDisplay = (props: Props) => {
     }
   }, [currentSessionUser])
 
+  // Workspace data
+  // -------------------------
+
+  // Get Credential view data
+
   return (
     <>
     {
       currentSessionUser ?
       <div className='max-w-[90%] w-[1250px]'>
         {linkValue === "Credentials" ?
-          isGodCheck ? <CredentialView /> : <UserCredentialView />
+          isGodCheck ? 
+            <CredentialView 
+              filteredData={filteredData()}
+              serviceData={serviceData}
+              tabValue={tabValue}
+            /> 
+            : 
+            <UserCredentialView 
+              userCredentialsData={userCredentialsData}
+              userFilteredData={userFilteredData()}
+              tabValue={tabValue}
+            />
           :
           linkValue === "Workspace" ?
             <WorkSpace workSpaceData={workSpaceData} />

@@ -103,7 +103,6 @@ export const getCurrentUserAllDetail = async () => {
     const { data, error } = await supabase.auth.getUser();
     if(error) {
         console.log("Something went WONG")
-        redirect('/error')
     } else {
         const authUserEmail = data.user?.email
         const fetchedData = await supabase.from("User_Details").select("*").eq("email", authUserEmail)

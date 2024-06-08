@@ -1,42 +1,15 @@
 'use client'
-
 import SwitcherBlock from "@/app/credentials/_components/switcher-block"
-import { useEffect, useState } from "react"
 import { DataTable } from "@/app/credentials/_components/data-table"
-import { useGlobalContext } from "../my-global-context"
 import { userCredentialColumn } from "./user-columns"
 import AlertContainer from "../alert"
-type Props = {}
+type Props = {
+  userCredentialsData: any
+  userFilteredData: any
+  tabValue: any
+}
 
-const UserCredentialView = (props: Props) => {
-
-  const {  tabValue, currentSessionUser } = useGlobalContext()
-  const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
-  let sessionUserEmail: any
-  if(currentSessionUser) {
-    sessionUserEmail = currentSessionUser[0].email
-  }
-  useEffect(() => {
-    const url = "/api/UserCredential/SessionUserCredential"
-    async function getUserCredentialsData() {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify({sessionUserEmail})
-      })
-      if(!res.ok) {
-        console.log("Network request is not okay")
-      } else {
-        const { data } = await res.json()
-        return setUserCredentialsData(() => data)
-      }
-    }
-    getUserCredentialsData()
-  }, [])
-  
-  const filteredData = () =>  userCredentialsData.filter((item: any) => item.type === tabValue)
+const UserCredentialView = ({ userCredentialsData, userFilteredData, tabValue }: Props) => {
 
   return (
     <div>
@@ -47,7 +20,7 @@ const UserCredentialView = (props: Props) => {
           tabValue !== "All" ?
           <DataTable 
             columns={userCredentialColumn}
-            data={filteredData()}
+            data={userFilteredData}
           />
           :
           <DataTable 
