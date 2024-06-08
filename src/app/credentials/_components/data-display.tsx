@@ -77,7 +77,8 @@ const DataDisplay = (props: Props) => {
           getUserCredentialsData()
         }
       }
-  }, [value, currentSessionUser])
+      console.log("RENDERRRRR")
+  }, [value, currentSessionUser, isGodCheck])
 
   const userFilteredData = () =>  userCredentialsData.filter((item: any) => item.type === tabValue)
 
