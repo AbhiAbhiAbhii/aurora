@@ -50,8 +50,6 @@ export async function POST(req: NextRequest) {
 
       const { data, error } = await supabase.from('User_Details').select('email').eq('email', storeReceivermail)
       console.log('AAAAAAAAAAAAAAAAAAAAA')
-      console.log(data, 'SERVER DATA')
-      console.log(error, 'SERVER ERROR')
 
       if(error === null) {        
         const {error} = await supabase.from('shared_table').insert({
@@ -70,7 +68,7 @@ export async function POST(req: NextRequest) {
           shared_by_email: 'GOD'
         })
         // if(error === null) {
-        //   const { data, error } = await resend.emails.send({
+        //    await resend.emails.send({
         //     from: 'noreply@aurora.gradical.xyz',
         //     to: `${storeReceivermail}`,
         //     subject: "Credentials",

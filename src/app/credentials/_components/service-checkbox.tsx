@@ -2,7 +2,6 @@ import { useGlobalContext } from '@/components/global/my-global-context'
 import { Checkbox } from '@/components/ui/checkbox'
 import { getServiceRowDetails } from '@/lib/queries'
 import { createClient } from '@/utils/supabase/client'
-import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
@@ -150,8 +149,7 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
           checked={checkBoxIdValue.includes(initValues?.service_name)}
           onCheckedChange={() => handleCheckBoxChange(initValues?.service_name)}
         />
-      } 
-      {/* data passed here */}
+      }
       <div>
         {data}
       </div>

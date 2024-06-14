@@ -164,7 +164,7 @@ const DataDisplay = (props: Props) => {
     } else {
       null
     }
-  }, [currentSessionUser])
+  }, [currentSessionUser, isGodCheck])
 
   // Workspace data
   // -------------------------
