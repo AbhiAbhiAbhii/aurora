@@ -7,13 +7,9 @@ import UserCredentialView from '@/components/global/user/user-credential-view'
 import WorkSpace from '@/components/global/workspace/workspace'
 import { currentSessionUserDetails, getServiceDetails } from '@/lib/queries'
 import React, { useEffect, useState } from 'react'
-import { PacmanLoader } from "react-spinners"
 type Props = {}
 
 const DataDisplay = (props: Props) => {
-
-
-  
 
   // Shared by team lead emails done
   // Team Lead mail done
@@ -22,15 +18,13 @@ const DataDisplay = (props: Props) => {
   // Acquired all 3
   // Now workspacedata must be equal to these values
 
-  const { linkValue, isGodCheck, setIsGodCheck, currentSessionUser, setCurrentSessionUser, setServiceTableName, value, tabValue } = useGlobalContext()
+  const { linkValue, isGodCheck, setIsGodCheck, currentSessionUser, setCurrentSessionUser, setServiceTableName, value, tabValue, sharedCredentialsData, setSharedCredentialData, targetId } = useGlobalContext()
   const [ filteredUsers, setFilteredUsers ] = useState<any>()
   const [ workSpaceData, setWorkSpaceData ] = useState<any>([])
   const [ serviceData, setServiceData ] = useState<any>([])
   const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
   const [ isTeamLeadMail, setIsTeamLeadMail ] = useState<any>('')
   const [ inTeamMail, setInTeamMail ] = useState<any>('')
-
-
 
   // -------------------------
   // Workspace data
@@ -44,45 +38,69 @@ const DataDisplay = (props: Props) => {
   }
 
   useEffect(() => {
-      if(currentSessionUser) {
-        if(isGodCheck) {
-          const FetchServiceData = async() => {
-            try {
-              console.log("BBBBBBBB")
-              const serviceDetails = await getServiceDetails(value)
-              if(serviceDetails) return setServiceData(serviceDetails)
-            } catch (error) {
-              console.log(error, "Something went WONG")
-            } 
-          }
-          FetchServiceData()
-        } else {
-          const url = "/api/UserCredential/SessionUserCredential"
-          let sessionUserEmail: any = currentSessionUser[0].email
-          async function getUserCredentialsData() {
-            const res = await fetch(url, {
-              method: "POST",
-              headers: {
-                'Content-type': 'application/json'
-              },
-              body: JSON.stringify({sessionUserEmail})
-            })
-            if(!res.ok) {
-              console.log("Network request is not okay")
-            } else {
-              const { data } = await res.json()
-              return setUserCredentialsData(() => data)
-            }
-          }
-          getUserCredentialsData()
+    if(currentSessionUser) {
+      if(isGodCheck) {
+        const FetchServiceData = async() => {
+          try {
+            console.log("BBBBBBBB")
+            const serviceDetails = await getServiceDetails(value)
+            if(serviceDetails) return setServiceData(serviceDetails)
+          } catch (error) {
+            console.log(error, "Something went WONG")
+          } 
         }
+        FetchServiceData()
+      } else {
+        const url = "/api/UserCredential/SessionUserCredential"
+        let sessionUserEmail: any = currentSessionUser[0].email
+
+        async function getUserCredentialsData() {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify({sessionUserEmail})
+          })
+          if(!res.ok) {
+            console.log("Network request is not okay")
+          } else {
+            const { data } = await res.json()
+            return setUserCredentialsData(() => data)
+          }
+        }
+        getUserCredentialsData()
+
+
+        // Shared credentials
+        const sharedUrl = '/api/UserCredential/GetSharedCreds'
+
+        async function getSharedCredentials() {
+          const res = await fetch(sharedUrl, {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify({sessionUserEmail})
+          })
+
+          if(!res.ok) {
+            console.log(`Error`)
+          } else {
+            const data = await res.json()
+            console.log(data, "CLIENT SIDE DATA NETWORK RESPONSE")
+            setSharedCredentialData(() => data)
+          }
+        }
+        getSharedCredentials()
       }
-      console.log("RENDERRRRR")
+    }
+    console.log("RENDERRRRR")
   }, [value, currentSessionUser, isGodCheck])
 
-  const userFilteredData = () =>  userCredentialsData.filter((item: any) => item.type === tabValue)
+  const userFilteredData = userCredentialsData.filter((item: any) => item.type === tabValue)
 
-  const filteredData = () => serviceData.filter((item: any) => item.company_name === value && item.type === tabValue)
+  const filteredData = serviceData.filter((item: any) => item.company_name === value && item.type === tabValue)
 
   useEffect(() => { // function to keep current user logged in at the top of settings view
     
@@ -153,6 +171,41 @@ const DataDisplay = (props: Props) => {
 
   // Get Credential view data
 
+  // Deleting timer function
+  // useEffect(() => {
+  //   if(!isGodCheck) {
+  //     if(currentSessionUser) {
+  //       let email = currentSessionUser[0].email
+  //       const deleteOldRecords = async () => {
+  //         try {
+  //           const response = await fetch('/api/DeleteSharedRecords', {
+  //             method: 'POST',
+  //             headers: {
+  //               'Content-type': 'application/json'
+  //             },
+  //             body: JSON.stringify({email, targetId})
+  //           })
+  //           if(response.ok) {
+  //             const data = await response.json()
+  //             console.log(data.message, 'Our message')
+  //           }
+  //         } catch (error) {
+  //           console.error('Failed to delete old records:', error)
+  //         }
+  //       }
+    
+  //       // Set up a timer to delete old records every 30 seconds for testing
+  //       const interval = setInterval(deleteOldRecords, 30000)
+    
+  //       // Optionally, call the function once when the component mounts
+  //       deleteOldRecords()
+    
+  //       // Clean up the interval on component unmount
+  //       return () => clearInterval(interval)
+  //     }
+  //   }
+  // }, [currentSessionUser])
+
   return (
     <>
     {
@@ -161,14 +214,15 @@ const DataDisplay = (props: Props) => {
         {linkValue === "Credentials" ?
           isGodCheck ? 
             <CredentialView 
-              filteredData={filteredData()}
+              filteredData={filteredData}
               serviceData={serviceData}
               tabValue={tabValue}
             /> 
             : 
             <UserCredentialView 
+              sharedCredentialsData={sharedCredentialsData}
               userCredentialsData={userCredentialsData}
-              userFilteredData={userFilteredData()}
+              userFilteredData={userFilteredData}
               tabValue={tabValue}
             />
           :

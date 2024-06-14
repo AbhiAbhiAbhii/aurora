@@ -157,7 +157,7 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
             servicename: service_name,
             username: user_name,
             password: password,
-            url: url,
+            URL: url,
             workspace: shared_to_workspace,
             additionalnotes: additional_notes,
         }
@@ -169,7 +169,7 @@ const UserEditCredentialForm = ({ serviceRowData }: Props) => {
             servicename: serviceNameData,
             username: userNameData,
             password: passwordData,
-            url: urlData,
+            URL: urlData,
             workspace: workSpaceData,
             additionalnotes: additionalNotesData
         }

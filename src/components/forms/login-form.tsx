@@ -133,6 +133,7 @@ const LoginForm = (props: Props) => {
     }
 
     const isInvalid = Object.keys(formValues).length < 3 || formValues.email === '' || formValues.password === ''
+    const loginInvalid = form.getValues().email === '' || form.getValues().password === ''
 
   return (
     <Card className='w-[90%] mx-auto md:w-[412px]'>
@@ -325,6 +326,7 @@ const LoginForm = (props: Props) => {
                         <Button
                             type='submit'
                             className='w-full'
+                            disabled={loginInvalid}
                         >
                             {
                                 loading ?

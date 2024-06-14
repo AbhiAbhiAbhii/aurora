@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
             type: type,
             client_name: client_name,
             user_name: user_name,
-            url: url,
+            URL: url,
             additional_notes: additional_notes,
             created_by_name: name,
             created_by_email: email,

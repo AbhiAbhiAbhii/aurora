@@ -16,6 +16,8 @@ const ContextWrapper = ({ children }: Props) => {
   const [ isGodCheck, setIsGodCheck ] = useState<string>("") // Check Session Users is_god status 
   const [ currentSessionUser, setCurrentSessionUser ] = useState<any>() // Checks current session user details
   const [ serviceTableName, setServiceTableName ] = useState<string>("")
+  const [ sharedCredentialsData, setSharedCredentialData ] = useState<any>([])
+  const [ targetId, setTargetId ] = useState<any>([])
 
   return (
     <MyGlobalContext.Provider 
@@ -28,7 +30,9 @@ const ContextWrapper = ({ children }: Props) => {
           checkBoxIdValue, setCheckBoxIdValue,
           isGodCheck, setIsGodCheck,
           currentSessionUser, setCurrentSessionUser,
-          serviceTableName, setServiceTableName
+          serviceTableName, setServiceTableName,
+          sharedCredentialsData, setSharedCredentialData,
+          targetId, setTargetId
         }
       }
     >

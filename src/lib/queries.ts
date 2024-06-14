@@ -158,20 +158,20 @@ export const updateItem = async(
             sso_name: sso_name
         }
 
-        let otherTable: any = {
-            id: rowId,
-            company_name: companyname,
-            service_name: servicename,
-            password: pass,
-            type: type,
-            user_name: username,
-            url: urll,
-            additional_notes: additionalnotes,
-            managed_by: managedby,
-            sso_name: sso_name
-        }
+        // let otherTable: any = {
+        //     id: rowId,
+        //     company_name: companyname,
+        //     service_name: servicename,
+        //     password: pass,
+        //     type: type,
+        //     user_name: username,
+        //     url: urll,
+        //     additional_notes: additionalnotes,
+        //     managed_by: managedby,
+        //     sso_name: sso_name
+        // }
 
-        let updateValue: any = tableName === "Service" ? serviceTable : otherTable
+        let updateValue: any = serviceTable
 
         const { error } = await supabase.from(`${tableName}`).update(updateValue).eq('id', rowId)
         if(error) {
@@ -199,7 +199,7 @@ export const editAccountDetails = async (
 
 export const getServiceURL = async (id: number, tableName: any) => {
     const supabase = createClient()
-    let value = tableName == "Service" ? 'URL' : 'url'
+    let value = 'URL' 
     const { data, error } = await supabase.from(`${tableName}`).select(value).eq('id', id)
     if(error) {
         return alert('Something went wrong')
