@@ -14,6 +14,9 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
 
     const [ initValues, setInitValues ] = useState<any>()
     const { checkBoxIdValue, setCheckBoxIdValue, serviceTableName, tabValue, setSharedCredentialData, currentSessionUser, setTargetId, targetId, isGodCheck } = useGlobalContext()
+    const [timeLeft, setTimeLeft] = useState(200) // Initial time left in seconds
+    const [ hoverReveal, setHoverReveal ] = useState<boolean>(false)
+
     useEffect(() => {
         async function SetInitialValues() {
           let data:any = await getServiceRowDetails(rowServicenameData, serviceTableName)
@@ -37,7 +40,6 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
     })
   }
 
-  const [timeLeft, setTimeLeft] = useState(20) // Initial time left in seconds
 
   useEffect(() => {
 
@@ -60,8 +62,10 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
           const createdAtTimestamp = new Date(data[0].created_at).getTime()
           const now = new Date().getTime()
           const thirtySeconds = 30 * 1000 // 30 seconds in milliseconds
+          const twentyFourHours = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
-          let timeRemaining = thirtySeconds - (now - createdAtTimestamp)
+
+          let timeRemaining = twentyFourHours - (now - createdAtTimestamp)
           if (timeRemaining < 0) {
             timeRemaining = 0 // Ensure timeRemaining doesn't go negative
           }
@@ -87,6 +91,11 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
   const hours = Math.floor(timeLeft / 3600)
   const minutes = Math.floor((timeLeft % 3600) / 60)
   const seconds = timeLeft % 60
+
+  // Calculate stroke-dashoffset based on timeLeft
+  const radius = 15 // radius of the circle
+  const circumference = 2 * Math.PI * radius
+  const strokeDashoffset = circumference - (timeLeft / (24 * 60 * 60)) * circumference
 
   useEffect(() => {
     if(!isGodCheck) {
@@ -140,8 +149,34 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
     <div className='flex items-center space-x-2'>
       {
         tabValue === 'Shared' ?
-        <div className="flex items-center justify-center">
-          <div className="text-xl">{`${hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</div>
+        // <div className="flex items-center justify-center">
+        //   <div className="text-xl">{`${hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</div>
+        // </div>
+        <div onMouseEnter={() => setHoverReveal(() => true)} onMouseLeave={() => setHoverReveal(() => false)} className="flex items-center justify-center relative time-hover">
+          <svg className="w-8 h-8" viewBox="0 0 40 40">
+            <circle
+              className="text-gray-300"
+              strokeWidth="4"
+              stroke="currentColor"
+              fill="transparent"
+              r={radius}
+              cx="20"
+              cy="20"
+            />
+            <circle
+              className="text-black"
+              strokeWidth="4"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              r={radius}
+              cx="20"
+              cy="20"
+              style={{ transition: 'stroke-dashoffset 1s linear' }}
+            />
+          </svg>
         </div>
         :
         <Checkbox 
@@ -150,9 +185,16 @@ const ServiceCheckBox = ({ data, rowServicenameData, id }: Props) => {
           onCheckedChange={() => handleCheckBoxChange(initValues?.service_name)}
         />
       }
-      <div>
-        {data}
-      </div>
+      {
+        hoverReveal ?
+        <div className='reveal-hover'>
+          <div className="text-sm">{`${hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</div>
+        </div>
+        :
+        <div>
+          {data}
+        </div>
+      }
     </div>
   )
 }

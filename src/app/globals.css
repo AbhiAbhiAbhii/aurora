@@ -126,4 +126,12 @@ td:has(.remove-header), th:has(.remove-header) {
 th, td {
   /* text-align: center !important; */
 }
-
+.reveal-hover {
+  background: white;
+  opacity: 1;
+  transition: all 0.6s var(--quint);
+  overflow: hidden;
+}
+.time-hover:hover .reveal-hover{
+  opacity: 1;
+}
