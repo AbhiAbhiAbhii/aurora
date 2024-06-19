@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
             client_name: clientNameData,
             user_name: userNameData,
             service_name: serviceNameData,
-            url: urlData,
+            URL: urlData,
             additional_notes: additionalNotesData,
             shared_to_workspace: workSpaceData
         }).eq('id', id)

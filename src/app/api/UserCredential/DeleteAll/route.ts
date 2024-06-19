@@ -8,8 +8,6 @@ export async function DELETE(req: NextRequest) {
     const body = await req.json()
     const { serviceTableName, checkBoxIdValue } = body
 
-    console.log(checkBoxIdValue)
-
     try {
         const { error } = await supabase.from(`${serviceTableName}`).delete().in('service_name', [...checkBoxIdValue])
         if(error) {

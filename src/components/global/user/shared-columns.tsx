@@ -1,13 +1,14 @@
 "use client"
+import AllAction from "@/app/credentials/_components/all-action"
+import DataTableDropDown from "@/app/credentials/_components/data-table-dropdown"
+import PasswordFormat from "@/app/credentials/_components/password-format"
+import ServiceCheckBox from "@/app/credentials/_components/service-checkbox"
+import LoginType from "@/app/credentials/_components/table-header/login-type"
+import TypeBadge from "@/app/credentials/_components/type-badge"
+import UsernameBox from "@/app/credentials/_components/username-box"
 import { Badge } from "@/components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
-import PasswordFormat from "./_components/password-format"
-import UsernameBox from "./_components/username-box"
-import DataTableDropDown from "./_components/data-table-dropdown"
-import AllAction from "./_components/all-action"
-import ServiceCheckBox from "./_components/service-checkbox"
-import LoginType from "./_components/table-header/login-type"
-import TypeBadge from "./_components/type-badge"
+
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -26,14 +27,15 @@ export type Service = {
   login_type: string
 }
 
-export const columns: ColumnDef<Service>[] = [
+export const sharedCredentialsColumn: ColumnDef<Service>[] = [
   {
     accessorKey: "service_name",
     header: "Service Name",
     cell: ({ row }) => {
       const data: string = row.getValue('service_name')
       const rowServicenameData: string = row.getValue('service_name')
-      return <ServiceCheckBox rowServicenameData={rowServicenameData} data={data} />
+      const idData: any = row.getValue('id')
+      return <ServiceCheckBox rowServicenameData={rowServicenameData} data={data} id={idData} />
     }
   },
   {

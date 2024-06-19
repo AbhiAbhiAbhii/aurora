@@ -1,60 +1,41 @@
 'use client'
-
 import SwitcherBlock from "@/app/credentials/_components/switcher-block"
-import { useEffect, useState } from "react"
 import { DataTable } from "@/app/credentials/_components/data-table"
-import { useGlobalContext } from "../my-global-context"
 import { userCredentialColumn } from "./user-columns"
 import AlertContainer from "../alert"
-type Props = {}
+import { sharedCredentialsColumn } from "./shared-columns"
+type Props = {
+  userCredentialsData: any
+  userFilteredData: any
+  tabValue: any,
+  sharedCredentialsData: any
+}
 
-const UserCredentialView = (props: Props) => {
+const UserCredentialView = ({ userCredentialsData, userFilteredData, tabValue, sharedCredentialsData }: Props) => {
 
-  const {  tabValue, currentSessionUser } = useGlobalContext()
-  const [ userCredentialsData, setUserCredentialsData ] = useState<any>([])
-  let sessionUserEmail: any
-  if(currentSessionUser) {
-    sessionUserEmail = currentSessionUser[0].email
-  }
-  useEffect(() => {
-    const url = "/api/UserCredential/SessionUserCredential"
-    async function getUserCredentialsData() {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify({sessionUserEmail})
-      })
-      if(!res.ok) {
-        console.log("Network request is not okay")
-      } else {
-        const { data } = await res.json()
-        return setUserCredentialsData(() => data)
-      }
-    }
-    getUserCredentialsData()
-  }, [])
-  
-  const filteredData = () =>  userCredentialsData.filter((item: any) => item.type === tabValue)
 
   return (
     <div>
       <AlertContainer />
       <SwitcherBlock />
        <div className="mt-12">
-        {
-          tabValue !== "All" ?
-          <DataTable 
-            columns={userCredentialColumn}
-            data={filteredData()}
-          />
-          :
-          <DataTable 
-            columns={userCredentialColumn}
-            data={userCredentialsData}
-          />
-        }
+          {tabValue === 'All' ?
+            <DataTable 
+              columns={userCredentialColumn}
+              data={userCredentialsData}
+            />    
+            :
+            tabValue === 'Shared' ?
+            <DataTable 
+              columns={sharedCredentialsColumn}
+              data={sharedCredentialsData}
+            />
+            :
+            <DataTable 
+              columns={userCredentialColumn}
+              data={userFilteredData}
+            />
+          }
        </div>
     </div>
   )

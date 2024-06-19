@@ -16,7 +16,7 @@ export type WorkSpaceCredentialsType = {
     type: string 
     client_name: string 
     user_name: string 
-    url: string 
+    URL: string 
     additional_notes: string
     created_by_name: string
     created_by_email: string

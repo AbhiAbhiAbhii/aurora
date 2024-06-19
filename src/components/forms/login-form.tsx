@@ -8,15 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { Login } from '@/app/login/actions'
 import { PacmanLoader } from 'react-spinners'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { inputClassName, labelClassName, selectCustomClassName } from '@/utils/classnames'
 import AlertContainer from '../global/alert'
 import { getAlertContainer } from '@/utils/functions/alert-function'
 import { useGlobalContext } from '../global/my-global-context'
 import { reloadPage } from '@/utils/functions/reload'
-import { Checkbox } from '../ui/checkbox'
 import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
 
 type Props = {}
@@ -34,6 +32,7 @@ const LoginForm = (props: Props) => {
 
     const { setAlertTitle, setAlertDescription } = useGlobalContext()
     const [ loading, setLoading ] = useState(false)
+    const [ resOkay, setResOkay ] = useState(false)
     const [ switchLogin, setSwitchLogin ] = useState(false)
     const [ formStep, setFormStep ] = useState<number>(0)
     const [ formStepSelect, setFormStepSelect ] = useState<boolean>(false)
@@ -49,7 +48,7 @@ const LoginForm = (props: Props) => {
 
     const handleUpdate = (title: string, description: string) => {
         messageFunction(title, description)
-        setTimeout(() => reloadPage(), 8000)
+        setTimeout(() => reloadPage(), 2000)
     }
 
     // 1. Define our form
@@ -63,7 +62,6 @@ const LoginForm = (props: Props) => {
 
     const handleLogin = async (values: z.infer<typeof FormSchema>) => {
         const {email, password} = values
-        // Login(email,password)
 
         setLoading((prevState) => !prevState)
         const URL = '/api/Signin'
@@ -115,7 +113,7 @@ const LoginForm = (props: Props) => {
             handleUpdate(title, message)
             console.log('Network response not okay', title, message)
         } else {
-            handleUpdate(title, message)
+            setResOkay((prevState) => !prevState)
             console.log('Network response is okay', title, message)
         }
     }
@@ -135,6 +133,7 @@ const LoginForm = (props: Props) => {
     }
 
     const isInvalid = Object.keys(formValues).length < 3 || formValues.email === '' || formValues.password === ''
+    const loginInvalid = form.getValues().email === '' || form.getValues().password === ''
 
   return (
     <Card className='w-[90%] mx-auto md:w-[412px]'>
@@ -142,32 +141,51 @@ const LoginForm = (props: Props) => {
         <CardHeader 
             className='py-4'
         >
-            <CardTitle
-                className='font-geist py-1'
-            >
-                {
-                    switchLogin ?
-                    "Signup to Aurora"
-                    :
-                    "Login to Aurora"
-                }
-            </CardTitle>
-            <CardDescription
-                className='font-geist py-1'
-            >
-                {
-                    switchLogin ?
-                    "Enter your details below"
-                    :
-                    "Enter your email and passsword below to continue."
-                }
-            </CardDescription>
+            {
+                resOkay ?
+                <>
+                <CardTitle className='font-geist py-1'>
+                    Signup success
+                </CardTitle>
+                <CardDescription className='font-geist py-1'>
+                    To continue confirm with the link sent to your email
+                </CardDescription>
+                </>
+                :
+                <>
+                <CardTitle
+                    className='font-geist py-1'
+                >
+                    {
+                        switchLogin ?
+                        "Signup to Aurora"
+                        :
+                        "Login to Aurora"
+                    }
+                </CardTitle>
+                <CardDescription
+                    className='font-geist py-1'
+                >
+                    {
+                        switchLogin ?
+                        "Enter your details below"
+                        :
+                        "Enter your email and passsword below to continue."
+                    }
+                </CardDescription>
+                </>
+            }
         </CardHeader>
         <CardContent>
             {
                 switchLogin ?
                 <form>
                     {
+                        resOkay ?
+                        null
+                        :
+                        <>
+                        {
                         formStep === 0 ?
                         <>
                         <div className='flex flex-col space-y-1 mb-6'>
@@ -244,27 +262,28 @@ const LoginForm = (props: Props) => {
                             </button>
                         </div>
                         :
-                        null
-                    }
-                    <Button
-                        disabled={isInvalid}
-                        onClick={handleFormStepClick}
-                        className='w-full'
-                    >
-                        {
-                            formStep > 0 ?
-                                loading ?
-                                <PacmanLoader 
-                                    color='#FFF'
-                                    speedMultiplier={5}
-                                    size={14}
-                                />
+                        null}   
+                        <Button
+                            disabled={isInvalid}
+                            onClick={handleFormStepClick}
+                            className='w-full'
+                        >
+                            {
+                                formStep > 0 ?
+                                    loading ?
+                                    <PacmanLoader 
+                                        color='#FFF'
+                                        speedMultiplier={5}
+                                        size={14}
+                                    />
+                                    :
+                                    "Complete signup"
                                 :
-                                "Complete signup"
-                            :
-                            "Next"
-                        }
-                    </Button>
+                                "Next"
+                            }
+                        </Button>
+                        </>
+                    }
                 </form>
                 :
                 <Form {...form}>
@@ -307,6 +326,7 @@ const LoginForm = (props: Props) => {
                         <Button
                             type='submit'
                             className='w-full'
+                            disabled={loginInvalid}
                         >
                             {
                                 loading ?
@@ -322,17 +342,22 @@ const LoginForm = (props: Props) => {
                     </form>
                 </Form>
             }
-            <p 
-                onClick={() => setSwitchLogin((prevState) => !prevState)}
-                className='text-black mx-auto flex items-center justify-center mt-4 font-geist text-sm cursor-pointer transition-all hover:opacity-70'
-            >
-                {
-                    switchLogin ?
-                    "Already have an account? Login"
-                    :
-                    "or Create an account?"
-                }
-            </p>
+            {
+                resOkay ?
+                null
+                :
+                <p 
+                    onClick={() => setSwitchLogin((prevState) => !prevState)}
+                    className='text-black mx-auto flex items-center justify-center mt-4 font-geist text-sm cursor-pointer transition-all hover:opacity-70'
+                >
+                    {
+                        switchLogin ?
+                        "Already have an account? Login"
+                        :
+                        "or Create an account?"
+                    }
+                </p>
+            }
         </CardContent>
     </Card>
   )

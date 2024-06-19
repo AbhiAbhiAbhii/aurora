@@ -45,6 +45,9 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
   let isTeamLead: boolean
   let name: string
   let email: string
+  let userIsTeamLead: boolean
+  let getUserTeamLeader: string
+  let sharedByEmail: any = null
   
   const router = useRouter()
   const clickRef: MutableRefObject<any>= useRef()
@@ -89,10 +92,18 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
   ) => {
     name = currentSessionUser[0].user_name
     email = currentSessionUser[0].email
+    userIsTeamLead = currentSessionUser[0].is_team_lead
+    getUserTeamLeader = currentSessionUser[0].in_team
 
     const { client_name, service_name, type, user_name, password, url, additional_notes, shared_to_workspace } = values
 
     const { dateString, timeString } = getCurrentDate()
+
+    if((shared_to_workspace) && (userIsTeamLead)) {
+      sharedByEmail= email
+    } else {
+      sharedByEmail= getUserTeamLeader
+    }
 
     const formData = {
       client_name,
@@ -104,7 +115,8 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
       additional_notes,
       shared_to_workspace,
       name,
-      email
+      email,
+      sharedByEmail
     }
 
     const createdAtLogData = { name, email, dateString, timeString, service_name }

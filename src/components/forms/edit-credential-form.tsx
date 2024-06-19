@@ -135,7 +135,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         setTypeData(serviceRowData.type)
         setUserNameData(serviceRowData.user_name)
         setPasswordData(serviceRowData.password)
-        setUrlData(() => serviceTableName == "Service" ? serviceRowData.URL : serviceRowData.url)
+        setUrlData(() =>  serviceRowData.URL)
         setManagedbyData(serviceRowData.managed_by)
         setAdditionalNotesData(serviceRowData.additional_notes)
         setSsoNameData(serviceRowData.sso_name)
@@ -145,7 +145,6 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         serviceRowData.user_name, 
         serviceRowData.password, 
         serviceRowData.URL,
-        serviceRowData.url, 
         serviceRowData.managed_by, 
         serviceRowData.additional_notes,
         serviceRowData.sso_name
@@ -171,7 +170,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         } else {
             // compare logic 
             let itemsEdited: any
-            let ourUrl = serviceTableName === "Service" ? serviceRowData.URL : serviceRowData.url
+            let ourUrl =  serviceRowData.URL
             let prevData: any = {
                 type: serviceRowData.type,
                 service_name: serviceRowData.service_name,

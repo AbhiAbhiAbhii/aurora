@@ -18,7 +18,7 @@ interface TabValue {
 const tabs: TabValue[] = [{tab: 'All'},{tab: 'Operations'},{tab: 'Socials'},{tab: 'Subscriptions'}]
 
 const WorkSpace = ({ workSpaceData }: Props) => {
-
+  console.log(workSpaceData, "WorkSpace Data")
   const { setTabValue, tabValue } = useGlobalContext()
 
   const filteredData = () => workSpaceData.filter((item: any) => item.type === tabValue)

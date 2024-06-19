@@ -243,7 +243,10 @@ const SwitcherBlock = (props: Props) => {
                                     value={item.tab}
                                     key={item.tab}
                                     className="font-inter font-medium text-sm text-muted-foreground"
-                                    onClick={(e) => setTabValue(e.currentTarget.innerText)}
+                                    onClick={(e) => {
+                                        setTabValue(e.currentTarget.innerText)
+                                        console.log(e.currentTarget.innerText, "Our tabValue")
+                                    }}
                                 >
                                     {
                                         item.tab === "Shared" ?
