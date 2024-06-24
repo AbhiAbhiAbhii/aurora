@@ -80,7 +80,7 @@ const AddTeamForm = (props: Props) => {
         } else {
             userStatus = false
         }
-        const teamLeadMail = currentSessionUser[0].email
+        const teamLeadMail = ''
         const URL = "/api/AddUser"
         try {
             // SignUpTeam(name, password, email, username, additionalNotes, role, isLead)

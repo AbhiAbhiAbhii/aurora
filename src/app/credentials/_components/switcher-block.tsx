@@ -150,6 +150,7 @@ const SwitcherBlock = (props: Props) => {
         const { dateString, timeString } = getCurrentDate()
 
        if(isSSO) {
+        console.log('Hello')
         const supabase = createClient()
         if(ssoName.toLowerCase() === "google") {
             const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail')
@@ -192,6 +193,8 @@ const SwitcherBlock = (props: Props) => {
             null
         }
        } else {
+
+        console.log('HELLO THERE')
         const formData = {
             value, 
             social, 
