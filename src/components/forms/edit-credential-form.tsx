@@ -9,7 +9,7 @@ import {
     SheetTitle, 
     SheetTrigger 
 } from '@/components/ui/sheet'
-import { deleteRowItem, editLinkedPassword, getAuthUsers, getCurrentUserAllDetail, getServiceRowDetails, getUserDetails, insertEditLog, updateItem } from '@/lib/queries'
+import { deleteRowItem, editLinkedPassword, getAuthUsers, getCurrentUserAllDetail, getServiceRowDetails, getUserDetails, insertEditLog, updateCreatedAtLog, updateItem } from '@/lib/queries'
 import { Button } from '../ui/button'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
 import SelectArrowIcon from '@/app/credentials/_components/select-arrow-icon'
@@ -55,7 +55,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
     
     const ref: any = useRef()
 
-    const { setAlertDescription, setAlertTitle } = useGlobalContext()
+    const { setAlertDescription, setAlertTitle, serviceTableName } = useGlobalContext()
     const [ users, setUsers ] = useState<any>([]) 
     const [ authUser, setAuthUser ] = useState<any>()
     const [ detectRole, setDetectRole ] = useState<any>()
@@ -135,7 +135,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         setTypeData(serviceRowData.type)
         setUserNameData(serviceRowData.user_name)
         setPasswordData(serviceRowData.password)
-        setUrlData(serviceRowData.URL)
+        setUrlData(() =>  serviceRowData.URL)
         setManagedbyData(serviceRowData.managed_by)
         setAdditionalNotesData(serviceRowData.additional_notes)
         setSsoNameData(serviceRowData.sso_name)
@@ -144,7 +144,7 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         serviceRowData.type, 
         serviceRowData.user_name, 
         serviceRowData.password, 
-        serviceRowData.URL, 
+        serviceRowData.URL,
         serviceRowData.managed_by, 
         serviceRowData.additional_notes,
         serviceRowData.sso_name
@@ -170,12 +170,13 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
         } else {
             // compare logic 
             let itemsEdited: any
+            let ourUrl =  serviceRowData.URL
             let prevData: any = {
                 type: serviceRowData.type,
                 service_name: serviceRowData.service_name,
                 username: serviceRowData.user_name,
                 password: serviceRowData.password,
-                URL: serviceRowData.URL,
+                URL: ourUrl,
                 managed_by: serviceRowData.managed_by,
                 additional_notes: serviceRowData.additional_notes,
                 sso_name: serviceRowData.sso_name
@@ -206,11 +207,11 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
                     } 
                     if(differentKeys.length > 0) {
                         itemsEdited = `Credential fields ${differentKeys.join(", ")} edited`
-                        updateSuccess()
                     } else {
                         console.log("No changes were found")
                     }
                 }
+                updateSuccess()
             }
             await insertEditLog(name, email, dateString, timeString, serviceNameData, itemsEdited)
             await updateItem(
@@ -223,8 +224,10 @@ const EditCredentialForm = ({serviceRowData, checkState }: Props) => {
                 urlData,
                 additionalNotesData,
                 managedbyData,
+                serviceTableName,
                 ssoNameData
             )
+            await updateCreatedAtLog(serviceNameData, serviceRowData.service_name)
         }   
     }
 

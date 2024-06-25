@@ -129,11 +129,14 @@ const SwitcherBlock = (props: Props) => {
 
     useEffect(() => {
         async function fetchClients() {
-            if(currentSessionUser[0].is_team_lead) {
-                let data: any = await getClients()
-                setClientsArray(() => data)
+            const res = await fetch("/api/NewClientName", {
+                cache: "no-store"
+            })
+            if(!res.ok) {
+                alert("Error")
             } else {
-                setClientsArray(() => null)
+                const data: any = await res.json()
+                setClientsArray(() => data.data)
             }
         }
         fetchClients()
@@ -147,6 +150,7 @@ const SwitcherBlock = (props: Props) => {
         const { dateString, timeString } = getCurrentDate()
 
        if(isSSO) {
+        console.log('Hello')
         const supabase = createClient()
         if(ssoName.toLowerCase() === "google") {
             const { data, error } = await supabase.from("Service").select('password').eq('user_name', user_name).eq('login_type', 'Gmail')
@@ -189,6 +193,8 @@ const SwitcherBlock = (props: Props) => {
             null
         }
        } else {
+
+        console.log('HELLO THERE')
         const formData = {
             value, 
             social, 
@@ -240,7 +246,10 @@ const SwitcherBlock = (props: Props) => {
                                     value={item.tab}
                                     key={item.tab}
                                     className="font-inter font-medium text-sm text-muted-foreground"
-                                    onClick={(e) => setTabValue(e.currentTarget.innerText)}
+                                    onClick={(e) => {
+                                        setTabValue(e.currentTarget.innerText)
+                                        console.log(e.currentTarget.innerText, "Our tabValue")
+                                    }}
                                 >
                                     {
                                         item.tab === "Shared" ?

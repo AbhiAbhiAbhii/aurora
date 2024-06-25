@@ -1,9 +1,9 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import SettingSwitcher from '@/app/credentials/_components/settings/settings-switcher'
 import AddTeam from '@/app/credentials/_components/settings/team/add-team'
-import { createClient } from '@/utils/supabase/client'
 import AccountView from '@/app/credentials/_components/settings/account/account-view'
+import AlertContainer from './alert'
 
 type Props = {
   currentUser: any
@@ -16,25 +16,20 @@ const SettingView = ({ currentUser, filteredUsers }: Props) => {
  
   return (
     <div className='flex justify-between'>
+      <AlertContainer />
       <SettingSwitcher 
         tabState={tabState}
         setTabState={setTabState}
       />
       <div className='w-[60%]'>
-        {
-          tabState === "Account" && (
-            <AccountView 
-              currentUser={currentUser}
-            />
-          )
-        }
-        {
-          tabState === "Team" && (
-            <AddTeam 
-              filteredUsers={filteredUsers}
-              currentUser={currentUser}
-            />
-          )
+        {tabState === 'Account' ?
+          <AccountView 
+            currentUser={currentUser}
+          />
+          :
+          <AddTeam 
+            filteredUsers={filteredUsers}
+          />
         }
       </div>
     </div>

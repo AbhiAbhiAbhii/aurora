@@ -11,6 +11,10 @@ import { SheetClose, SheetFooter } from '../ui/sheet'
 import { Button } from '../ui/button'
 import { SignUpTeam } from '@/app/login/signup-test'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
+import { Checkbox } from '../ui/checkbox'
+import { useGlobalContext } from '../global/my-global-context'
+import { getAlertContainer } from '@/utils/functions/alert-function'
+import { reloadPage } from '@/utils/functions/reload'
 
 type Props = {}
 
@@ -20,7 +24,8 @@ const AddNewMemberFormSchema = z.object({
     username: z.string().min(1, { message: 'This field is required ' }),
     password: z.string().min(5, { message: 'Must be 5 characters or more' }),
     additionalNotes: z.string(),
-    role: z.string()
+    role: z.string(),
+    isLead: z.boolean()
 })
 
 const AddTeamForm = (props: Props) => {
@@ -33,18 +38,66 @@ const AddTeamForm = (props: Props) => {
             username: '',
             password: '',
             additionalNotes: '',
-            role: ''
+            role: '',
+            isLead: false
         }
-    });
+    })
 
-    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false);
-    const ref:MutableRefObject<any> = useRef();
-    
+    const { currentSessionUser, setAlertTitle, setAlertDescription } = useGlobalContext()
+    const { is_team_lead } = currentSessionUser[0]
+    const [ togglePassClick, setTogglePassClick ] = useState<boolean>(false)
+    const ref:MutableRefObject<any> = useRef()
+
+    const messageFunction = (title: string, description: string) => {
+        getAlertContainer()
+        setAlertTitle(title)
+        setAlertDescription(description)
+    }
+
+    const updateMessage = (title: any, description: any) => {
+        messageFunction(title, description)
+    }
+
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
-        const { name, email, username, password, additionalNotes, role } = values
+        const { name, email, username, password, additionalNotes, role, isLead } = values
+        let userStatus
+
+        const addTeamData = {
+            name,
+            email,
+            username,
+            password,
+            additionalNotes,
+            userStatus,
+            isLead
+        }
+
+        if(role === "God") {
+            userStatus = true
+        } else if(is_team_lead){
+            userStatus = false
+        } else {
+            userStatus = false
+        }
+        const teamLeadMail = ''
+        const URL = "/api/AddUser"
         try {
-            SignUpTeam(name, password, email, username, additionalNotes, role);
+            // SignUpTeam(name, password, email, username, additionalNotes, role, isLead)
+            const res = await fetch(URL, {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, username, password, additionalNotes, userStatus, isLead, teamLeadMail }) 
+            })
             ref.current.click()
+            if(!res.ok) {
+                let { message } = await res.json()
+                console.log(message, "Error")
+            } else {
+                const { message, title } = await res.json()
+                updateMessage(title, message)
+            }
         } catch(err) {
             console.log(err)
         }
@@ -137,12 +190,14 @@ const AddTeamForm = (props: Props) => {
                 name="role"
                 render={({ field }) => (
                     <FormItem 
-                        className="mb-4"
+                        className={`mb-4 ${is_team_lead ? 'hidden': null}`}
                     >
                         <FormLabel>
                             Role of this user
                         </FormLabel>
-                        <Select onValueChange={field.onChange}>
+                        <Select 
+                            onValueChange={field.onChange}
+                        >
                             <SelectTrigger>
                                 <SelectValue 
                                     placeholder="Select Role"
@@ -152,13 +207,29 @@ const AddTeamForm = (props: Props) => {
                                 <SelectGroup>
                                     <SelectLabel>Types of Roles</SelectLabel>
                                     {
-                                        ['God', 'Admin'].map((item: any) => (
-                                            <SelectItem value={item} key={item}>{item}</SelectItem>
-                                        ))
-                                    }
+                                        ['God', 'User'].map((item: any) => <SelectItem value={item} key={item}>{item}</SelectItem>
+                                    )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                    </FormItem>
+                )}
+            />
+            {/* Is Lead */}
+            <FormField 
+                control={form.control}
+                name="isLead"
+                render={({ field }) => (
+                    <FormItem 
+                        className={`space-x-2 mb-6 mt-6 flex items-center ${is_team_lead ? 'hidden' : null}`}
+                    >
+                        <FormLabel className='mt-2'>
+                            Team leader?
+                        </FormLabel>
+                        <Checkbox 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
                     </FormItem>
                 )}
             />

@@ -3,6 +3,8 @@ export const getCurrentDate = () => {
     const date = new Date()
     const day = date.getDate()
     const monthName = date.toLocaleString('default', { month: 'long' })
+    const monthNumber = date.getMonth() + 1
+    const year = date.getFullYear()
 
     let hours= date.getHours()
     const minutes = date.getMinutes()
@@ -21,7 +23,7 @@ export const getCurrentDate = () => {
     // Ensure hours are not 0 for midnight or 12 for noon
     const formattedHours = hours === 0 ? 12 : hours
 
-    const dateString = `${monthName} ${day}`
+    const dateString = `${day}/${monthNumber}/${year}`
     const timeString = `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${amPm}`
 
     return { dateString, timeString }

@@ -7,6 +7,7 @@ import DataTableDropDown from "./_components/data-table-dropdown"
 import AllAction from "./_components/all-action"
 import ServiceCheckBox from "./_components/service-checkbox"
 import LoginType from "./_components/table-header/login-type"
+import TypeBadge from "./_components/type-badge"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -36,10 +37,20 @@ export const columns: ColumnDef<Service>[] = [
     }
   },
   {
-     accessorKey: "id",
-     header: () => <div className="remove-header"></div>,
-     cell:() => <div className="remove-header"></div>,
-    },
+    accessorKey: "id",
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
+  },
+  {
+    accessorKey: "company_name",
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
+  },
+  {
+    accessorKey: "additional_notes",
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
+  },
   {
     accessorKey: "user_name",
     header: "Username/Email",
@@ -52,9 +63,9 @@ export const columns: ColumnDef<Service>[] = [
     accessorKey: 'login_type',
     header: "Login type",
     cell: ({ row }) => {
-      const data: string = row.getValue('login_type');
-      const ssoData: string = row.getValue('sso_name');
-      const isSSO: boolean = row.getValue('is_sso');
+      const data: string = row.getValue('login_type')
+      const ssoData: string = row.getValue('sso_name')
+      const isSSO: boolean = row.getValue('is_sso')
 
       return <LoginType ssoName={ssoData} isSSO={isSSO} data={data} />
     }
@@ -63,7 +74,11 @@ export const columns: ColumnDef<Service>[] = [
     accessorKey: 'is_sso',
     header: () => <div className="remove-header"></div>,
     cell:() => <div className="remove-header"></div>,
-    
+  },
+  {
+    accessorKey: 'URL',
+    header: () => <div className="remove-header"></div>,
+    cell:() => <div className="remove-header"></div>,
   },
   {
     accessorKey: 'sso_name',
@@ -83,16 +98,7 @@ export const columns: ColumnDef<Service>[] = [
     header: "Type",
     cell: ({ row }) => {
       const data:string = row.getValue('type')
-      return (
-        <Badge
-          variant={'outline'} 
-          className="
-            bg-white text-foreground rounded-[6px]
-             p-2 w-[97px] hover:bg-white hover:text-foreground
-            font-inter font-semibold text-xs flex items-center justify-center">
-          {data}
-        </Badge>
-      )
+      return <TypeBadge data={data} />
     }
   },
   {
@@ -104,7 +110,27 @@ export const columns: ColumnDef<Service>[] = [
       const rowServicenameData: string = row.getValue('service_name')
       const boolean: boolean = row.getValue('is_sso')
       const serviceId:number = row.getValue('id')
-      
+      const rowTypeData: any = row.getValue('type')
+      const rowSSONameData: any = row.getValue('sso_name')
+      const rowCompanyNameData: any = row.getValue('company_name')
+      const rowLoginTypeData: any = row.getValue('login_type')
+      const rowURLData: any = row.getValue('URL')
+      const rowAdditionalNotesData: any = row.getValue('additional_notes')
+
+      const allRowData: any = {
+        serviceId,
+        rowUsernameData,
+        rowPasswordData,
+        rowServicenameData,
+        boolean,
+        rowTypeData,
+        rowSSONameData,
+        rowCompanyNameData,
+        rowLoginTypeData,
+        rowURLData,
+        rowAdditionalNotesData
+      }
+
       return(
         <DataTableDropDown 
           id={serviceId}
@@ -112,6 +138,7 @@ export const columns: ColumnDef<Service>[] = [
           rowUsernameData={rowUsernameData} 
           rowPasswordData={rowPasswordData}
           rowServicenameData={rowServicenameData}
+          allRowData={allRowData}
         />
       )
     }

@@ -1,5 +1,6 @@
 'use client'
 import Loading from '@/components/global/loading'
+import { useGlobalContext } from '@/components/global/my-global-context'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
@@ -8,10 +9,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { SheetClose, SheetFooter } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { getClients } from '@/lib/queries'
+import { getAlertContainer } from '@/utils/functions/alert-function'
+import { getCurrentDate } from '@/utils/functions/date'
+import { reloadPage } from '@/utils/functions/reload'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import React, { MutableRefObject, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { PacmanLoader } from 'react-spinners'
+import { EyeNoneIcon } from "@radix-ui/react-icons"
 import { z } from "zod"
 
 type Props = {
@@ -33,9 +39,15 @@ const UserAddCredentialFormSchema = z.object({
 
 const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClientsArray, tabs }: Props) => {
 
+
+  const { setAlertTitle, setAlertDescription } = useGlobalContext()
+
   let isTeamLead: boolean
   let name: string
   let email: string
+  let userIsTeamLead: boolean
+  let getUserTeamLeader: string
+  let sharedByEmail: any = null
   
   const router = useRouter()
   const clickRef: MutableRefObject<any>= useRef()
@@ -43,6 +55,7 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
   const [ newClientValue, setNewClientValue ]= useState<any>("")
   const [ disableSelect, setDisableSelect ] = useState(false)
   const [ loadingState, setLoadingState ] = useState(false)
+  const [ togglePassClick, setTogglePassClick ] = useState(false)
 
   const form = useForm<z.infer<typeof UserAddCredentialFormSchema>>({
     resolver: zodResolver(UserAddCredentialFormSchema),
@@ -58,6 +71,20 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
     }
   })
 
+  const messageFunction = (title: string, description: string) => {
+    getAlertContainer()
+    setAlertTitle(title)
+    setAlertDescription(description)
+  }
+
+  const successNotification = () => {
+    messageFunction('Success', 'Your credential is added successfully')
+    setTimeout(() => reloadPage(), 1500)
+  }
+
+  const notSuccessNotification = () => {
+    messageFunction("Error", "Something went WONG")
+  }
 
   const handleCredentialSubmit = async (
     // e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -65,7 +92,19 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
   ) => {
     name = currentSessionUser[0].user_name
     email = currentSessionUser[0].email
+    userIsTeamLead = currentSessionUser[0].is_team_lead
+    getUserTeamLeader = currentSessionUser[0].in_team
+
     const { client_name, service_name, type, user_name, password, url, additional_notes, shared_to_workspace } = values
+
+    const { dateString, timeString } = getCurrentDate()
+
+    if((shared_to_workspace) && (userIsTeamLead)) {
+      sharedByEmail= email
+    } else {
+      sharedByEmail= getUserTeamLeader
+    }
+
     const formData = {
       client_name,
       service_name,
@@ -76,25 +115,48 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
       additional_notes,
       shared_to_workspace,
       name,
-      email
+      email,
+      sharedByEmail
     }
+
+    const createdAtLogData = { name, email, dateString, timeString, service_name }
+
     try {
-      const res = await fetch("api/AddUserCredential", {
+      const res = await fetch("/api/UserCredential", {
         method: "POST",
         headers: {
           'Content-type': 'application/json'
         },
         body: JSON.stringify(formData)
       })
-
       if(!res.ok) {
         throw new Error("Error")
       } else {
+        successNotification()
+        clickRef.current.click()
         console.log("Success")
-      }
+        try {
+          const response = await fetch("/api/CreatedAtLog", {
+            method: "POST",
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify(createdAtLogData)
+          })
+          if(!response.ok) {
+            throw new Error("Error")
+          } else {
+            console.log("Success creating at log")
+          }
 
+        } catch(err) {
+          console.log("Error created log", err)
+        }
+      }
     } catch(err) {
-      console.log("Error", err)
+      notSuccessNotification()
+      clickRef.current.click()
+      console.log("Error post credentials", err)
     }
   }
 
@@ -157,7 +219,7 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
                         <SelectLabel>Type of credentials</SelectLabel>
                         {
                           initialClientsArray.length > 0 && (
-                            clientsArray.map((client: any, index: number) => <SelectItem disabled={disableSelect} value={client.client_name} key={client.number}>{client.client_name}</SelectItem>)
+                            clientsArray.map((client: any) => <SelectItem disabled={disableSelect} value={client.client_name} key={client.number}>{client.client_name}</SelectItem>)
                           )
                         }
                         {isTeamLead && (
@@ -174,7 +236,12 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
                             >
                               {
                                 loadingState ?
-                                  <Loading className='h-6 w-6' />
+                                  // <Loading className='h-6 w-6' />
+                                  <PacmanLoader 
+                                      color='#FFF'
+                                      speedMultiplier={5}
+                                      size={14}
+                                  />
                                 :
                                 "Add new client"
                               }
@@ -198,9 +265,9 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
                 </FormLabel>
                 <Select onValueChange={field.onChange}>
                   <SelectTrigger>
-                      <SelectValue 
-                          placeholder="Select type"
-                      />
+                    <SelectValue 
+                        placeholder="Select type"
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -246,9 +313,25 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder='' />
-                </FormControl>
+                <div className='w-full relative'>
+                  <FormControl>
+                    <Input
+                      type={
+                        togglePassClick ?
+                        "text"
+                        :
+                        "password"
+                      } 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <div
+                      onClick={() => setTogglePassClick(!togglePassClick)}
+                      className="absolute top-0 right-0 flex items-center justify-center h-full w-9 border-0 border-l cursor-pointer"
+                  >
+                      <EyeNoneIcon />
+                  </div>
+                </div>
               </FormItem>
             )}
           />
@@ -288,7 +371,10 @@ const UserAddCredentialForm = ({ currentSessionUser, clientsArray: initialClient
                   className='flex items-center space-x-2'
                 >
                   <FormControl>
-                    <Checkbox onChange={field.onChange} />
+                    <Checkbox 
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
                   </FormControl>
                   <FormLabel>Share to workspace</FormLabel>
                 </div>

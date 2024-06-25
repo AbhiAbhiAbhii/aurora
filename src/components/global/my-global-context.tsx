@@ -17,6 +17,12 @@ export type GlobalContent = {
   setIsGodCheck: (v: any) => void
   currentSessionUser: any
   setCurrentSessionUser: (v: any) => void
+  serviceTableName: any
+  setServiceTableName: (v: any) => void,
+  sharedCredentialsData: any,
+  setSharedCredentialData: (v: any) => void,
+  targetId: any,
+  setTargetId: (v: any) => void
 }
 export const MyGlobalContext = createContext<GlobalContent>({
 value: '', // set a default value
@@ -34,6 +40,12 @@ setCheckBoxIdValue: () => {},
 isGodCheck: '',
 setIsGodCheck: () => {},
 currentSessionUser: '',
-setCurrentSessionUser: () => {}
+setCurrentSessionUser: () => {},
+serviceTableName: '',
+setServiceTableName: () => {},
+sharedCredentialsData: '',
+setSharedCredentialData: () => {},
+targetId: '',
+setTargetId: () => {}
 })
 export const useGlobalContext = () => useContext(MyGlobalContext)

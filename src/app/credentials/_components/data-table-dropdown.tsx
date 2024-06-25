@@ -33,29 +33,32 @@ import VersionHistory from '@/components/logs/version_history/edit-version-histo
 import { MessageFunction } from '@/utils/functions/alert-function'
 import { reloadPage } from '@/utils/functions/reload'
 import { getCurrentDate } from '@/utils/functions/date'
+import UserEditCredentialForm from '@/components/forms/user-forms/user-edit-credential-form'
 
 type Props = {
   rowUsernameData: string,
   rowPasswordData: string,
   rowServicenameData: string,
   checkState: boolean,
-  id: number
+  id: number,
+  allRowData?: any
 }
 
-const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData, checkState, id }: Props) => {
+const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameData, checkState, id, allRowData }: Props) => {
 
-  const { setAlertTitle, setAlertDescription, value } = useGlobalContext()
+  const { setAlertTitle, setAlertDescription, value, isGodCheck, serviceTableName, tabValue } = useGlobalContext()
   const [ initValues, setInitValues ] = useState<any>()
-  const [ serviceURL, setServiceURL ] = useState<string>("")
+  const [ serviceURL, setServiceURL ] = useState<any>()
 
   const [ storeUsernameData, setStoreUsernameData ] = useState<string>("")
   const [ passwordData, setPasswordData ] = useState<string>("")
   const [ storeReceivermail, setStoreReceivermail ] = useState<string>("")
-  const [ storeServicenameData, setStoreServicenameData ] = useState<string>("")
 
   const [ editLogs, setEditLogs ] = useState<any>()
   const [ createdAtLog, setCreatedAtLog ] = useState<any>()
   const [ getCurrentAuthUser, setGetCurrentAuthUser ] = useState<any>()
+
+  let tableName
 
   let alertDialog: string = "Enter receiver's email"
   let itemClassName: string = "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-all hover:bg-[#F5F5F4]"
@@ -72,22 +75,21 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     }, 2000)
   }
 
-  const UserNameCopy = () => {
-    copyToClipBoard(rowUsernameData)
-    MessageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
-  }
-
-  const PasswordCopy = () => {
-    copyToClipBoard(rowPasswordData)
-    MessageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
-  }
-
   const messageFunction = (title: string, description: string) => {
     getAlertContainer()
     setAlertTitle(title)
     setAlertDescription(description)
   }
-
+  const PasswordCopy = () => {
+    copyToClipBoard(rowPasswordData)
+    messageFunction('Password Copied!', 'Your credential password is ready to be pasted.')
+  }
+  
+  const UserNameCopy = () => {
+    copyToClipBoard(rowUsernameData)
+    messageFunction('Username Copied!', 'Your credential username is ready to be pasted.')
+  }
+  
   const ItemDeletedSuccess = () => {
     messageFunction('Item Deleted', 'Your selected credential were deleted')
   }
@@ -96,23 +98,35 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
     messageFunction('Item not deleted', 'Something went wrong and credential was not deleted')
   }
 
-  const emailSendSuccess = () => {
-    messageFunction('Email Sent', `Your selected credential was sent to ${storeReceivermail}`)
-  }
+  // const emailSendSuccess = () => {
+  //   messageFunction('Email Sent', `Your selected credential was sent to ${storeReceivermail}`)
+  // }
+
+  const shareUpdateStatus = (title: string, description: string) => messageFunction(title, description)
 
   const DeleteItem = async () => {
-    let dataDeleted = await deleteItem(rowServicenameData)
-    if(!dataDeleted.error) {
-      ItemDeletedSuccess()
-    } else {
+    tableName = isGodCheck ? 'Service' : 'Users_Servicenames'
+    const deleteData = {rowServicenameData, tableName}
+    const res = await fetch("/api/UserCredential/DropDownDelete", {
+      method: "DELETE",
+      headers: {
+        'Content-type': 'applications/json'
+      },
+      body: JSON.stringify(deleteData)
+    })
+    if(!res.ok) {
       ItemDeletedError()
-    } 
-    setTimeout(() => reloadPage(), 1500)
+    } else {
+      ItemDeletedSuccess()
+      setTimeout(() => reloadPage(), 1500)
+    }
   }
 
   useEffect(() => {
     async function SetInitialValues() {
-      let data:any = await getServiceRowDetails(rowServicenameData)
+      let ourTableName: any = tabValue === 'Shared' ? 'shared_table' : serviceTableName
+
+      let data:any = await getServiceRowDetails(rowServicenameData, ourTableName)
       setInitValues(() => {
         let currentValue = data[0]
         return currentValue;
@@ -123,17 +137,18 @@ const DataTableDropDown = ({ rowUsernameData, rowPasswordData, rowServicenameDat
 
 useEffect(() => {
   async function getURLData() {
-    let data = await getServiceURL(id)
-    setServiceURL(() => data)
+    let ourTableName: any = tabValue === 'Shared' ? 'shared_table' : serviceTableName
+    let data: any = await getServiceURL(id, ourTableName)
+    let ourData: any =  data.URL
+    setServiceURL(() => ourData)
   }
-  getURLData();
-}, [serviceURL, id])
+  getURLData()
+}, [id])
 
 useEffect(() => {
-  setPasswordData(() => rowPasswordData);
-  setStoreUsernameData(() => rowUsernameData);
-  setStoreServicenameData(() => rowServicenameData);
-}, [rowUsernameData, rowPasswordData, rowServicenameData]);
+  setPasswordData(() => rowPasswordData)
+  setStoreUsernameData(() => rowUsernameData)
+}, [rowUsernameData, rowPasswordData])
 
 useEffect(() => {
   const fetchEditLogs = async () => {
@@ -162,29 +177,58 @@ const storeReceivermailInput = (e:any) => setStoreReceivermail(() => e.target.va
 
 const sendEmail = async () => {
 
-  const ourData = { passwordData, storeUsernameData, storeReceivermail, rowServicenameData }
-  
   const { name, email } = getCurrentAuthUser
-  const { dateString, timeString } = getCurrentDate() // destructure time and date
+  const {
+    boolean, 
+    rowCompanyNameData,
+    rowLoginTypeData,
+    rowPasswordData,
+    rowSSONameData,
+    rowServicenameData,
+    rowTypeData,
+    rowUsernameData,
+    serviceId,
+    rowURLData,
+    rowAdditionalNotesData,
+  } = allRowData
 
-  const itemsEdited = `${rowServicenameData} credentials was shared to ${storeReceivermail}`
+  const sendData = {
+    boolean, 
+    rowCompanyNameData,
+    rowLoginTypeData,
+    rowPasswordData,
+    rowSSONameData,
+    rowServicenameData,
+    rowTypeData,
+    rowUsernameData,
+    serviceId,
+    rowURLData,
+    rowAdditionalNotesData,
+    storeReceivermail
+  }
 
-  try {
-    const response = await fetch('/api/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ourData})
-    });
-    if(response.ok) {
-      console.log("Response is ok");
-      emailSendSuccess()
-      await insertEditLog(name, email, dateString, timeString, rowServicenameData, itemsEdited)
-      return await response.json();
-    }
-  } catch(error) {
-    console.log(error, "Mail failed to send")
+  const res = await fetch('/api/send', {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify(sendData)
+  })
+  
+  
+  if(!res.ok) {
+    const { title, message } = await res.json()
+    console.log(title, message, "network response not okay")
+    return shareUpdateStatus(title, message)
+  } else {
+    const { title, message } = await res.json()
+    const { dateString, timeString } = getCurrentDate()
+    const itemsEdited = `${rowServicenameData} credentials was shared to ${storeReceivermail}`
+
+    console.log(title, message, "network response okay")
+    await insertEditLog(name, email, dateString, timeString, rowServicenameData, itemsEdited)
+    
+    shareUpdateStatus(title, message)
   }
 }
 
@@ -200,10 +244,19 @@ const sendEmail = async () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <EditCredentialForm 
-          checkState={checkState}
-          serviceRowData={initValues}
-        />
+        {isGodCheck ? 
+          <EditCredentialForm 
+            checkState={checkState}
+            serviceRowData={initValues}
+          />
+        :
+          tabValue === 'Shared' ?
+          null
+          :
+          <UserEditCredentialForm 
+            serviceRowData={initValues}
+          />
+        }
         <DropdownMenuItem
           onClick={UserNameCopy}
         >
@@ -228,75 +281,84 @@ const sendEmail = async () => {
         >
           Copy Password
         </DropdownMenuItem>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <div className={itemClassName}>
-              Share Credential
-            </div>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{alertDialog}</AlertDialogTitle>
-              <AlertDialogDescription>
-                <input 
-                  placeholder='thahaseer@gradical.xyz'
-                  onChange={storeReceivermailInput}
-                  className={inputClassName}
-                />
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <DropdownMenuItem className='px-0 py-0 space-x-2'>
-                <AlertDialogAction
-                  className='p-0'
-                >
-                  <Button
-                    onClick={sendEmail}
+        {
+          tabValue === 'Shared' ?
+          null
+          :
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <div className={itemClassName}>
+                Share Credential
+              </div>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{alertDialog}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  <input 
+                    placeholder='thahaseer@gradical.xyz'
+                    onChange={storeReceivermailInput}
+                    className={inputClassName}
+                  />
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <DropdownMenuItem className='px-0 py-0 space-x-2'>
+                  <AlertDialogAction
+                    className='p-0'
                   >
-                    Share Credentials
-                  </Button>
-                </AlertDialogAction>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-              </DropdownMenuItem>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                    <Button
+                      onClick={sendEmail}
+                    >
+                      Share Credentials
+                    </Button>
+                  </AlertDialogAction>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                </DropdownMenuItem>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        }
         <DropdownMenuSeparator />
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <div role="menuitem" 
-              className={`${itemClassName} justify-between`} 
-              data-orientation="vertical" data-radix-collection-item=""
-            >
-              <AuroraText 
-                text="Delete"
-              />
-              <Trash2Icon size={15} />
-            </div>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the credential.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <DropdownMenuItem className='px-0 py-0'>
-                <AlertDialogAction
-                  className='p-0'
+        {tabValue === 'Shared' ?
+        null
+      :
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <div role="menuitem" 
+            className={`${itemClassName} justify-between`} 
+            data-orientation="vertical" data-radix-collection-item=""
+          >
+            <AuroraText 
+              text="Delete"
+            />
+            <Trash2Icon size={15} />
+          </div>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the credential.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <DropdownMenuItem className='px-0 py-0'>
+              <AlertDialogAction
+                className='p-0'
+              >
+                <Button
+                  onClick={DeleteItem}
                 >
-                  <Button
-                    onClick={DeleteItem}
-                  >
-                    Continue
-                  </Button>
-                </AlertDialogAction>
-              </DropdownMenuItem>
-            </AlertDialogFooter>
-          </AlertDialogContent>
+                  Continue
+                </Button>
+              </AlertDialogAction>
+            </DropdownMenuItem>
+          </AlertDialogFooter>
+        </AlertDialogContent>
       </AlertDialog>
+      }
       </DropdownMenuContent>
     </DropdownMenu>
   )

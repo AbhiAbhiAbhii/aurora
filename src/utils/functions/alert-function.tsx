@@ -5,7 +5,7 @@ export const getAlertContainer = () => {
     alertContainer?.classList.add('alert-active')
     setTimeout(() => {
       alertContainer?.classList.remove('alert-active')
-    }, 1000)
+    }, 1600)
 }
 
 export const MessageFunction = (title: string, description: string) => {
