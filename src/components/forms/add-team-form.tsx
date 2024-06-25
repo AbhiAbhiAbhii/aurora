@@ -58,7 +58,6 @@ const AddTeamForm = (props: Props) => {
         messageFunction(title, description)
     }
 
-    
     async function handleAddNewTeamSubmit(values: z.infer<typeof AddNewMemberFormSchema>) {
         const { name, email, username, password, additionalNotes, role, isLead } = values
         let userStatus

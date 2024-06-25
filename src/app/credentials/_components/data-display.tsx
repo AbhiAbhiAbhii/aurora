@@ -118,7 +118,6 @@ const DataDisplay = (props: Props) => {
         return usersAllData?.filter((user) => user.email !== getCurrentUserEmail)
       })
     }
-
     filteredUsersData()
   }, [])
 
@@ -160,51 +159,11 @@ const DataDisplay = (props: Props) => {
           } else null
         }
       }
+      console.log('WorkSpace Data useEffect')
       fetchWorkSpaceData() 
-    } else {
-      null
     }
-  }, [currentSessionUser, isGodCheck, isTeamLeadMail])
+  }, [currentSessionUser, isGodCheck, isTeamLeadMail, inTeamMail])
 
-  // Workspace data
-  // -------------------------
-
-  // Get Credential view data
-
-  // Deleting timer function
-  // useEffect(() => {
-  //   if(!isGodCheck) {
-  //     if(currentSessionUser) {
-  //       let email = currentSessionUser[0].email
-  //       const deleteOldRecords = async () => {
-  //         try {
-  //           const response = await fetch('/api/DeleteSharedRecords', {
-  //             method: 'POST',
-  //             headers: {
-  //               'Content-type': 'application/json'
-  //             },
-  //             body: JSON.stringify({email, targetId})
-  //           })
-  //           if(response.ok) {
-  //             const data = await response.json()
-  //             console.log(data.message, 'Our message')
-  //           }
-  //         } catch (error) {
-  //           console.error('Failed to delete old records:', error)
-  //         }
-  //       }
-    
-  //       // Set up a timer to delete old records every 30 seconds for testing
-  //       const interval = setInterval(deleteOldRecords, 30000)
-    
-  //       // Optionally, call the function once when the component mounts
-  //       deleteOldRecords()
-    
-  //       // Clean up the interval on component unmount
-  //       return () => clearInterval(interval)
-  //     }
-  //   }
-  // }, [currentSessionUser])
 
   return (
     <>
