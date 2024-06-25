@@ -37,7 +37,7 @@ const AddTeamMemberForm = (props: Props) => {
         })
 
         const { title, message } = await res.json()
-
+        ref.current.click()
         if(!res.ok) {
             console.log("Network response is not okay")
             updateMessage(title, message)
@@ -50,6 +50,7 @@ const AddTeamMemberForm = (props: Props) => {
     return (
         <form 
             className='space-y-4'
+            onSubmit={handleAddTeamMemberSubmit}
         >
             <div className='space-y-2'>
                 <label className={labelClassName}>
@@ -65,7 +66,7 @@ const AddTeamMemberForm = (props: Props) => {
                 <SheetClose className='hidden' ref={ref} />
                 <Button
                     className='w-[66%] !ml-0'
-                    onClick={handleAddTeamMemberSubmit}
+                    type='submit'
                 >
                     Add User
                 </Button>
