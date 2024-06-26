@@ -11,7 +11,7 @@ const AlertContainer = (props: Props) => {
 
   return (
     <div 
-        className="alert"
+        className="alert z-50"
     >
         <Alert>
             <RocketIcon
