@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
                 }) 
                 return NextResponse.json({ title: 'Success', message: "Successfully sent mail for signup" })
             } else {
-                return NextResponse.json({ message: "Error signing up", error})
+                return NextResponse.json({ message: "Email rate over", error})
             }
         } else {
             return NextResponse.json({ title: 'Error', message: "User already exists" })
