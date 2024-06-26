@@ -67,14 +67,14 @@ export async function POST(req: NextRequest) {
           shared_to_email: storeReceivermail,
           shared_by_email: 'GOD'
         })
-        // if(error === null) {
-        //    await resend.emails.send({
-        //     from: 'noreply@aurora.gradical.xyz',
-        //     to: `${storeReceivermail}`,
-        //     subject: "Credentials",
-        //     react: EmailTemplate({servicename: rowServicenameData}) as React.ReactElement,
-        //   })
-        // }
+        if(error === null) {
+           await resend.emails.send({
+            from: 'noreply@aurora.gradical.xyz',
+            to: `${storeReceivermail}`,
+            subject: "Credentials",
+            react: EmailTemplate({servicename: rowServicenameData}) as React.ReactElement,
+          })
+        }
         console.log('BBBBBBBBBBBBBBBBBBBBBBBB', error)
         return NextResponse.json({ title: 'Success', message: `Credentials has been sent to ${storeReceivermail}` }, { status: 200 })
       } else {

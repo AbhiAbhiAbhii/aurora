@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
         const { error } = await supabase.from(`${tableName}`).select().eq("email", email)
         if(error === null) {
             const { error } = await supabase.auth.signUp(signupData)
+            console.log(error, 'Signup error')
             if(!error) {
                 await supabase.from(`${tableName}`).insert({ // insert data into table
                     is_god: userStatus,
