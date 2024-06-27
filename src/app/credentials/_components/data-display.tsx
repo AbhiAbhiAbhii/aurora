@@ -139,9 +139,7 @@ const DataDisplay = (props: Props) => {
       const fetchWorkSpaceData = async () => {
 
         const fetchWorkSpaceDataUrl = '/api/UserCredential/WorkSpace'
-        const res = await fetch(fetchWorkSpaceDataUrl, {
-          cache: 'no-store'
-        })
+        const res = await fetch(fetchWorkSpaceDataUrl)
         if(!res.ok) {
           console.log("Error fetching workspace data")
         } else {
